@@ -46,9 +46,9 @@ jQuery(document).ready(function($) {
     $('body').append($mobileNav);
     $('body').prepend('<button type="button" id="mobileNavToggle"><i class="fa fa-bars"></i></button>');
     $('body').append('<div id="mobile-body-overly"></div>');
-    $('#mobileNav').find('.menu-has-children').prepend('<i class="fa fa-chevron-down"></i>');
+    $('#mobileNav').find('.menuHasChildren').prepend('<i class="fa fa-chevron-down"></i>');
 
-    $(document).on('click', '.menu-has-children i', function(e) {
+    $(document).on('click', '.menuHasChildren i', function(e) {
       $(this).next().toggleClass('menu-item-active');
       $(this).nextAll('ul').eq(0).slideToggle();
       $(this).toggleClass("fa-chevron-up fa-chevron-down");
