@@ -2,7 +2,7 @@
 
 $error = $name = $email = $message = $telephone = $company = "";
 
-$secret = "6Lf0UzkUAAAAAEt9jaseX6uDRt1RugeM0FIJ4r9Y";
+$secret = "";
 $response = null;
 $reCaptcha = new ReCaptcha($secret);
 if ($_POST["g-recaptcha-response"]) {
