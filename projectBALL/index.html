@@ -1,0 +1,1670 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset='utf-8'>
+<link  rel='shortcut icon' href='icon.ico'>
+<title>BALL</title>
+<style>
+	body{
+		background-color:#000;
+		margin:0;
+		padding:0;
+	}
+	#game{
+		background-color:#000;
+		display:block;
+		margin:0 auto;
+	}
+</style>
+
+</head>
+<body onresize='resize()' onload='init()'>
+<canvas id='game'></canvas>
+<script src='levels.js'></script>
+<script>
+var vehicles={
+	Human:new Profile('human','Human',[[[0]]],[[0]],[{xoff:0,yoff:0,r:0.55,fire:false}],[7,11,13],0,'default',1,1,10,3,17,5,5,5,5,1.1,false,0.007,0.15,0.25,0,1.3,1,1.2,true,0,1.3,2,2,2,2,1.01,true),
+	Start:new Profile('object','Start',[[[208]]],[[208]],[{xoff:0,yoff:0,r:0.38,fire:false}],[7,11,13],0,'default',1,1,10,3,17,5,5,5,5,1.1,false,0.007,0.15,0.25,0,1.3,1,1.2,true,0,1.3,2,2,2,2,1.01,true),
+	Finnish:new Profile('object','Finnish',[[[192]]],[[192]],[{xoff:0,yoff:0,r:0.55,fire:false}],[11,13],0,'default',1,1,10,3,17,5,5,5,5,1.1,false,0.007,0.15,0.25,0,1.3,1,1.2,true,0,1.3,2,2,2,2,1.01,true),
+	XP:new Profile('object','XP',[[[176]]],[[176]],[{xoff:0,yoff:0,r:0.38,fire:false}],[7,11,13],0,'default',1,1,10,3,17,5,5,5,5,1.1,false,0.007,0.15,0.25,0,1.3,1,1.2,true,0,1.3,2,2,2,2,1.01,true),
+	DeltaSurgeX:new Profile('car','Delta Surge X',[[[1,2],[17,18],[33,34],[49,50]],[[65,66],[81,82],[97,98],[113,114]],[[129,130],[145,146],[161,162],[177,178]]],[[193,194],[209,210],[225,226],[241,242]],[{xoff:0,yoff:-1.5,r:1,fire:{health:2,fullHealth:2,time:200,link:[[0,1],[1,0.5]]}},{xoff:0,yoff:0,r:1,fire:{health:1,fullHealth:1,time:100,link:[[1,1],[2,1]]}},{xoff:0,yoff:1.5,r:1,fire:{health:1.5,fullHealth:1.5,time:200,link:[[2,0.5],[3,1]]}}],[7,11,13],3,'default',1,1,2,30,4,4,5,4,5,1.05,true,0.01,0.4,1,0.1,1.5,1.5,1.1,false,50,1.5,3,3,3,3,1.01,false),
+	DeltaSurgeX2:new Profile('car','Delta Surge X2',[[[3,4],[19,20],[35,36],[51,52]],[[67,68],[83,84],[99,100],[115,116]],[[131,132],[147,148],[163,164],[179,180]]],[[195,196],[211,212],[227,228],[243,244]],[{xoff:0,yoff:-1.5,r:1,fire:{health:2,fullHealth:2,time:200,link:[[0,1],[1,0.5]]}},{xoff:0,yoff:0,r:1,fire:{health:1,fullHealth:1,time:100,link:[[1,1],[2,1]]}},{xoff:0,yoff:1.5,r:1,fire:{health:1.5,fullHealth:1.5,time:200,link:[[2,0.5],[3,1]]}}],[7,11,13],3,'default',1,1,2,30,4,4,5,4,5,1.05,true,0.01,0.4,1.3,0.3,1.5,1.5,1.1,false,50,1.5,2,2,2,2,1.01,false),
+	DeltaSurgeX3:new Profile('car','Delta Surge X3',[[[5,6],[21,22],[37,38],[53,54]],[[69,70],[85,86],[101,102],[117,118]],[[133,134],[149,150],[165,166],[181,182]]],[[197,198],[213,214],[229,230],[245,246]],[{xoff:0,yoff:-1.5,r:1,fire:{health:2,fullHealth:2,time:200,link:[[0,1],[1,0.5]]}},{xoff:0,yoff:0,r:1,fire:{health:1,fullHealth:1,time:100,link:[[1,1],[2,1]]}},{xoff:0,yoff:1.5,r:1,fire:{health:1.5,fullHealth:1.5,time:200,link:[[2,0.5],[3,1]]}}],[7,11,13],3,'default',1,1,2,30,4,4,5,4,5,1.05,true,0.01,0.6,1.6,0.3,1.5,1.5,1.1,false,50,1.5,2,2,2,2,1.01,false),
+	DeltaSurgeY:new Profile('car','Delta Surge Y',[[[7,8],[23,24],[39,40],[55,56]],[[71,72],[87,88],[103,104],[119,120]],[[135,136],[151,152],[167,168],[183,184]]],[[199,200],[215,216],[231,232],[247,248]],[{xoff:0,yoff:-1.5,r:1,fire:{health:2,fullHealth:2,time:200,link:[[0,1],[1,0.5]]}},{xoff:0,yoff:0,r:1,fire:{health:1,fullHealth:1,time:100,link:[[1,1],[2,1]]}},{xoff:0,yoff:1.5,r:1,fire:{health:1.5,fullHealth:1.5,time:200,link:[[2,0.5],[3,1]]}}],[7,11,13],3,'default',1,1,2,30,4,4,5,4,5,1.05,true,0.01,0.7,1.5,0.4,1.5,1.5,1.1,false,50,1.5,2,2,2,2,1.01,false),
+	DeltaSurgeY2:new Profile('car','Delta Surge Y2',[[[9,10],[25,26],[41,42],[57,58]],[[73,74],[89,90],[105,106],[121,122]],[[137,138],[153,154],[169,170],[185,186]]],[[201,202],[217,218],[233,234],[249,250]],[{xoff:0,yoff:-1.5,r:1,fire:{health:3,fullHealth:3,time:200,link:[[0,1],[1,0.5]]}},{xoff:0,yoff:0,r:1,fire:{health:1,fullHealth:1,time:100,link:[[1,1],[2,1]]}},{xoff:0,yoff:1.5,r:1,fire:{health:2,fullHealth:2,time:200,link:[[2,0.5],[3,1]]}}],[7,11,13],3,'default',1,1,2,30,4,4,5,4,5,1.05,true,0.01,0.5,1,0.5,1.5,1.5,1.1,false,50,1.5,2,2,2,2,1.01,false),
+	DeltaSurgeZ:new Profile('car','Delta Surge Z',[[[11,12],[27,28],[43,44],[59,60]],[[75,76],[91,92],[107,108],[123,124]],[[139,140],[155,156],[171,172],[187,188]]],[[203,204],[219,220],[235,236],[251,252]],[{xoff:0,yoff:-1.5,r:1,fire:{health:3,fullHealth:3,time:200,link:[[0,1],[1,0.5]]}},{xoff:0,yoff:0,r:1,fire:{health:1,fullHealth:1,time:100,link:[[1,1],[2,1]]}},{xoff:0,yoff:1.5,r:1,fire:{health:2,fullHealth:2,time:200,link:[[2,0.5],[3,1]]}}],[7,11,13],3,'default',1,1,2,30,4,4,5,4,5,1.05,true,0.01,0.9,1.8,1,1.5,1.5,1.1,false,50,1.5,2,2,2,2,1.01,false)
+}
+var vehicleNames=['DeltaSurgeX','DeltaSurgeX2','DeltaSurgeX3','DeltaSurgeY','DeltaSurgeY2','DeltaSurgeZ'];
+var canvas=document.getElementById('game');
+var ctx=canvas.getContext('2d')
+var width,height,widthHeight,min,max,resizeTimeout,defaultSize,size,loop,level,menuGradient,damageGradient,deathGradient,shadowGradient,count=0,loopCounter=0,objectsOnScreen=[],refreshOnKey=false;
+var player=new Player();
+var mouse={x:0,y:0,startX:0,startY:0,start:0,down:false}
+var textures=new Image();
+textures.src='textures.png';
+var vehicleTextures=new Image();
+vehicleTextures.src='vehicles.png';
+var vehicleMap=[];
+var mobileDevice=/Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|Opera Mini/i.test(navigator.userAgent);
+function init(){
+	//player.screen='game'; //'menu','pauseMenu','game','none'
+	//resize();
+	loadLevel(levels[0]);
+	document.body.style.backgroundColor='FFF';
+	canvas.style.backgroundColor='FFF';
+	ctx.textAlign='center';
+	ctx.textBaseline='middle';
+	startLoop();
+}
+function loadLevel(lvl){
+	endLoop();
+	resizeTimeout=undefined;
+	count=0;loopCounter=0;objectsOnScreen=[];
+	level=lvl;
+	player.profile.movementBinding.shift='controllable';
+	player.profile.movementBinding.angles='controllable';
+	player.profile.movementBinding.forward='controllable';
+	player.profile.movementBinding.backward='controllable';
+	player.profile.focused=true;
+	player.profile.realtime.position.x=level.spawn.x-Math.floor(-0.5+level.map.width/2)-1;
+	player.profile.realtime.position.y=level.spawn.y-Math.floor(-0.5+level.map.height/2)-1;
+	player.profile.realtime.oldPosition.x=player.profile.realtime.position.x;
+	player.profile.realtime.oldPosition.y=player.profile.realtime.position.y;
+	player.profile.realtime.angle=level.spawn.angle;
+	player.profile.spawn.x=player.profile.realtime.x;
+	player.profile.spawn.y=player.profile.realtime.y;
+	player.profile.spawn.angle=player.profile.realtime.angle;
+	player.camera.x=player.profile.realtime.position.x;
+	player.camera.y=player.profile.realtime.position.y;
+	player.camera.angle=player.profile.realtime.angle;
+	player.camera.scale=1;
+	resize(false);
+	vehicleMap=[];
+	for(var i=0;i<level.vehicles.length;i++){
+		var a=level.vehicles[i],vehicleName=a[0],m=a[4]||'';
+		switch(vehicleName){
+			case 'RandomCar':vehicleName=vehicleNames[rnd(0,vehicleNames.length-1,true)];break;
+		}
+		var v=spawnVehicle(a[1]||0,a[2]||0,a[3]||0,eval('vehicles.'+vehicleName),m);
+		v.spawn.vehicle=a[0];v.spawn.x=(a[1]||0);v.spawn.y=(a[2]||0);v.spawn.angle=(a[3]||0);
+		v.tag=a[5]||'';
+		var m=(m||'').split(',');
+		for(var j=0;j<m.length;j++){
+			switch(m[j]){
+				case 'up':v.realtime.up=true;break;
+				case 'down':v.realtime.down=true;break;
+				case 'left':v.realtime.left=true;break;
+				case 'right':v.realtime.right=true;break;
+				case 'shift':v.realtime.shift=true;break;
+			}
+		}
+	}
+	startLoop();
+}
+function respawn(i){
+	var oldObj=objectsByID[i],vehicle=oldObj.spawn.vehicle;
+	switch(vehicle){
+		case 'RandomCar':vehicle=vehicleNames[rnd(0,vehicleNames.length-1,true)];break;
+	}
+	var obj=clone(eval('vehicles.'+vehicle));
+	obj.spawn=clone(oldObj.spawn);
+	obj.id=oldObj.id;
+	for(var i=0;i<oldObj.vehiclesMounted.length;i++) dismountVehicle(oldObj.vehiclesMounted[i]);
+	
+	var px=obj.spawn.x-Math.floor(-0.5+level.map.width/2);
+	var py=obj.spawn.y-Math.floor(-0.5+level.map.height/2);
+	obj.realtime.position.x=px;
+	obj.realtime.position.y=py;
+	obj.realtime.angle=obj.spawn.angle;
+	obj.realtime.oldPosition.x=px;
+	obj.realtime.oldPosition.y=py;
+	objectsByID[obj.id]=obj;
+	stepObject(i);
+	var m=obj.spawn.movement.split(',');
+	for(var i=0;i<m.length;i++){
+		switch(m[i]){
+			case 'up':obj.realtime.up=true;break;
+			case 'down':obj.realtime.down=true;break;
+			case 'left':obj.realtime.left=true;break;
+			case 'right':obj.realtime.right=true;break;
+			case 'shift':obj.realtime.shift=true;break;
+		}
+	}
+	for(var i=0;i<obj.sprites[0].length;i++) obj.damage[i]=0;
+}
+function Vector2(x,y){
+	this.x=x||0;
+	this.y=y||0;
+}
+function Profile(parent,vehicle,sprites,explodedSprite,collisionMask,collisionTiles,maxRiders,camType,camTiltX,
+camTiltY,camSmoothPos,camSmoothAngle,camLookAhead,turnLeftSpeed,turnLeftSmoothing,
+turnRightSpeed,turnRightSmoothing,turnFriction,reversedBackwardTurns,forwardSpeed,maxForwardSpeed,
+maxForwardSpeed2,forwardMaxedRocket,backwardSpeedRatio,maxBackwardSpeedRatio,moveFriction,turnWhenStopped,
+acceleratingTurnSpeed,heightFriction,wallBounceFrictionTop,wallBounceFrictionBottom,wallBounceFrictionLeft,
+wallBounceFrictionRight,wallSlideFriction,allowJumping){
+	this.parent=parent||'none';
+	this.vehicle=vehicle||'none';
+	this.sprites=sprites||[
+		[[1,2],[17,18],[33,34],[49,50]],
+		[[65,66],[81,82],[97,98],[113,114]],
+		[[129,130],[145,146],[161,162],[177,178]]
+	];
+	this.explodedSprite=explodedSprite||[[193,194],[209,210],[225,226],[241,242]];
+	this.collisionMask=collisionMask||[{xoff:0,yoff:-1.5,r:1,fire:{health:2,fullHealth:2,time:200,link:[[0,1],[1,0.5]]}},{xoff:0,yoff:0,r:0.5,fire:{health:0.5,fullHealth:0.5,time:100,link:[[1,1],[2,1]]}},{xoff:0,yoff:1.5,r:1,fire:{health:1,fullHealth:1,time:200,link:[[2,0.5],[3,1]]}}];
+	this.collisionTiles=collisionTiles||[1,4];
+	this.maxRiders=maxRiders;
+	this.camera={
+		type:camType||'default', //'default', 'locked', 'fixed', 'fixed-angle'
+		tilt3D:new Vector2(camTiltX||1,camTiltY||1),
+		smooth:{position:camSmoothPos||2,angle:camSmoothAngle||30,lookAhead:camLookAhead||4}
+	}
+	this.turnLeftSpeed=turnLeftSpeed;
+	this.turnLeftSmoothing=turnLeftSmoothing;
+	this.turnRightSpeed=turnRightSpeed;
+	this.turnRightSmoothing=turnRightSmoothing;
+	this.turnFriction=turnFriction;
+	this.reversedBackwardTurns=reversedBackwardTurns;
+	this.forwardSpeed=forwardSpeed;
+	this.maxForwardSpeed=maxForwardSpeed;
+	this.maxForwardSpeed2=maxForwardSpeed2;
+	this.forwardMaxedRocket=forwardMaxedRocket;
+	this.backwardSpeedRatio=backwardSpeedRatio;
+	this.maxBackwardSpeedRatio=maxBackwardSpeedRatio;
+	this.moveFriction=moveFriction;
+	this.turnWhenStopped=turnWhenStopped;
+	this.acceleratingTurnSpeed=acceleratingTurnSpeed;
+	this.heightFriction=heightFriction;
+	this.wallBounceFriction={
+		top:wallBounceFrictionTop||2,
+		bottom:wallBounceFrictionBottom||2,
+		left:wallBounceFrictionLeft||2,
+		right:wallBounceFrictionRight||2
+	}
+	this.wallSlideFriction=wallSlideFriction;
+	this.allowJumping=allowJumping;
+	if(maxRiders===undefined) this.maxRiders=3;
+	if(turnLeftSpeed===undefined) this.turnLeftSpeed=4;
+	if(turnLeftSmoothing===undefined) this.turnLeftSmoothing=5;
+	if(turnRightSpeed===undefined) this.turnRightSpeed=4;
+	if(turnRightSmoothing===undefined) this.turnRightSmoothing=5;
+	if(turnFriction===undefined) this.turnFriction=1.05;
+	if(reversedBackwardTurns===undefined) this.reversedBackwardTurns=true;
+	if(forwardSpeed===undefined) this.forwardSpeed=0.01;
+	if(maxForwardSpeed===undefined) this.maxForwardSpeed=0.5;
+	if(maxForwardSpeed2===undefined) this.maxForwardSpeed2=1.5;
+	if(forwardMaxedRocket===undefined) this.forwardMaxedRocket=0.2;
+	if(backwardSpeedRatio===undefined) this.backwardSpeedRatio=1.5;
+	if(maxBackwardSpeedRatio===undefined) this.maxBackwardSpeedRatio=1.5;
+	if(moveFriction===undefined) this.moveFriction=1.1;
+	if(turnWhenStopped===undefined) this.turnWhenStopped=false;
+	if(acceleratingTurnSpeed===undefined) this.acceleratingTurnSpeed=50;
+	if(heightFriction===undefined) this.heightFriction=1.3;
+	if(wallSlideFriction===undefined) this.wallSlideFriction=1.01;
+	if(allowJumping===undefined) this.allowJumping=true;
+	this.enabled=true;
+	this.visible=true;
+	this.focused=false;
+	this.realtime={
+		position:new Vector2(),
+		oldPosition:new Vector2(),
+		coords:{x:undefined,y:undefined},
+		height:0,
+		lastCorrectPosition:new Vector2(),
+		angle:0,
+		velocity:new Vector2(),
+		rotVelocity:0,
+		heightVelocity:0,
+		up:false,
+		down:false,
+		left:false,
+		right:false,
+		shift:false,
+		inAir:false
+	}
+	this.spawn={x:0,y:0,angle:0,vehicle:'Human',movement:''}
+	this.ridingVehicle=false;
+	this.vehiclesMounted=false;
+	this.movementBinding={ //'none', 'controllable'
+		shift:'none',
+		angles:'none',
+		forward:'none',
+		backward:'none'
+	}
+	this.tag='';
+	this.damage=[];
+	this.fire={
+		onFire:false,
+		explosionCountdown:0
+	}
+	this.exploded=false;
+	this.destroy=false;
+	this.respawnCountdown=undefined;
+	this.id=-1;
+	return this;
+}
+function Player(){
+	this.renderMargins=4;
+	this.screen='menu';
+	this.menu={
+		position:new Vector2(),
+		angle:0,
+		scale:2,
+		changeInterval:200,
+		smooth:{position:600,angle:180,scale:400},
+		target:{position:new Vector2(),angle:180,scale:1},
+		selection:0,
+		buttons:[],
+		buttonHeight:1.2,
+		btnSmoothing:4,
+		btnTarget:new Vector2(),
+		transitionTo:-1,
+		transitionStart:0
+	}
+	this.camera={
+		x:0,
+		y:0,
+		angle:0,
+		scale:1,
+		fadeOpacity:0,
+		fadeColor:'0,0,0'
+	}
+	this.messages=[];
+	this.pausable=true;
+	this.profile=clone(vehicles.Human);
+	this.profile.id=(objectsByID.indexOf(undefined)==-1)?objectsByID.length:objectsByID.indexOf(undefined);
+	objectsByID[this.profile.id]=this.profile;
+}
+function jump(i,height){
+	if(!level.allowJumping) return;
+	var obj=objectsByID[i];
+	if(!obj.allowJumping) return;
+	if(obj.ridingVehicle!=false) obj=objectsByID[obj.ridingVehicle];
+	if(obj.realtime.inAir) return;
+	obj.realtime.heightVelocity=height;
+	obj.realtime.inAir=true;
+}
+function clone(obj){
+	return JSON.parse(JSON.stringify(obj));
+}
+function resize(redraw){
+	clearTimeout(resizeTimeout);
+	resizeTimeout=setTimeout(function(){
+		width=window.innerWidth||document.documentElement.clientWidth||document.body.clientWidth;
+		height=window.innerHeight||document.documentElement.clientHeight||document.body.clientHeight;
+		//min=width>=height?height:width;
+		//width=height=min; //square
+		widthHeight=comparePoints(width,height).distance;
+		canvas.width=width;
+		canvas.height=height;
+		mouse.x=width/2;mouse.y=height/2;mouse.startX=width/2;mouse.startY=height/2;
+		defaultSize=Math.floor((widthHeight/15)*level.scale);
+		defaultSize=defaultSize%2?defaultSize:defaultSize-1;
+		if(mobileDevice) defaultSize*=3;
+		menuGradient=ctx.createRadialGradient(width/2,height/2,0,width/2,height/2,widthHeight/2);
+			menuGradient.addColorStop(0,'rgba(0,0,0,0)');
+			menuGradient.addColorStop(1,'white');
+			deathGradient=ctx.createRadialGradient(width/2,height/2,defaultSize,width/2,height/2,widthHeight/2);
+			deathGradient.addColorStop(0.3,'rgba(0,0,0,0)');
+			deathGradient.addColorStop(1,'black');
+			shadowGradient=ctx.createRadialGradient(0,0,0,0,0,defaultSize/5);
+			shadowGradient.addColorStop(0,'black');
+			shadowGradient.addColorStop(1,'rgba(0,0,0,0)');
+		if(player.screen=='game'&&redraw!==false){
+			drawMap();
+			drawObjects();
+		}
+	},resizeTimeout===undefined?0:200);
+}
+function cls(){
+	ctx.setTransform(1,0,0,1,0,0);
+	ctx.clearRect(0,0,width,height);
+}
+var keys={up:false,down:false,left:false,right:false,shift:false,ctrl:false,alt:false,esc:false,space:false,backspace:false,enter:false}
+document.onkeydown=function(e){
+	var evtobj=window.event?event:e;
+	var key=evtobj.charCode?evtobj.charCode:evtobj.keyCode;
+	switch(key){
+		case 38:
+			keys.up=true;
+			if((player.screen=='menu'||player.screen=='pauseMenu')&&player.menu.transitionTo==-1&&count>130) if(player.menu.selection>0) player.menu.selection--;
+			break;
+		case 40:
+			keys.down=true;
+			if((player.screen=='menu'||player.screen=='pauseMenu')&&player.menu.transitionTo==-1&&count>130) if(player.menu.selection<player.menu.buttons.length-1) player.menu.selection++;
+			break;
+		case 37:
+			keys.left=true;
+			break;
+		case 39:
+			keys.right=true;
+			break;
+		case 27:
+			keys.esc=true;
+			if(player.screen=='pauseMenu'){
+				player.menu.selection=0;
+			}
+			break;
+		case 32:
+			keys.space=true;
+			break;
+		case 8:
+			keys.backspace=true;
+			break;
+		case 13:
+			keys.enter=true;
+			if((player.screen=='menu'||player.screen=='pauseMenu')&&player.menu.transitionTo==-1&&count>130){
+				player.menu.transitionTo=player.menu.selection;
+				player.menu.transitionStart=count;
+			}
+			break;
+		case 116:
+			return;
+			break;
+		case 122:
+			return;
+			break;
+		case 123:
+			return;
+			break;
+	}
+	keys.ctrl=evtobj.ctrlKey;
+	keys.shift=evtobj.shiftKey;
+	keys.alt=evtobj.altKey;
+	if(player.screen=='game'){
+		if(keys.ctrl) searchForVehicle();
+		if(keys.up||keys.down||keys.left||keys.right||keys.space||keys.backspace||keys.esc) startLoop();
+	}
+	e.preventDefault();
+}
+document.onkeyup=function(e){
+	var evtobj=window.event?event:e;
+	var key=evtobj.charCode?evtobj.charCode:evtobj.keyCode;
+	switch(key){
+		case 38:
+			keys.up=false;
+			break;
+		case 40:
+			keys.down=false;
+			break;
+		case 37:
+			keys.left=false;
+			break;
+		case 39:
+			keys.right=false;
+			break;
+		case 27:
+			keys.esc=false;
+			break;
+		case 32:
+			keys.space=false;
+			break;
+		case 8:
+			keys.backspace=false;
+			break;
+		case 13:
+			keys.enter=false;
+			break;
+	}
+	keys.ctrl=evtobj.ctrlKey;
+	keys.shift=evtobj.shiftKey;
+	keys.alt=evtobj.altKey;
+	e.preventDefault();
+}
+
+
+canvas.addEventListener("touchmove",mousemove,false);
+canvas.addEventListener("mousemove",mousemove,false);
+function mousemove(e){
+	if(e.changedTouches!==undefined) e=e.changedTouches[0];
+	mouse.x=e.pageX-canvas.offsetLeft;
+	mouse.y=e.pageY-canvas.offsetTop;
+	if(mouse.down){
+		keys.left=mouse.x<width/4;
+		keys.right=mouse.x>width-width/4;
+		keys.up=mouse.y<height/4;
+		keys.down=mouse.y>height-height/4;
+	}
+	if(e.changedTouches!==undefined) if(e.changedTouches.length>=2) keys.shift=true;
+}
+
+canvas.addEventListener("touchstart",mousedown,false);
+canvas.addEventListener("mousedown",mousedown,false);
+function mousedown(e){
+	if(e.changedTouches!==undefined) e=e.changedTouches[0];
+	mouse.startX=e.pageX-canvas.offsetLeft;
+	mouse.startY=e.pageY-canvas.offsetTop;
+	mouse.start=count;
+	mouse.down=true;
+	if(player.screen=='game'){
+		player.profile.realtime.rotVelocity=10*(0.5-mouse.x/width);
+		keys.left=mouse.x<width/4;
+		keys.right=mouse.x>width-width/4;
+		keys.up=mouse.y<height/4;
+		keys.down=mouse.y>height-height/4;
+		if(e.changedTouches!==undefined) if(e.changedTouches.length>=2) keys.shift=true;
+	}
+}
+
+canvas.addEventListener("touchend",mouseup,false);
+canvas.addEventListener("mouseup",mouseup,false);
+function mouseup(e){
+	if(refreshOnKey){
+		refreshOnKey=false;
+		location.reload();
+	}
+	mouse.down=false;
+	if(e.changedTouches!==undefined) if(e.changedTouches.length>=2){
+		if(!searchForVehicle()) jump(player.profile.id,0.3)
+	}
+	keys.up=false;
+	keys.down=false;
+	keys.left=false;
+	keys.right=false;
+	keys.shift=false;
+}
+
+canvas.ondblclick=function(e){
+	if(player.screen=='game') searchForVehicle();
+}
+function searchForVehicle(){
+	if(player.profile.ridingVehicle===false){
+		var minDist=3,index;
+		for(var i=0;i<objectsOnScreen.length;i++){
+			var d=comparePoints(player.profile.realtime.position.x,player.profile.realtime.position.y,objectsByID[objectsOnScreen[i]].realtime.position.x,objectsByID[objectsOnScreen[i]].realtime.position.y).distance;
+			if(d<=minDist){
+				minDist=d;
+				index=i;
+			}
+		}
+		if(index!==undefined){
+			mountVehicle(objectsOnScreen[index]);
+			startLoop();
+			return true;
+		}else return false;
+	}else{
+		if(objectsByID[player.profile.ridingVehicle].exploded==false) dismountVehicle(player.profile.index);
+	}
+}
+function mountVehicle(i,j){
+	var obj=objectsByID[i];
+	if(obj.exploded) return;
+	if(obj.vehiclesMounted.length||0>=obj.maxRiders) return;
+	var rider=(j===undefined)?player.profile:objectsByID[j];
+	if(obj.vehiclesMounted==false){ //1st player controls the car
+		rider.enabled=false;
+		rider.focused=false;
+		obj.focused=true;
+		obj.vehiclesMounted=[rider.id];
+		obj.movementBinding.shift='controllable';
+		obj.movementBinding.angles='controllable';
+		obj.movementBinding.forward='controllable';
+		obj.movementBinding.backward='controllable';
+		rider.ridingVehicle=obj.id;
+	}else{
+		if(obj.vehiclesMounted.indexOf(rider.id)==-1){
+			rider.enabled=false;
+			rider.focused=false;
+			obj.focused=true;
+			obj.vehiclesMounted.push(rider.id);
+			rider.ridingVehicle=i;
+		}
+	}
+	msg(obj.vehicle);
+	startLoop();
+}
+function dismountVehicle(i){
+	var rider=objectsByID[i]||player.profile;
+	if(rider.ridingVehicle!==false){
+		var obj=objectsByID[rider.ridingVehicle];
+		rider.enabled=true;
+		player.pausable=true;
+		if(rider.id==player.profile.id) rider.focused=true;
+		obj.focused=false;
+		obj.vehiclesMounted.splice(obj.vehiclesMounted.indexOf(rider.id),1);
+		obj.movementBinding.shift='none';
+		obj.movementBinding.angles='none';
+		obj.movementBinding.forward='none';
+		obj.movementBinding.backward='none';
+		obj.realtime.up=false;
+		obj.realtime.down=false;
+		obj.realtime.left=false;
+		obj.realtime.right=false;
+		obj.realtime.shift=false;
+		rider.ridingVehicle=false;
+		rider.realtime.position.x+=1.2*Math.sin((obj.realtime.angle-90)*Math.PI/180);
+		rider.realtime.position.y+=1.2*Math.cos((obj.realtime.angle-90)*Math.PI/180);
+		rider.realtime.rotVelocity+=obj.realtime.rotVelocity;
+		rider.realtime.heightVelocity+=obj.realtime.heightVelocity;
+		rider.realtime.velocity.x+=obj.realtime.velocity.x;
+		rider.realtime.velocity.y+=obj.realtime.velocity.y;
+		player.camera.scale=1;
+	}
+	startLoop();
+}
+function drawMap(){
+	overlayTiles=[];
+	objectsOnScreen=[];
+	size=defaultSize*player.camera.scale;
+	var visitedCells=[];
+	var activeCells=[Math.round(player.camera.x)+','+Math.round(player.camera.y)];
+	var d=Math.sqrt(2*size*size)/2;
+	//d=0; //debugging
+	var marginCells=[];
+	while(activeCells.length>0){
+		var newActiveCells=[];
+		var i=0;
+		while(i<activeCells.length){
+			var nx=Number(activeCells[i].split(',')[0]);
+			var ny=Number(activeCells[i].split(',')[1]);
+			visitedCells.push(activeCells[i]);
+			var p=getScreenCoordinates(nx+1,ny);
+			var p2=(nx+1)+','+ny;
+			if(visitedCells.indexOf(p2)==-1&&activeCells.indexOf(p2)==-1&&newActiveCells.indexOf(p2)==-1) if(p.x<width+d&&p.x>-d&&p.y<height+d&&p.y>-d){newActiveCells.push(p2)}else{marginCells.push(p2)}
+			var p=getScreenCoordinates(nx-1,ny);
+			var p2=(nx-1)+','+ny;
+			if(visitedCells.indexOf(p2)==-1&&activeCells.indexOf(p2)==-1&&newActiveCells.indexOf(p2)==-1) if(p.x<width+d&&p.x>-d&&p.y<height+d&&p.y>-d){newActiveCells.push(p2)}else{marginCells.push(p2)}
+			var p=getScreenCoordinates(nx,ny+1);
+			var p2=nx+','+(ny+1);
+			if(visitedCells.indexOf(p2)==-1&&activeCells.indexOf(p2)==-1&&newActiveCells.indexOf(p2)==-1) if(p.x<width+d&&p.x>-d&&p.y<height+d&&p.y>-d){newActiveCells.push(p2)}else{marginCells.push(p2)}
+			var p=getScreenCoordinates(nx,ny-1);
+			var p2=nx+','+(ny-1);
+			if(visitedCells.indexOf(p2)==-1&&activeCells.indexOf(p2)==-1&&newActiveCells.indexOf(p2)==-1) if(p.x<width+d&&p.x>-d&&p.y<height+d&&p.y>-d){newActiveCells.push(p2)}else{marginCells.push(p2)}
+			var p=getScreenCoordinates(nx,ny);
+			ctx.setTransform(1/player.profile.camera.tilt3D.x,0,0,1/player.profile.camera.tilt3D.y,p.x,p.y);
+			ctx.rotate(player.camera.angle*Math.PI/180);
+			var mx=nx+Math.floor(-0.5+level.map.width/2);
+			var my=ny+Math.floor(-0.5+level.map.height/2);
+			drawTile(mx,my);
+			checkPositionForVehicles(mx,my);
+			i++;
+		}
+		activeCells=newActiveCells;
+	}
+	if(!mobileDevice) for(var j=0;j<player.renderMargins;j++){
+		var newMarginCells=[];
+		var i=0;
+		while(i<marginCells.length){
+			var nx=Number(marginCells[i].split(',')[0]);
+			var ny=Number(marginCells[i].split(',')[1]);
+			visitedCells.push(marginCells[i]);
+			var p=getScreenCoordinates(nx+1,ny);
+			var p2=(nx+1)+','+ny;
+			if(visitedCells.indexOf(p2)==-1&&marginCells.indexOf(p2)==-1&&newMarginCells.indexOf(p2)==-1) newMarginCells.push(p2);
+			var p=getScreenCoordinates(nx-1,ny);
+			var p2=(nx-1)+','+ny;
+			if(visitedCells.indexOf(p2)==-1&&marginCells.indexOf(p2)==-1&&newMarginCells.indexOf(p2)==-1) newMarginCells.push(p2);
+			var p=getScreenCoordinates(nx,ny+1);
+			var p2=nx+','+(ny+1);
+			if(visitedCells.indexOf(p2)==-1&&marginCells.indexOf(p2)==-1&&newMarginCells.indexOf(p2)==-1) newMarginCells.push(p2);
+			var p=getScreenCoordinates(nx,ny-1);
+			var p2=nx+','+(ny-1);
+			if(visitedCells.indexOf(p2)==-1&&marginCells.indexOf(p2)==-1&&newMarginCells.indexOf(p2)==-1) newMarginCells.push(p2);
+			var p=getScreenCoordinates(nx,ny);
+			var mx=nx+Math.floor(-0.5+level.map.width/2);
+			var my=ny+Math.floor(-0.5+level.map.height/2);
+			checkPositionForVehicles(mx,my);
+			i++;
+		}
+		marginCells=newMarginCells;
+	}
+	if(player.profile.ridingVehicle!==false) if(objectsOnScreen.indexOf(player.profile.ridingVehicle)==-1) objectsOnScreen.push(player.profile.ridingVehicle);
+	objectsOnScreen.sort(function(a,b){
+		var bool=true;
+		var obj1=objectsByID[a];
+		var obj2=objectsByID[b];
+		if(obj1.realtime.height==obj2.realtime.height){
+			if(obj1.realtime.heightVelocity==obj2.realtime.heightVelocity){
+				bool=a<b;
+			}else{
+				bool=obj1.realtime.heightVelocity>obj2.realtime.heightVelocity;
+			}
+		}else{
+			bool=obj1.realtime.height>obj2.realtime.height;
+		}
+		return bool;
+	});
+}
+function spawnVehicle(x,y,a,p,m){
+	profile=clone(p)||new Profile();
+	x-=1;
+	y-=1;
+	var px=x-Math.floor(-0.5+level.map.width/2);
+	var py=y-Math.floor(-0.5+level.map.height/2);
+	x=Math.round(x);y=Math.round(y);
+	profile.id=(objectsByID.indexOf(undefined)==-1)?objectsByID.length:objectsByID.indexOf(undefined);
+	objectsByID[profile.id]=profile;
+	if(vehicleMap[y]===undefined) vehicleMap[y]=[];
+	if(vehicleMap[y][x]===undefined) vehicleMap[y][x]=[];
+	vehicleMap[y][x].push(profile.id);
+	profile.realtime.position.x=px;
+	profile.realtime.position.y=py;
+	profile.realtime.angle=a;
+	profile.realtime.oldPosition.x=px;
+	profile.realtime.oldPosition.y=py;
+	profile.spawn.movement=m;
+	for(var i=0;i<profile.sprites[0].length;i++) profile.damage[i]=0;
+	return profile;
+}
+function checkPositionForVehicles(mx,my){
+	var x=mx,y=my;
+	if(level.loop.x) x=(level.map.width+mx%level.map.width)%level.map.width;
+	if(level.loop.y) y=(level.map.height+my%level.map.height)%level.map.height;
+	if(x>=0&&x<level.map.width&&y>=0&&y<level.map.height){
+		if(vehicleMap[y]!==undefined) if(vehicleMap[y][x]!==undefined){
+			for(var i=0;i<vehicleMap[y][x].length;i++){
+				if(objectsByID[vehicleMap[y][x][i]].destroy){
+					objectsByID[vehicleMap[y][x][i].id]=undefined;
+					vehicleMap[y][x].splice(i,1);
+					continue;
+				}
+				if(objectsOnScreen.indexOf(vehicleMap[y][x][i])==-1){
+					objectsOnScreen.push(vehicleMap[y][x][i]);
+				}
+			}
+		}
+	}
+}
+function drawObject(i){
+	/*
+	var x=mx,y=my;
+	ctx.mozImageSmoothingEnabled=false;
+	ctx.webkitImageSmoothingEnabled=false;
+	ctx.imageSmoothingEnabled=false;
+	if(level.loop.x) x=(level.map.width+mx%level.map.width)%level.map.width;
+	if(level.loop.y) y=(level.map.height+my%level.map.height)%level.map.height;
+	if(x>=0&&x<level.map.width&&y>=0&&y<level.map.height){
+		var type=level.map.data[y][x];
+		if(type==Math.abs(type)){
+			if(type>=0&&type<=255){
+				var typex=type%16;
+				var typey=Math.floor(type/16);
+				ctx.drawImage(textures,(typex*16)+0.2,(typey*16)+0.2,16-0.4,16-0.4,-size/2,-size/2,size,size);
+			}
+		}else{
+			overlayTiles.push({type:Math.abs(type),x:mx,y:my});
+		}
+		if(vehicleMap[y]!==undefined) if(vehicleMap[y][x]!==undefined){ //debugging
+			//ctx.fillStyle='hsl('+count+',100%,50%)';
+			//ctx.fillRect(-size/2,-size/2,size,size);
+		}
+	}
+	*/
+	var obj=objectsByID[i];
+	if(obj.visible==false) return;
+	objSize=size+(obj.realtime.height*size);
+	var p=getScreenCoordinates(obj.realtime.position.x,obj.realtime.position.y);
+	ctx.setTransform(1/player.profile.camera.tilt3D.x,0,0,1/player.profile.camera.tilt3D.y,p.x,p.y);
+	ctx.rotate((player.camera.angle-obj.realtime.angle)*Math.PI/180);
+	for(var y=0;y<obj.sprites[0].length;y++){
+		if(obj.exploded){
+			var sprite=obj.explodedSprite;
+		}else{
+			var damage=Math.floor(obj.damage[y])||0;
+			if(damage>obj.sprites.length-1) damage=obj.sprites.length-1;
+			var sprite=obj.sprites[damage];
+		}
+		for(var x=0;x<sprite[0].length;x++){
+			var type=sprite[y][x];
+			if(type>=0&&type<=255){
+				var typex=type%16;
+				var typey=Math.floor(type/16);
+				ctx.drawImage(vehicleTextures,(typex*16)+0.2,(typey*16)+0.2,16-0.4,16-0.4,((x-(sprite[0].length-1)/2)*objSize)-objSize/2,((y-(sprite.length-1)/2)*objSize)-objSize/2,objSize+1,objSize+1);
+			}
+		}
+	}
+}
+function drawObjects(){
+	drawObject(player.profile.id);
+	for(var i=0;i<objectsOnScreen.length;i++){
+		if(objectsOnScreen[i]){
+			drawObject(objectsOnScreen[i]);
+		}
+	}
+	/*if(keys.shift){
+		ctx.setTransform(1,0,0,1,0,0);
+		var text='World Coordinates: ('+Math.round(player.profile.realtime.position.x)+','+Math.round(player.profile.realtime.position.y)+')';
+		ctx.font='10px Arial';
+		ctx.textAlign='left';
+		ctx.textBaseline='top';
+		ctx.fillStyle='rgba(100,255,255,0.5)';
+		ctx.fillRect(0,0,ctx.measureText(text).width+10,20);
+		ctx.fillStyle='#000';
+		ctx.fillText(text,5,5);
+	}*/
+	drawOverlayTiles();
+}
+function menuStep(){
+	count++;
+	if(count==1){
+		player.menu.buttonHeight=1.2;
+		player.menu.btnSmoothing=4;
+		player.menu.btnTarget=new Vector2();
+		if(player.screen=='menu'){
+			player.camera.x=(rnd(-1,1)*level.map.width)-Math.floor(-0.5+level.map.width/2);
+			player.camera.y=(rnd(-1,1)*level.map.width)-Math.floor(-0.5+level.map.width/2);
+			player.camera.scale=0.5;
+			player.camera.angle=rnd(-360,360);
+			player.menu.buttons=[
+				{text:'Maze Generator',description:'PLAY A RANDOMLY GENERATED MAZE',position:new Vector2(0,height/2),width:6},
+				{text:'Free Roam',description:'EXPLORE A BIG MAP WITH NO GOAL',position:new Vector2(0,height/2),width:6},
+				{text:'Level Editor',description:'MAKE YOUR OWN LEVELS!',position:new Vector2(0,height/2),width:6},
+				{text:'About',description:'CREDITS & CONTROLS',position:new Vector2(0,height/2),width:6},
+				{text:'Quit',description:'',position:new Vector2(0,height/2),width:6}
+			]
+		}else{
+			player.menu.buttons=[
+				{text:'Continue Playing',description:'',position:new Vector2(0,height/2),width:6},
+				{text:'Controls',description:'',position:new Vector2(0,height/2),width:6},
+				{text:'Return to Menu',description:'',position:new Vector2(0,height/2),width:6}
+			]
+			count=300;
+			player.menu.position.x=player.profile.realtime.position.x;
+			player.menu.position.y=player.profile.realtime.position.y;
+			player.menu.angle=player.profile.realtime.angle;
+			player.menu.target.position.x=player.menu.position.x;
+			player.menu.target.position.y=player.menu.position.y;
+			player.menu.target.angle=player.menu.angle;
+			player.menu.target.scale=player.menu.scale;
+		}
+	}
+	player.menu.position.x=((player.menu.position.x*player.menu.smooth.position)+player.menu.target.position.x)/(1+player.menu.smooth.position);
+	player.menu.position.y=((player.menu.position.y*player.menu.smooth.position)+player.menu.target.position.y)/(1+player.menu.smooth.position);
+	player.menu.angle=((player.menu.angle*player.menu.smooth.angle)+player.menu.target.angle)/(1+player.menu.smooth.angle);
+	player.camera.scale=((player.camera.scale*player.menu.smooth.scale)+player.menu.target.scale)/(1+player.menu.smooth.scale);
+	player.camera.x=((player.camera.x*player.menu.smooth.position)+player.menu.position.x)/(1+player.menu.smooth.position);
+	player.camera.y=((player.camera.y*player.menu.smooth.position)+player.menu.position.y)/(1+player.menu.smooth.position);
+	player.camera.angle=((player.camera.angle*player.menu.smooth.angle)+player.menu.angle)/(1+player.menu.smooth.angle);
+	player.camera.scale=((player.camera.scale*player.menu.smooth.scale)+player.menu.scale)/(1+player.menu.smooth.scale);
+	if(count%player.menu.changeInterval==0||count==50){
+		player.menu.target.position.x=(rnd(-1,1)*level.map.width)-Math.floor(-0.5+level.map.width/2);
+		player.menu.target.position.y=(rnd(-1,1)*level.map.height)-Math.floor(-0.5+level.map.height/2);
+		player.menu.target.angle=rnd(-360,360);
+		player.menu.target.scale=rnd(0,1);
+	}
+	if(count>50) drawMap();
+	ctx.setTransform(1,0,0,1,0,0);
+	if(count<=230){
+		ctx.fillStyle='rgba(0,0,0,'+(1-(count-60)/(230-60))+')';
+		ctx.fillRect(0,0,width,height);
+	}
+	ctx.fillStyle='rgba(0,70,100,'+Math.abs(0.25+Math.sin(count/60)/2)+')';
+	ctx.fillRect(0,0,width,height);
+	if(count>130) drawOverlay();
+	ctx.setTransform(1,0,0,1,0,0);
+	ctx.fillStyle=menuGradient;
+	ctx.fillRect(0,0,width,height);
+	if(count<=80){
+		ctx.fillStyle='rgba(0,0,0,'+(1-(count-10)/(80-10))+')';
+		ctx.fillRect(0,0,width,height);
+	}
+	if(player.screen=='menu'){
+		switch(player.menu.transitionTo){
+			case 0:
+				player.menu.btnTarget.x=widthHeight;
+				ctx.fillStyle='rgba(255,255,255,'+(count-player.menu.transitionStart)/25+')';
+				ctx.fillRect(0,0,width,height);
+				if(count-player.menu.transitionStart>=25){
+					player.screen='none';
+					endLoop();
+					player.menu.transitionTo=-1;
+					player.menu.transitionStart=0;
+					var style=-1,a=-1,b=-1,c=-1,d=-1;
+					while(style<=0||style>3) style=Number(prompt('Input 1 of 5\n\n1=Default\n2=Trippy\n3=Simple\n\nStyle:',1));
+					while(a<=2||a>300) a=Number(prompt('Input 3 of 5\n\nEnter width (in cells) [2 to 300]:',10));
+					while(b<=2||b>300) b=Number(prompt('Input 3 of 5\n\nEnter height (in cells) [2 to 300]:',10));
+					while(c<=0||c>15) c=Number(prompt('Input 4 of 5\n\nEnter the number of tiles per maze cell [1 to 15]:',rnd(1,4,true)));
+					while(d<=0||d>15) d=Number(prompt('Input 5 of 5\n\nEnter the width of the walls (in tiles) [1 to 15]:',1));
+					ctx.font=(widthHeight/30)+'px Helvetica';
+					var textWidth=Math.round(ctx.measureText('Generating Map...').width);
+					ctx.fillStyle='#000';
+					ctx.fillText('Generating Map...',width/2-textWidth/2,height/2);
+					setTimeout(function(){
+						var lvl=generateMaze(style,a,b,c,d);
+						setTimeout(function(){
+							player.screen='game';
+							loadLevel(lvl);
+						},1500);
+					},500);
+				}
+				break;
+			case 1:
+				player.menu.btnTarget.x=widthHeight;
+				ctx.fillStyle='rgba(255,255,255,'+(count-player.menu.transitionStart)/25+')';
+				ctx.fillRect(0,0,width,height);
+				if(count-player.menu.transitionStart>=25){
+					player.menu.transitionTo=-1;
+					player.menu.transitionStart=0;
+					player.screen='game';
+					player.camera.x=0;
+					player.camera.y=0;
+					player.camera.angle=0;
+					player.camera.scale=1;
+					count=0;
+					endLoop();
+					startLoop();
+				}
+				break;
+			case 2:
+				player.menu.btnTarget.x=widthHeight;
+				ctx.fillStyle='rgba(255,255,255,'+(count-player.menu.transitionStart)/25+')';
+				ctx.fillRect(0,0,width,height);
+				if(count-player.menu.transitionStart>=25){
+					endLoop();
+					window.location.href='editor.html';
+				}
+				break;
+			case 3:
+				alert('Game engine was created by Simeon Wuthier\n________________________________________________________________\n\nControls:\nESC to open the paused game menu\nUP, DOWN, LEFT, and RIGHT arrow keys to move around\nHold SHIFT to go faster\nPress CTRL when your next to a vehicle to enter it\nSPACE to jump (although it is disabled in some levels)\nF5 to return to the menu\nF11 to toggle fullscreen.');
+				player.menu.transitionTo=-1;
+				break;
+			case 4:
+				player.menu.btnTarget.x=-widthHeight;
+				ctx.fillStyle='rgba(0,0,0,'+(count-player.menu.transitionStart)/50+')';
+				ctx.fillRect(0,0,width,height);
+				if(count-player.menu.transitionStart>=50){
+					player.screen='none';
+					endLoop();
+					ctx.font=(widthHeight/60)+'px Arial';
+					var textWidth=Math.round(ctx.measureText('Click to Begin').width);
+					ctx.fillStyle='#FFF';
+					ctx.fillText('Click to Begin',width/2-textWidth/2,height/2);
+					refreshOnKey=true;
+				}
+				break;
+		}
+	}else{
+		switch(player.menu.transitionTo){
+			case 0:
+				player.screen='game';
+				player.camera.scale=1;
+				endLoop();
+				startLoop();
+				break;
+			case 1:
+				alert('Controls:\n________________________________________________________________\n\nESC to open the paused game menu\nUP, DOWN, LEFT, and RIGHT arrow keys to move around\nHold SHIFT to go faster\nPress CTRL when your next to a vehicle to enter it\nSPACE to jump (although it is disabled in some levels)\nF5 to return to the menu\nF11 to toggle fullscreen.');
+				player.menu.transitionTo=-1;
+				break;
+			case 2:
+				player.menu.btnTarget.x=widthHeight;
+				ctx.fillStyle='rgba(0,0,0,'+(count-player.menu.transitionStart)/25+')';
+				ctx.fillRect(0,0,width,height);
+				if(count-player.menu.transitionStart>=25){
+					loadLevel(levels[0]);
+					player.screen='menu';
+					player.menu.transitionTo=-1;
+					count=0;
+					endLoop();
+					startLoop();
+				}
+				break;
+		}
+	}
+}
+function inBounds(x,y,gridx,gridy){
+	return(x>=0&&x<gridx&&y>=0&y<gridy);
+}
+function cellInTact(cell){
+	return cell.up&&cell.down&&cell.left&&cell.right;
+}
+function generateMaze(style,gridx,gridy,cellWidth,wallWidth){
+	var maze=[],cell=[],backtrack=[],solution=[],endx,endy,totalCells=-1,visitedCells=0,px=rnd(0,gridx-1,true),py=rnd(0,gridy-1,true),cellSize=cellWidth+wallWidth;
+	var lvl=new Level();
+	lvl.allowJumping=false;
+	lvl.scale=levels[0].scale*1.2;
+	for(var y=0;y<gridy;y++){
+		cell[y]=[];
+		for(var x=0;x<gridx;x++){
+			cell[y][x]={up:true,down:true,left:true,right:true};
+			if(inBounds(x,y,gridx,gridy)) totalCells++;
+		}
+	}
+	while(!inBounds(px,py,gridx,gridy)){px=rnd(0,gridx-1,true);py=rnd(0,gridy-1,true)}
+	var startx=px;starty=py;
+	while(visitedCells<totalCells){
+		var neighbors=[];
+		if(inBounds(px,py-1,gridx,gridy)) if(cellInTact(cell[py-1][px])) neighbors.push(0);
+		if(inBounds(px,py+1,gridx,gridy)) if(cellInTact(cell[py+1][px])) neighbors.push(1);
+		if(inBounds(px-1,py,gridx,gridy)) if(cellInTact(cell[py][px-1])) neighbors.push(2);
+		if(inBounds(px+1,py,gridx,gridy)) if(cellInTact(cell[py][px+1])) neighbors.push(3);
+		if(neighbors.length>0){
+			visitedCells++;
+			var n=neighbors[rnd(0,neighbors.length-1,true)];
+			switch(n){
+				case 0:cell[py][px].up=false;cell[py-1][px].down=false;py--;backtrack.push('up');break;
+				case 1:cell[py][px].down=false;cell[py+1][px].up=false;py++;backtrack.push('down');break;
+				case 2:cell[py][px].left=false;cell[py][px-1].right=false;px--;backtrack.push('left');break;
+				case 3:cell[py][px].right=false;cell[py][px+1].left=false;px++;backtrack.push('right');break;
+			}
+			if(backtrack.length>=solution.length){
+				solution=backtrack.slice(0);
+				endx=px;endy=py;
+			}
+		}else{
+			switch(backtrack.pop()){
+				case 'up':py++;break;
+				case 'down':py--;break;
+				case 'left':px++;break;
+				case 'right':px--;break;
+			}
+		}
+	}
+	px=startx;py=starty;
+	for(var i=0;i<solution.length;i++){
+		switch(solution[i]){
+			case 'up':py--;break;
+			case 'down':py++;break;
+			case 'left':px--;break;
+			case 'right':px++;break;
+		}
+		if(i%10==0&&rnd(1,3,true)==1){
+			var x=cellSize/2+1+px*cellSize;
+			var y=cellSize/2+1+py*cellSize;
+			lvl.vehicles.push(['XP',x,y,0,'','@xp']);
+		}
+	}
+	for(var i=0;i<gridy;i++){
+		for(var j=0;j<gridx;j++){
+			var c=cell[i][j];
+			//c={up:true,down:true,left:true,right:true};
+			for(y=0;y<cellSize+(i==gridy-1?wallWidth:0);y++){
+				var py=y+i*cellSize;
+				if(maze[py]===undefined) maze[py]=[];
+				for(x=0;x<cellSize+(j==gridx-1?wallWidth:0);x++){
+					var wallTexture,pathTexture;
+					switch(style){
+						case 1:wallTexture=11;pathTexture=16;break;
+						case 2:wallTexture=13;pathTexture=14;break;
+						case 3:wallTexture=7;pathTexture=8;break;
+					}
+					var px=x+j*cellSize;
+					maze[py][px]=pathTexture;
+					if(y<wallWidth) if(c.up||x<wallWidth) maze[py][px]=wallTexture;
+					if(x<wallWidth) if(c.left||y<wallWidth) maze[py][px]=wallTexture;
+					if(i==gridy-1||j==gridx-1) if(x>=cellSize|y>=cellSize) maze[py][px]=wallTexture;
+				}
+			}
+		}
+	}
+	var startPos=new Vector2(cellSize/2+1+startx*cellSize,cellSize/2+1+starty*cellSize);
+	var endPos=new Vector2(cellSize/2+1+endx*cellSize,cellSize/2+1+endy*cellSize);
+	lvl.spawn.x=startPos.x;
+	lvl.spawn.y=startPos.y;
+	lvl.vehicles.push(['Start',startPos.x,startPos.y,0,'','@start']);
+	lvl.vehicles.push(['Finnish',endPos.x,endPos.y,0,'','@finnish']);
+	lvl.map=new Map(maze);
+	return lvl;
+}
+function drawOverlay(){
+	if(player.menu.transitionTo==-1){
+		player.menu.btnTarget.x=(-(mouse.x-width/2)/5)+(Math.sin(count/70)*width/20);
+		player.menu.btnTarget.y=-player.menu.selection*player.menu.buttonHeight*size;
+	}
+	var newSelection,d=(player.menu.btnTarget.y-player.menu.buttons[0].position.y);
+	for(var i=d<=0?0:player.menu.buttons.length-1;d<=0?i<player.menu.buttons.length:i>=0;d<=0?i++:i--){
+		var btn=player.menu.buttons[i];
+		var w=btn.width*size,h=player.menu.buttonHeight*size;
+		if(mouse.down&&player.menu.transitionTo==-1){
+			var mx=(mouse.startX-width/2-btn.position.x)/w;
+			var my=(mouse.startY-height/2-btn.position.y)/h;
+			if(mx>=-0.5&&mx<=0.5&&my>=-0.5&&my<=0.5){
+				if(i==player.menu.selection){
+					if(count-mouse.start==1){
+						player.menu.transitionTo=player.menu.selection;
+						player.menu.transitionStart=count;
+						player.menu.btnSmoothing=15;
+					}
+				}else{
+					newSelection=i;
+				}
+			}
+		}else{
+			player.menu.btnSmoothing=4;
+		}
+		drawMenuButton(btn,w,h,i/player.menu.buttons.length,i);
+		if(d<=0){
+			var target=(i==0)?new Vector2(player.menu.btnTarget.x,player.menu.btnTarget.y):new Vector2(player.menu.buttons[i-1].position.x,player.menu.buttons[i-1].position.y+player.menu.buttonHeight*size);
+		}else{
+			var target=(i==player.menu.buttons.length-1)?new Vector2(player.menu.btnTarget.x,player.menu.btnTarget.y+((player.menu.buttons.length-1)*player.menu.buttonHeight*size)):new Vector2(player.menu.buttons[i+1].position.x,player.menu.buttons[i+1].position.y-player.menu.buttonHeight*size);
+		}
+		btn.position.x=((btn.position.x*player.menu.btnSmoothing)+target.x)/(1+player.menu.btnSmoothing);
+		btn.position.y=((btn.position.y*player.menu.btnSmoothing)+target.y)/(1+player.menu.btnSmoothing);
+	}
+	if(newSelection!==undefined) if(player.menu.transitionTo==-1) player.menu.selection=newSelection
+}
+function drawMenuButton(btn,w,h,i,j){
+	ctx.setTransform(w,0,0,h,btn.position.x+width/2,btn.position.y+height/2);
+	if(j==player.menu.selection){
+		ctx.fillStyle='rgba(130,255,200,'+(Math.sin((-i*5)+Math.sin(count/10)*4)+8)/9+')';
+	}else{
+		ctx.fillStyle='rgba(130,255,200,'+(Math.sin((-i*5)+Math.sin(count/10)*2)+4)/9+')';
+	}
+	ctx.fillRect(-0.5,-0.5,1,1);
+	ctx.fillStyle=ctx.strokeStyle='rgb(10,15,50)';
+	ctx.lineWidth=0.1;
+	ctx.strokeRect(-0.4,-0.4,0.8,0.8);
+	if(j==player.menu.selection){
+		ctx.beginPath();
+		ctx.moveTo(-0.5,-0.5);
+		ctx.lineTo(-0.6,0);
+		ctx.lineTo(-0.5,0.5);
+		ctx.moveTo(0.5,-0.5);
+		ctx.lineTo(0.6,0);
+		ctx.lineTo(0.5,0.5);
+		ctx.closePath();
+		ctx.fill();
+	}
+	ctx.setTransform(1,0,0,1,btn.position.x+width/2,btn.position.y+height/2);
+	if(btn.description!=''){
+		ctx.font=(size/2)+'px Helvetica';
+		var textWidth=Math.round(ctx.measureText(btn.text).width);
+		ctx.fillText(btn.text,-textWidth/2,size/15);
+		ctx.font=(size/6)+'px Arial';
+		var descriptionWidth=Math.round(ctx.measureText(btn.description).width);
+		ctx.fillText(btn.description,-descriptionWidth/2,size/3);
+	}else{
+		ctx.font=(size/2)+'px Helvetica';
+		var textWidth=Math.round(ctx.measureText(btn.text).width);
+		ctx.fillText(btn.text,-textWidth/2,size/7);
+	}
+}
+function step(){
+	count++;
+	loopCounter++;
+	var pause=stepObjects();
+	if(player.camera.fadeOpacity>0){
+		ctx.setTransform(1,0,0,1,0,0);
+		ctx.fillStyle='rgba('+player.camera.fadeColor+','+player.camera.fadeOpacity+')';
+		ctx.fillRect(0,0,width,height);
+	}
+	drawMap();
+	objectCollisions();
+	drawObjects();
+	var rider=player.profile;
+	if(player.profile.ridingVehicle!==false) rider=objectsByID[player.profile.ridingVehicle];
+	if(rider.damage.length>0){
+		var damage=0;for(var i=0;i<rider.damage.length;i++) damage+=rider.damage[i];damage/=rider.damage.length;
+		if(rider.fire.onFire) damage+=0.6;
+		if(damage>0.2){
+			damage*=(0.7+Math.sin(count/8)/4);
+			if(damage<0) damage=0;if(damage>1) damage=1;
+			ctx.setTransform(1,0,0,1,0,0);
+			damageGradient=ctx.createRadialGradient(width/2,height/2,defaultSize,width/2,height/2,widthHeight/2.5);
+			damageGradient.addColorStop(0,'rgba(0,0,0,0)');
+			damageGradient.addColorStop(1,'rgba(200,0,0,'+damage/1.7+')');
+			ctx.fillStyle=damageGradient;
+			ctx.fillRect(0,0,width,height);
+		}
+	}
+	if(rider.exploded){
+		ctx.setTransform(1,0,0,1,0,0);
+		ctx.fillStyle=deathGradient;
+		ctx.fillRect(0,0,width,height);
+	}
+	if(pause){
+		rider.realtime.velocity.x=0; //Pause game until movement is detected
+		rider.realtime.velocity.y=0;
+		rider.realtime.rotVelocity=0;
+		endLoop();
+		console.log('Paused');
+	}
+	
+	if(!rider.exploded){
+		ctx.setTransform(1,0,0,1,0,0);
+		ctx.font=(size/3)+'px Arial';
+		var textWidth=Math.round(ctx.measureText('Press ESC to pause the game').width);
+		ctx.fillStyle='#025';
+		ctx.fillText('Press ESC to pause the game',width/2-textWidth/2,height-size/3);
+	}
+	
+	if(count<=75){
+		ctx.setTransform(1,0,0,1,0,0);
+		ctx.fillStyle='rgba(255,255,255,'+(1-count/75)+')';
+		ctx.fillRect(0,0,width,height);
+	}
+	if(player.messages.length>0){
+		var msg=player.messages[0];
+		msg.count++;
+		if(msg.count<20) drawMessage(msg.text,msg.count/20);
+		if(msg.count>=20&&msg.count<msg.time) drawMessage(msg.text,1);
+		if(msg.count>=msg.time) drawMessage(msg.text,1-(msg.count-msg.time)/20);
+		if(msg.count>=msg.time+20) player.messages.splice(0,1);
+	}
+	if(keys.esc) pauseMenu();
+}
+function drawMessage(s,i){
+	ctx.setTransform(1,0,0,1,0,0);
+	ctx.font=size/2+'px Helvetica';
+	var w=ctx.measureText(s).width;
+	var fontSize=size/2;
+	if(w>=size*4){
+		fontSize*=(size*4)/w;
+		ctx.font=Math.round(fontSize)+'px Helvetica';
+		w=ctx.measureText(s).width;
+	}
+	var h=size*1.5;
+	ctx.fillStyle='rgba(0,0,0,0.8)';
+	ctx.fillRect(width/2-size*2.5,i*h/2-h,size*5,h);
+	ctx.fillStyle='rgb(255,255,255)';
+	ctx.fillText(s,width/2-w/2,i*size/2);
+}
+function explode(obj){
+	obj.exploded=true;
+	obj.enabled=false;
+	obj.respawnCountdown=200;
+	if(obj.focused){
+		obj.camera.type='death';
+		player.pausable=false;
+		msg('Vehicle Exploded',3);
+	}
+}
+function stepObject(i){
+	var obj=objectsByID[i];
+	obj.realtime.heightVelocity-=level.gravity.heightForce;
+	obj.realtime.height+=obj.realtime.heightVelocity;
+	if(obj.focused&&keys.space&&obj.realtime.inAir==false&&!obj.exploded) jump(obj.id,0.3);
+	if(obj.realtime.height<0){
+		obj.realtime.inAir=false;
+		obj.realtime.height=0;
+		obj.realtime.heightVelocity=-obj.realtime.heightVelocity/obj.heightFriction;
+		if(Math.abs(obj.realtime.heightVelocity)<=0.1) obj.realtime.heightVelocity=0;
+	}else{
+		obj.realtime.inAir=true;
+	}
+	if(obj.fire!==false){
+		if(obj.fire.onFire){
+			obj.fire.explosionCountdown--;
+			if(!obj.exploded&&obj.fire.explosionCountdown<=0) explode(obj);
+		}
+	}
+	if(obj.exploded&&obj.respawnCountdown!==undefined){
+		obj.respawnCountdown--;
+		if(obj.respawnCountdown<=0) respawn(obj.id); //respawning
+	}
+	if(obj.realtime.inAir==false) if(obj.enabled){
+		if(obj.movementBinding.angles=='controllable'){
+			obj.realtime.left=keys.left;
+			obj.realtime.right=keys.right;
+		}
+		if(obj.movementBinding.forward=='controllable') obj.realtime.up=keys.up;
+		if(obj.movementBinding.backward=='controllable') obj.realtime.down=keys.down;
+		if(obj.movementBinding.shift=='controllable') obj.realtime.shift=keys.shift;
+	}else{
+		obj.realtime.up=false;
+		obj.realtime.down=false;
+		obj.realtime.left=false;
+		obj.realtime.right=false;
+		obj.realtime.shift=false;
+	}
+	var v=comparePoints(obj.realtime.velocity.x,obj.realtime.velocity.y);
+	var speed=v.distance||0.0005;
+	if(obj.focused){
+		var camTarget=new Vector2(obj.realtime.position.x-(Math.sin(obj.realtime.angle*Math.PI/180)*speed*(keys.down?-1:1)*obj.camera.smooth.lookAhead),obj.realtime.position.y-(Math.cos(obj.realtime.angle*Math.PI/180)*speed*(keys.down?-1:1)*obj.camera.smooth.lookAhead));
+		switch(obj.camera.type){
+			case 'default':
+				player.camera.x=((player.camera.x*obj.camera.smooth.position)+camTarget.x)/(1+obj.camera.smooth.position);
+				player.camera.y=((player.camera.y*obj.camera.smooth.position)+camTarget.y)/(1+obj.camera.smooth.position);
+				player.camera.angle=((player.camera.angle*obj.camera.smooth.angle)+obj.realtime.angle)/(1+obj.camera.smooth.angle);
+				break;
+			case 'locked':
+				player.camera.x=obj.realtime.position.x;
+				player.camera.y=obj.realtime.position.y;
+				player.camera.angle=obj.realtime.angle;
+				break;
+			case 'fixed':
+				break;
+			case 'fixed-angle':
+				player.camera.x=((player.camera.x*obj.camera.smooth.position)+camTarget.x)/(1+obj.camera.smooth.position);
+				player.camera.y=((player.camera.y*obj.camera.smooth.position)+camTarget.y)/(1+obj.camera.smooth.position);
+				break;
+			case 'death':
+				player.camera.x=((player.camera.x*obj.camera.smooth.position)+camTarget.x)/(1+obj.camera.smooth.position);
+				player.camera.y=((player.camera.y*obj.camera.smooth.position)+camTarget.y)/(1+obj.camera.smooth.position);
+				player.camera.angle=(((player.camera.angle+count/50)*obj.camera.smooth.angle)+obj.realtime.angle)/(1+obj.camera.smooth.angle);
+				player.camera.scale+=0.005;
+				break;
+		}
+	}
+	if(obj.realtime.angle>360){
+		obj.realtime.angle-=360;
+		if(obj.focused) player.camera.angle-=360;
+	}
+	if(obj.realtime.angle<0){
+		obj.realtime.angle+=360;
+		if(obj.focused) player.camera.angle+=360;
+	}
+	if(obj.realtime.left){
+		if(obj.reversedBackwardTurns&&obj.realtime.down){
+			obj.realtime.rotVelocity=((obj.realtime.rotVelocity*obj.turnLeftSmoothing)-obj.turnLeftSpeed)/(obj.turnLeftSmoothing+1);
+		}else{
+			obj.realtime.rotVelocity=((obj.realtime.rotVelocity*obj.turnLeftSmoothing)+obj.turnLeftSpeed)/(obj.turnLeftSmoothing+1);
+		}
+		if(obj.turnWhenStopped==false){
+			var a=((speed-0.0005)*obj.acceleratingTurnSpeed)<1?((speed-0.0005)*obj.acceleratingTurnSpeed):1;
+			obj.realtime.rotVelocity*=a;
+		}
+	}
+	if(obj.realtime.right){
+		if(obj.reversedBackwardTurns&&obj.realtime.down){
+			obj.realtime.rotVelocity=((obj.realtime.rotVelocity*obj.turnRightSmoothing)+obj.turnRightSpeed)/(obj.turnRightSmoothing+1);
+		}else{
+			obj.realtime.rotVelocity=((obj.realtime.rotVelocity*obj.turnRightSmoothing)-obj.turnRightSpeed)/(obj.turnRightSmoothing+1);
+		}
+		if(obj.turnWhenStopped==false){
+			var a=((speed-0.0005)*obj.acceleratingTurnSpeed)<1?((speed-0.0005)*obj.acceleratingTurnSpeed):1;
+			obj.realtime.rotVelocity*=a;
+		}
+	}
+	if(obj.realtime.up){
+		obj.realtime.velocity.x-=obj.forwardSpeed*Math.sin(obj.realtime.angle*Math.PI/180);
+		obj.realtime.velocity.y-=obj.forwardSpeed*Math.cos(obj.realtime.angle*Math.PI/180);
+		if(obj.realtime.shift){
+			if(speed>Math.abs(obj.maxForwardSpeed2)){
+				obj.realtime.velocity.x*=Math.abs((obj.maxForwardSpeed2+obj.forwardMaxedRocket)-0.01)/speed;
+				obj.realtime.velocity.y*=Math.abs((obj.maxForwardSpeed2+obj.forwardMaxedRocket)-0.01)/speed;
+			}
+		}else{
+			if(speed>Math.abs(obj.maxForwardSpeed)){
+				obj.realtime.velocity.x*=Math.abs(obj.maxForwardSpeed-0.01)/speed;
+				obj.realtime.velocity.y*=Math.abs(obj.maxForwardSpeed-0.01)/speed;
+			}
+		}
+	}
+	if(obj.realtime.down){
+		obj.realtime.velocity.x+=obj.forwardSpeed/obj.backwardSpeedRatio*Math.sin(obj.realtime.angle*Math.PI/180);
+		obj.realtime.velocity.y+=obj.forwardSpeed/obj.backwardSpeedRatio*Math.cos(obj.realtime.angle*Math.PI/180);
+		if(speed>Math.abs(obj.maxForwardSpeed/obj.maxBackwardSpeedRatio)){
+			obj.realtime.velocity.x*=Math.abs(obj.maxForwardSpeed/obj.maxBackwardSpeedRatio-0.01)/speed;
+			obj.realtime.velocity.y*=Math.abs(obj.maxForwardSpeed/obj.maxBackwardSpeedRatio-0.01)/speed;
+		}
+	}
+	if(obj.realtime.up==false&&obj.realtime.down==false){
+		obj.realtime.velocity.x/=obj.moveFriction;
+		obj.realtime.velocity.y/=obj.moveFriction;
+	}
+	if(obj.realtime.left==false&&obj.realtime.right==false) obj.realtime.rotVelocity/=obj.turnFriction;
+	var grav=new Vector2();
+	if(level.gravity.enabled){
+		grav.x=Math.sin(level.gravity.direction*Math.PI/180)*level.gravity.force;
+		grav.y=Math.cos(level.gravity.direction*Math.PI/180)*level.gravity.force;
+		obj.realtime.velocity.x+=grav.x;
+		obj.realtime.velocity.y+=grav.y;
+	}
+	obj.realtime.angle+=obj.realtime.rotVelocity;
+	obj.realtime.position.x+=obj.realtime.velocity.x;
+	obj.realtime.position.y+=obj.realtime.velocity.y;
+	if(obj.realtime.position.x>Math.floor(-0.5+level.map.width/2)){
+		obj.realtime.position.x-=level.map.width;
+		if(obj.focused) player.camera.x-=level.map.width;
+	}
+	if(obj.realtime.position.x<-Math.floor(-0.5+level.map.width/2)){
+		obj.realtime.position.x+=level.map.width;
+		if(obj.focused) player.camera.x+=level.map.width;
+	}
+	if(obj.realtime.position.y>Math.floor(-0.5+level.map.height/2)){
+		obj.realtime.position.y-=level.map.height;
+		if(obj.focused) player.camera.y-=level.map.height;
+	}
+	if(obj.realtime.position.y<-Math.floor(-0.5+level.map.height/2)){
+		obj.realtime.position.y+=level.map.height;
+		if(obj.focused) player.camera.y+=level.map.height;
+	}
+	if(!obj.realtime.inAir) gridCollision(obj,obj.collisionMask);
+	if(obj.ridingVehicle==false){ //If its not player update map positions
+		var px=Math.round(obj.realtime.position.x)+Math.floor(-0.5+level.map.width/2);
+		var py=Math.round(obj.realtime.position.y)+Math.floor(-0.5+level.map.height/2);
+		if(level.loop.x) px=(level.map.width+px%level.map.width)%level.map.width;
+		if(level.loop.y) py=(level.map.height+py%level.map.height)%level.map.height;
+		if(obj.realtime.coords.x===undefined||obj.realtime.coords.y===undefined){
+			obj.realtime.coords.x=px;
+			obj.realtime.coords.y=py;
+		}
+		var oldpx=obj.realtime.coords.x
+		var oldpy=obj.realtime.coords.y;
+		if(px!=oldpx||py!=oldpy){
+			if(px>=0&&px<level.map.width&&py>=0&&py<level.map.height){
+				if(oldpx>=0&&oldpx<level.map.width&&oldpy>=0&&oldpy<level.map.height){
+					if(vehicleMap[py]===undefined) vehicleMap[py]=[];
+					if(vehicleMap[oldpy]===undefined) vehicleMap[oldpy]=[];
+					if(vehicleMap[oldpy][oldpx]!==undefined){
+						var i=vehicleMap[oldpy][oldpx].indexOf(obj.id);
+						if(i!=-1){
+							if(vehicleMap[py][px]===undefined) vehicleMap[py][px]=[];
+							vehicleMap[py][px].push(vehicleMap[oldpy][oldpx].splice(i,1)[0]);
+							if(vehicleMap[oldpy][oldpx].length==0) vehicleMap[oldpy][oldpx]=undefined;
+							obj.realtime.coords.x=px;
+							obj.realtime.coords.y=py;
+						}
+					}
+				}
+			}
+		}
+	}
+	if(obj.vehiclesMounted!==false){
+		for(var i=0;i<obj.vehiclesMounted.length;i++){
+			var rider=objectsByID[obj.vehiclesMounted[i]];
+			rider.realtime.position.x=obj.realtime.position.x;
+			rider.realtime.position.y=obj.realtime.position.y;
+			rider.realtime.angle=obj.realtime.angle;
+			rider.realtime.height=obj.realtime.height;
+		}
+	}
+	obj.realtime.oldPosition.x=obj.realtime.position.x;
+	obj.realtime.oldPosition.y=obj.realtime.position.y;
+	var rider=obj;if(obj.ridingVehicle!==false) rider=objectsByID[obj.ridingVehicle];
+	if(player.pausable&&player.messages.length==0&&!rider.realtime.inAir&&keys.up==false&&keys.down==false&&keys.left==false&&keys.right==false&&loopCounter>=100){
+		if(Math.abs(rider.realtime.velocity.x)<=0.0005+(level.gravity.enabled?level.gravity.force:0)&&Math.abs(rider.realtime.velocity.y)<=0.0005+(level.gravity.enabled?level.gravity.force:0)&&Math.abs(rider.realtime.rotVelocity)<0.05){
+			return true;
+		}
+	}
+	return false;
+}
+function stepObjects(){
+	var pause=true;
+	for(var i=0;i<objectsOnScreen.length;i++){
+		if(!stepObject(objectsOnScreen[i])) pause=false;
+	}
+	if(!stepObject(player.profile.id)) pause=false;
+	return pause;
+}
+function drawTile(mx,my){
+	/*count+=0.6;
+	if(level.loop.x) x=(level.map.width+x%level.map.width)%level.map.width;
+	if(level.loop.y) y=(level.map.height+y%level.map.height)%level.map.height;
+	if(x>=0&&x<level.map.width&&y>=0&&y<level.map.height){
+		var type=level.map.data[y][x];
+		if(type>=0&&type<=255){
+			if(type==1){
+				ctx.fillStyle='hsl('+count+',100%,50%)';
+				ctx.fillRect(-size/2,-size/2,size,size);
+			}
+		}
+	}*/
+	var x=mx,y=my;
+	ctx.mozImageSmoothingEnabled=false;
+	ctx.webkitImageSmoothingEnabled=false;
+	ctx.imageSmoothingEnabled=false;
+	if(level.loop.x) x=(level.map.width+mx%level.map.width)%level.map.width;
+	if(level.loop.y) y=(level.map.height+my%level.map.height)%level.map.height;
+	if(x>=0&&x<level.map.width&&y>=0&&y<level.map.height){
+		var type=level.map.data[y][x];
+		if(type==Math.abs(type)){
+			if(type>=0&&type<=255){
+				var typex=type%16;
+				var typey=Math.floor(type/16);
+				ctx.drawImage(textures,(typex*16)+0.2,(typey*16)+0.2,16-0.4,16-0.4,-size/2,-size/2,size,size);
+			}
+		}else{
+			overlayTiles.push({type:Math.abs(type),x:mx,y:my});
+		}
+		if(vehicleMap[y]!==undefined) if(vehicleMap[y][x]!==undefined){ //debugging
+			//ctx.fillStyle='hsl('+count+',100%,50%)';
+			//ctx.fillRect(-size/2,-size/2,size,size);
+			//ctx.fillStyle=shadowGradient;
+			//ctx.fillRect(-size/2,-size/2,size,size);
+		}
+	}
+}
+function drawOverlayTiles(){
+	ctx.mozImageSmoothingEnabled=false;
+	ctx.webkitImageSmoothingEnabled=false;
+	ctx.imageSmoothingEnabled=false;
+	for(var i=0;i<overlayTiles.length;i++){
+		var x=overlayTiles[i].x-Math.floor(-0.5+level.map.width/2);
+		var y=overlayTiles[i].y-Math.floor(-0.5+level.map.height/2);
+		var p=getScreenCoordinates(x,y);
+		ctx.setTransform(1/player.profile.camera.tilt3D.x,0,0,1/player.profile.camera.tilt3D.y,p.x,p.y);
+		ctx.rotate(player.camera.angle*Math.PI/180);
+		if(overlayTiles[i].type>=0&&overlayTiles[i].type<=255){
+			var typex=overlayTiles[i].type%16;
+			var typey=Math.floor(overlayTiles[i].type/16);
+			ctx.drawImage(textures,(typex*16)+0.2,(typey*16)+0.2,16-0.4,16-0.4,-size/2,-size/2,size,size);
+		}
+	}
+}
+function gridCollision(obj,points){
+	var collided=false;
+	for(var i=0;i<obj.damage.length;i++) obj.damage[i]=0;
+	for(var i=0;i<points.length;i++){
+		var velocityBefore=new Vector2(obj.realtime.velocity.x,obj.realtime.velocity.y);
+		var radius=points[i].r*defaultSize/2;
+		var angle=(obj.realtime.angle)*Math.PI/180;
+		var xoff=Math.cos(angle)*points[i].xoff+Math.sin(angle)*points[i].yoff;
+		var yoff=Math.cos(angle)*points[i].yoff-Math.sin(angle)*points[i].xoff;		
+		var pointCollided=false;
+		for(var j=0;j<4;j++){
+			var x=obj.realtime.position.x+xoff,y=obj.realtime.position.y+yoff,px=Math.round(x),py=Math.round(y);
+			switch(j){
+				case 0:
+					x=Math.round(x+(radius/size));
+					y=Math.round(y+(radius/size));
+					break;
+				case 1:
+					x=Math.round(x+(radius/size));
+					y=Math.round(y-(radius/size));
+					break;
+				case 2:
+					x=Math.round(x-(radius/size));
+					y=Math.round(y+(radius/size));
+					break;
+				case 3:
+					x=Math.round(x-(radius/size));
+					y=Math.round(y-(radius/size));
+					break;
+			}
+			var unBoundedX=x,unBoundedY=y,unBoundedPx=px,unBoundedPy=py;
+			px+=Math.floor(-0.5+level.map.width/2);
+			py+=Math.floor(-0.5+level.map.height/2);
+			x+=Math.floor(-0.5+level.map.width/2);
+			y+=Math.floor(-0.5+level.map.height/2);
+			if(level.loop.x){
+				px=(level.map.width+px%level.map.width)%level.map.width;
+				x=(level.map.width+x%level.map.width)%level.map.width;
+			}
+			if(level.loop.y){
+				py=(level.map.height+py%level.map.height)%level.map.height;
+				y=(level.map.height+y%level.map.height)%level.map.height;
+			}
+			if(x>=0&&x<level.map.width&&y>=0&&y<level.map.height) if(obj.collisionTiles.indexOf(level.map.data[y][x])!=-1){
+				var dx=unBoundedX-unBoundedPx,dy=unBoundedY-unBoundedPy;
+				if(Math.abs(dx)!=Math.abs(dy)&&Math.abs(dx)-Math.abs(dy)==-(Math.abs(dy)-Math.abs(dx))){
+					if(Math.abs(dx)==0){
+						if(dy<0){
+							obj.realtime.position.y=unBoundedY+(0.5+(radius/size))-yoff;
+							obj.realtime.velocity.y=Math.abs(obj.realtime.velocity.y)/obj.wallBounceFriction.top;
+							obj.realtime.velocity.x/=obj.wallSlideFriction;
+							pointCollided=true;
+						}
+						if(dy>0){
+							obj.realtime.position.y=unBoundedY-(0.5+(radius/size))-yoff;
+							obj.realtime.velocity.y=-Math.abs(obj.realtime.velocity.y)/obj.wallBounceFriction.bottom;
+							obj.realtime.velocity.x/=obj.wallSlideFriction;
+							pointCollided=true;
+						}
+					}
+					if(Math.abs(dy)==0){
+						if(dx<0){
+							obj.realtime.position.x=unBoundedX+(0.5+(radius/size))-xoff;
+							obj.realtime.velocity.x=Math.abs(obj.realtime.velocity.x)/obj.wallBounceFriction.left;
+							obj.realtime.velocity.y/=obj.wallSlideFriction;
+							pointCollided=true;
+						}
+						if(dx>0){
+							obj.realtime.position.x=unBoundedX-(0.5+(radius/size))-xoff;
+							obj.realtime.velocity.x=-Math.abs(obj.realtime.velocity.x)/obj.wallBounceFriction.right;
+							obj.realtime.velocity.y/=obj.wallSlideFriction;
+							pointCollided=true;
+						}
+					}
+				}else{
+					var corner=new Vector2(unBoundedX+(-dx/2),unBoundedY+(-dy/2));
+					c=comparePoints(obj.realtime.position.x+xoff,obj.realtime.position.y+yoff,corner.x,corner.y);
+					if(c.distance<radius/size){
+						obj.realtime.position.x=corner.x-(radius*c.angle.x/size)-xoff;
+						obj.realtime.position.y=corner.y-(radius*c.angle.y/size)-yoff;
+						pointCollided=true;
+					}
+				}
+			}
+		}
+		if(pointCollided){
+			collided=true;
+			if(points[i].fire!==false&&obj.fire!==false) if(points[i].fire.time>0){
+				var force=comparePoints(obj.realtime.velocity.x,obj.realtime.velocity.y,velocityBefore.x,velocityBefore.y).distance;
+				points[i].fire.health-=force;
+				if(points[i].fire.health<=0){
+					if(obj.focused&&obj.fire.onFire==false) msg('Your vehicle is on fire',2);
+					if(obj.fire.onFire){
+						if(obj.fire.explosionCountdown>points[i].fire.time){
+							obj.fire.explosionCountdown=points[i].fire.time
+						}
+					}else{
+						obj.fire.onFire=true;
+						obj.fire.explosionCountdown=points[i].fire.time+rnd(-30,30,true);
+					}
+					points[i].fire.time=0;
+				}
+			}
+		}
+		if(points[i].fire!==false&&obj.fire!==false) for(var j=0;j<points[i].fire.link.length;j++) obj.damage[points[i].fire.link[j][0]]+=(1-points[i].fire.health/points[i].fire.fullHealth)*points[i].fire.link[j][1]*(1+obj.sprites.length);
+	}
+	var px=Math.round(obj.realtime.position.x)+Math.floor(-0.5+level.map.width/2);
+	var py=Math.round(obj.realtime.position.y)+Math.floor(-0.5+level.map.height/2);
+	if(level.loop.x) px=(level.map.width+px%level.map.width)%level.map.width;
+	if(level.loop.y) py=(level.map.height+py%level.map.height)%level.map.height;
+	if(px>=0&&px<level.map.width&&py>=0&&py<level.map.height){
+		if(obj.collisionTiles.indexOf(level.map.data[py][px])==-1){
+			if(collided==false){
+				obj.realtime.lastCorrectPosition.x=obj.realtime.position.x;
+				obj.realtime.lastCorrectPosition.y=obj.realtime.position.y;
+			}
+		}else{
+			obj.realtime.position.x=obj.realtime.lastCorrectPosition.x;
+			obj.realtime.position.y=obj.realtime.lastCorrectPosition.y;
+			obj.realtime.velocity.x=-obj.realtime.velocity.x/3;
+			obj.realtime.velocity.y=-obj.realtime.velocity.y/3;
+		}
+	}else if(level.allowOffBounds==false){
+		if(px<0){
+			obj.realtime.velocity.x=-obj.realtime.velocity.x/2;
+			obj.realtime.position.x=-Math.floor(-0.5+level.map.width/2)-0.5;
+		}else if(py<0){
+			obj.realtime.velocity.y=-obj.realtime.velocity.y/2;
+			obj.realtime.position.y=-Math.floor(-0.5+level.map.height/2)-0.5;
+		}else if(px>=level.map.width){
+			obj.realtime.velocity.x=-obj.realtime.velocity.x/2;
+			obj.realtime.position.x=Math.ceil(-0.5+level.map.width/2)+0.5;
+		}else if(py>=level.map.height){
+			obj.realtime.velocity.y=-obj.realtime.velocity.y/2;
+			obj.realtime.position.y=Math.ceil(-0.5+level.map.height/2)+0.5;
+		}
+	}
+}
+function objectCollisions(){
+	for(var i=-1;i<objectsOnScreen.length;i++){
+		var obj1=(i==-1)?player.profile:objectsByID[objectsOnScreen[i]];
+		for(var j=0;j<objectsOnScreen.length;j++){
+			if(i==j) continue;
+			var obj2=objectsByID[objectsOnScreen[j]];
+			if(obj1.ridingVehicle!==false) if(obj1.ridingVehicle==obj2.id) continue;
+			if(obj2.ridingVehicle!==false) if(obj2.ridingVehicle==obj1.id) continue;
+			for(k=0;k<obj1.collisionMask.length;k++){
+				var circle1=obj1.collisionMask[k];
+				for(l=0;l<obj2.collisionMask.length;l++){
+					var circle2=obj2.collisionMask[l];
+					var p1=new Vector2(obj1.realtime.position.x+circle1.xoff,obj1.realtime.position.y+circle1.yoff);
+					var p2=new Vector2(obj2.realtime.position.x+circle2.xoff,obj2.realtime.position.y+circle2.yoff);
+					var c=comparePoints(p1.x,p1.y,p2.x,p2.y),r=(circle1.r+circle2.r)/2;
+					if(c.distance<=r){
+						//var middle=new Vector2((p1.x+p2.x)/2,(p1.y+p2.y)/2);
+						if(obj1.tag=='@finnish'||obj2.tag=='@finnish'){
+							msg('CONGRATULATIONS!');
+							msg('YOU FOUND THE RED BALL!',3);
+							clearTimeout(resizeTimeout);
+							resizeTimeout=setTimeout(function(){
+								pauseMenu();
+							},6000);
+						}
+						if(obj1.tag=='@start'||obj2.tag=='@start'){
+							msg('Your goal: FIND THE RED BALL',3);
+						}
+						if(obj1.tag=='@xp'||obj2.tag=='@xp'){
+							((obj1.tag=='@xp')?obj1:obj2).tag='@xp2';
+							msg('CHECKPOINT',0.5);
+							msg('Your on the right track!');
+						}
+						if(obj1.tag=='@xp2'||obj2.tag=='@xp2'){
+							if(player.messages[player.messages.length-1]===undefined){
+								msg('This checkpoint has already been visited!',2);
+							}else{
+								if(player.messages[player.messages.length-1].text!=='Your on the right track!') msg('This checkpoint has already been visited!');
+							}
+						}
+						//obj1.realtime.position.x=middle.x-circle1.xoff-circle1.r*0.5*c.angle.x;
+						//obj1.realtime.position.y=middle.y-circle1.yoff-circle1.r*0.5*c.angle.y;
+						//obj2.realtime.position.x=middle.x-circle2.xoff+circle2.r*0.5*c.angle.x;
+						//obj2.realtime.position.y=middle.y-circle2.yoff+circle2.r*0.5*c.angle.y;
+						//obj1.realtime.velocity.x-=c.distance-c.dx;
+						//obj1.realtime.velocity.y-=c.distance-c.dy;
+						//obj2.realtime.velocity.x+=c.distance-c.dx;
+						//obj2.realtime.velocity.y+=c.distance-c.dy;
+						obj1.realtime.velocity.x-=c.dx*r/5;
+						obj1.realtime.velocity.y-=c.dy*r/5;
+						obj2.realtime.velocity.x+=c.dx*r/5;
+						obj2.realtime.velocity.y+=c.dy*r/5;
+					}
+				}
+			}
+		}
+	}
+}
+function pauseMenu(){
+	player.screen='pauseMenu';
+	count=0;
+	player.menu.transitionTo=-1;
+	player.menu.selection=0;
+	endLoop();
+	startLoop();
+}
+function getScreenCoordinates(posx,posy){
+	var angle=player.camera.angle*Math.PI/180;
+	x=size*(Math.cos(angle)*posx-Math.sin(angle)*posy-Math.cos(angle)*player.camera.x+Math.sin(angle)*player.camera.y)+width/2
+	y=size*(Math.sin(angle)*posx+Math.cos(angle)*posy-Math.cos(angle)*player.camera.y-Math.sin(angle)*player.camera.x)+height/2
+	x+=width/2*(player.profile.camera.tilt3D.x-1);
+	y+=height/2*(player.profile.camera.tilt3D.y-1);
+	return new Vector2(x/player.profile.camera.tilt3D.x,y/player.profile.camera.tilt3D.y);
+}
+function comparePoints(x1,y1,x2,y2){
+	var dx=(x2||0)-(x1||0);
+	var dy=(y2||0)-(y1||0);
+	var dist=Math.sqrt(dx*dx+dy*dy)||0;
+	return {angle:new Vector2(dx/dist,dy/dist),distance:dist,dx:dx,dy:dy};
+}
+function rnd(a,b,c){
+	return c?Math.floor(Math.random()*(b-a+1))+a:Math.random()*(b-a+1)+a;
+}
+function startLoop(){
+	loopCounter=0;
+	if(loop===undefined){
+		if(mobileDevice){
+			loop=(player.screen=='menu'||player.screen=='pauseMenu')?setInterval(menuStep,1000/10):setInterval(step,1000/15);
+		}else{
+			loop=(player.screen=='menu'||player.screen=='pauseMenu')?setInterval(menuStep,1000/18):setInterval(step,1000/30);
+		}
+	}
+}
+function endLoop(){
+	clearInterval(loop);
+	clearInterval(loop);
+	loop=undefined;
+}
+function msg(s,timeMultiplier){
+	if(!s) return;
+	if(player.messages.length>0) for(var i=0;i<player.messages.length;i++) if(player.messages[i].text===s) return;
+	timeMultiplier=timeMultiplier||1;
+	player.messages.push({text:s,count:0,time:60*timeMultiplier});
+}
+function websocketCompatible(){return 'WebSocket' in window};
+</script>
+
+</body>
+</html>

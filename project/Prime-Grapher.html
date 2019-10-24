@@ -1,0 +1,413 @@
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+body{
+	background-color:hsl(200,50%,10%);
+	font-family:Arial;
+	padding:0 100px;
+}
+#all{
+	width:100%;
+	min-width:210px;
+	display:block;
+	margin:0 auto;
+	border-radius:20px;
+	overflow:hidden;
+}
+#buttons{
+	background-color:hsl(200,20%,40%);
+	text-align:center;
+	width:100%;
+	min-height:40px;
+}
+#buttons button{
+	background-color:hsl(200,20%,60%);
+	font-size:15px;
+	font-weight:900;
+	min-width:170px;
+	display:block;
+	margin:0 auto;
+	padding:10px 50px;
+	border:none;
+}
+#buttons button:hover{
+	background-color:hsl(200,20%,50%);
+}
+#wrapper{
+	background-color:hsl(200,20%,60%);
+	width:100%;
+	overflow:hidden;
+}
+#draw{
+	background-color:#FFF;
+	display:none;
+	margin:0 auto;
+}
+#editor{
+	background-color:#333;
+	color:#FFF;
+	font-size:18px;
+	font-weight:900;
+	text-transform:uppercase;
+	display:block;
+	margin:0 auto;
+	padding:50px;
+	border:none;
+	resize:none;
+	-moz-tab-size:3;
+	-o-tab-size:3;
+	tab-size:3;
+}
+#commandsWrapper{
+	background-color:hsl(200,20%,70%);
+	color:hsl(200,100%,10%);
+	font-size:12px;
+	font-weight:900;
+	padding:10px 20px;
+	position:absolute;
+	margin:10px 17px;
+	right:100;
+	max-height:660px;
+	opacity:0.5;
+	overflow-y:scroll;
+	border-radius:20px;
+	cursor:default;
+}
+#commands{
+	max-width:180px;
+	pointer-events:none;
+	-webkit-user-select:none;
+	-moz-user-select:none;
+	-ms-user-select:none;
+}
+.number{
+	color:hsl(20,80%,30%);
+}
+</style>
+
+</head>
+<body onload='init()'>
+<div id='all'>
+	<div id='buttons'>
+		<button id='toggleBtn' onclick='switchTabs()'>Output</button>
+		<button id='startBtn' onclick='start()'>Start</button>
+	</div>
+	<div id='wrapper'>
+		<canvas id='draw' width='700px' height='700px' onresize='resize()'></canvas>
+		<div id='commandsWrapper'><div id='commands'>
+			<tr><b class='number'>:</b>STARTCMD</tr><br>
+			<hr>
+			<tr>SETSPEED(<b class='number'>pixels</b>)</tr><br>
+			<tr>SETPOS(<b class='number'>x</b>,<b class='number'>y</b>)</tr><br>
+			<tr>SETANGLE(<b class='number'>angle</b>)</tr><br>
+			<tr>SETGRID(<b class='number'>dimension</b>)</tr><br>
+			<tr>SETPIXELSIZE(<b class='number'>pixels</b><br>
+			<tr>SETCOLORS("<b class='number'>LAVENDER</b>,<b class='number'>RED</b>")</tr><br>
+			<tr>SETTCOLOR("<b class='number'>BLACK</b>")</tr><br>
+			<tr>SETFONTSIZE(<b class='number'>7</b>)</tr><br>
+			<tr>LEFT(<b class='number'>angle</b>)</tr><br>
+			<tr>RIGHT(<b class='number'>angle</b>)</tr><br>
+			<tr>FORWARD(<b class='number'>amount</b>)</tr><br>
+			<tr>BACKWARD(<b class='number'>amount</b>)</tr><br>
+			<tr>MOVEUP(<b class='number'>amount</b>)</tr><br>
+			<tr>MOVEDOWN(<b class='number'>amount</b>)</tr><br>
+			<tr>MOVELEFT(<b class='number'>amount</b>)</tr><br>
+			<tr>MOVERIGHT(<b class='number'>amount</b>)</tr><br>
+			<hr>
+			<tr>FACTORS, COUNT, GRID, SCALE, X, Y, ANGLE, HIDDENTEXT, ROTATEBOX, ROTATETEXT, PI</tr><br>
+			<hr>
+			<tr>DRAW()</tr><br>
+			<tr>CHECK("<b class='number'>LEFT(90),FORWARD(1)</b>")</tr><br>
+			<tr>RND(<b class='number'>from</b>,<b class='number'>to</b>)</tr><br>
+			<tr>DIST(<b class='number'>x1</b>,<b class='number'>y1</b>,<b class='number'>x2</b>,<b class='number'>y2</b>)</tr><br>
+			<tr>MOD(<b class='number'>a</b>,<b class='number'>b</b>)</tr><br>
+			<tr>SQR(<b class='number'>a</b>)</tr><br>
+			<tr>ABS(<b class='number'>a</b>)</tr><br>
+			<tr>INT(<b class='number'>a</b>)</tr><br>
+			<tr>ROUND(<b class='number'>a</b>)</tr><br>
+			<tr>SIN(<b class='number'>radians</b>)</tr><br>
+			<tr>COS(<b class='number'>radians</b>)</tr><br>
+			<tr>TAN(<b class='number'>radians</b>)</tr><br>
+			<tr>SEC(<b class='number'>radians</b>)</tr><br>
+			<tr>CSC(<b class='number'>radians</b>)</tr><br>
+			<tr>COT(<b class='number'>radians</b>)</tr><br>
+			<tr>INVSIN(<b class='number'>radians</b>)</tr><br>
+			<tr>INVCOS(<b class='number'>radians</b>)</tr><br>
+			<tr>INVTAN(<b class='number'>radians</b>)</tr><br>
+			<tr>IF(<b class='number'>COUNT==5</b>){</tr><br>
+			<tr>FOR(<b class='number'>VAR I=0;I<10;I++</b>){</tr><br>
+			<tr>WHILE(<b class='number'>COUNT<=5</b>){</tr><br>
+			<tr>}</tr>
+		</div></div>
+		<textarea id='editor' onchange='editorChange()' spellcheck='false'></textarea>
+	</div>
+	<div id='buttons'>
+		<button id='screenshotBtn' onclick='snapScreenshot()'>Snap Screenshot</button>
+		<button id='formatBtn' onclick='editorChange();save()'>Format and Save</button>
+	</div>
+</div>
+<script>
+var all=document.getElementById('all');
+var canvas=document.getElementById('draw');
+var editor=document.getElementById('editor');
+var commands=document.getElementById('commandsWrapper');
+var toggleBtn=document.getElementById('toggleBtn');
+var startBtn=document.getElementById('startBtn');
+var startBtn=document.getElementById('startBtn');
+var screenshotBtn=document.getElementById('screenshotBtn');
+var formatAndSaveBtn=document.getElementById('formatBtn');
+var ctx=canvas.getContext('2d');
+var loop,size,FACTORS,PI,COUNT,STEPS,SPEED,GRID,X,Y,ANGLE,SCALE,COLORS,TCOLOR,FONTSIZE,HIDDENTEXT,ROTATEBOX,ROTATETEXT,cmds;
+document.onkeydown=function(e){
+	var evtobj=window.event?event:e;
+	var key=evtobj.charCode?evtobj.charCode:evtobj.keyCode;
+	if(evtobj.ctrlKey&&key==83){ //ctrl+s
+		save();
+		e.preventDefault();
+	}
+}
+editor.onkeydown=function(e){
+	var evtobj=window.event?event:e;
+	var key=evtobj.charCode?evtobj.charCode:evtobj.keyCode;
+	if(key==13){ //enter
+		editorInsert('\n');
+		e.preventDefault();
+	}
+	if(evtobj.ctrlKey&&key==68){ //ctrl+d
+		var selection='',length=Math.abs(editor.selectionEnd-editor.selectionStart);
+		if(length==0){
+			editor.selectionStart=editor.value.substr(0,editor.selectionStart).lastIndexOf('\n')+1;
+			length=editor.value.substr(editor.selectionStart).indexOf('\n')+1;
+		}
+		selection=editor.value.substr(editor.selectionStart,length);
+		editor.selectionStart+=length;
+		editorInsert(selection);
+		editor.selectionStart-=selection.length;
+		e.preventDefault();
+	}
+}
+function editorInsert(s){
+	var start=editor.selectionStart;
+	var length=Math.abs(editor.selectionEnd-editor.selectionStart);
+	var line=editor.value.substr(0,editor.selectionStart+1).split('\n').length-1;
+	var tabs=0,a=editor.value.split('');
+	a.splice(start,length,s);
+	var b=a.join('').replace(/\t/g,'').split('\n');var d=0;
+	for(var i=0;i<b.length;i++){
+		d-=b[i].split('}').length-1;
+		for(var j=0;j<d;j++){
+			b[i]='\t'+b[i];
+			if(i==line) tabs++;
+		}
+		d+=b[i].split('{').length-1;
+	}
+	editor.value=b.join('\n');
+	editor.selectionStart=start+s.length+tabs;
+	editor.selectionEnd=start+s.length+tabs;
+}
+function start(){
+	save();
+	var s=format(editor.value).replace(/\n(\t+)/g,';').replace(/\n}/g,'}').replace(/{;/g,'{');
+	var m=s.match(/\b(var|if|else|for|while|true|false|draw|eval|function)\b/gi);
+	if(m) for(var i=0;i<m.length;i++) s=s.replace(m[i],m[i].toLowerCase());
+	cmds=s.split('\n');
+	PI=Math.PI
+	SPEED=2;
+	COUNT=0;
+	STEPS=0;
+	GRID=100;
+	X=0;
+	Y=0;
+	ctx.textAlign='center';
+	ctx.textBaseLine='middle';
+	ANGLE=0;
+	SCALE=1;
+	COLORS=['LAVENDER','RED'];
+	TCOLOR='BLACK';
+	FONTSIZE=10;
+	HIDDENTEXT=false;
+	ROTATEBOX=true;
+	ROTATETEXT=true;
+	ctx.setTransform(1,0,0,1,0,0);
+	ctx.clearRect(0,0,canvas.width,canvas.height);
+	switchTabs(true);
+	startLoop();
+}
+function step(){
+	FACTORS=getFactors(COUNT);
+	var errors=[];
+	size=canvas.width/GRID;
+	for(var i=0;i<cmds.length;i++){
+		var line=cmds[i]; if(line=='') continue;
+		if(line.charAt(0)==':'){
+			if(STEPS==0){
+				line=line.substr(1);
+			}else continue;
+		}
+		try{
+			eval(line+';');
+		}catch(e){
+			errors.push('Line '+(i+1)+' \t \t '+line+' \t \t '+e.message);
+		}
+	}
+	size=canvas.width/GRID;
+	draw();
+	if(errors.length>0){
+		endLoop();
+		alert(errors.length+' ERROR'+(errors.length==1?'':'S')+'\n\n'+errors.join('\n'));
+		switchTabs(false);
+	}
+	COUNT++;
+	STEPS++;
+}
+function draw(){
+	var x=(canvas.width/2)+X*size;
+	var y=(canvas.height/2)+Y*size;
+	ctx.fillStyle=COLORS[FACTORS+1]||COLORS[0];
+	ctx.setTransform(SCALE,0,0,SCALE,x,y);
+	if(ROTATEBOX) ctx.rotate(-ANGLE*Math.PI/180);
+	ctx.fillRect(-size/2,-size/2,size,size);
+	if(!HIDDENTEXT){
+		if(ROTATEBOX&&!ROTATETEXT) ctx.rotate(ANGLE*Math.PI/180);
+		if(!ROTATEBOX&&!ROTATETEXT) ctx.rotate(-ANGLE*Math.PI/180);
+		ctx.font=FONTSIZE+'px Arial';
+		ctx.fillStyle=TCOLOR;
+		ctx.fillText(COUNT,0,0);
+	}
+}
+function switchTabs(draw){
+	endLoop();
+	draw=draw||canvas.style.display=='none';
+	if(draw){
+		canvas.style.display='block';
+		editor.style.display='none';
+		commands.style.display='none';
+		toggleBtn.innerHTML='Editor';
+		screenshotBtn.style.display='block';
+		formatAndSaveBtn.style.display='none';
+	}else{
+		canvas.style.display='none';
+		editor.style.display='block';
+		commands.style.display='block';
+		toggleBtn.innerHTML='Output';
+		formatAndSaveBtn.style.display='block';
+		screenshotBtn.style.display='none';
+	}
+}
+function resize(){
+	editor.style.width=canvas.width;
+	editor.style.height=canvas.height;
+	all.style.minimumWidth=canvas.width;
+	all.style.minimumHeight=canvas.width;
+}
+function editorChange(){editor.value=format(editor.value)+'\n'}
+function format(s){
+	return fixTabs(s.trim().replace(/\s*\r*\n+\s*/g,'\n').replace(/ +/g,' ').toUpperCase());
+}
+function fixTabs(s){
+	s=s.replace(/\t/g,'').split('\n');var d=0;
+	for(var i=0;i<s.length;i++){
+		d-=s[i].split('}').length-1;
+		for(var j=0;j<d;j++) s[i]='\t'+s[i];
+		d+=s[i].split('{').length-1;
+	}
+	return s.join('\n');
+}
+function init(){
+	resize();
+	load()
+	switchTabs(false);
+}
+function save(){
+	try{localStorage.setItem('save',editor.value)}catch(e){}
+}
+function load(){
+	try{editor.value=localStorage.getItem('save').trim()||''}catch(e){editor.value=''}
+	if(!editor.value) editor.value=format('\
+:SETSPEED(2)\n\
+:HIDDENTEXT=TRUE\n\
+:SETFONTSIZE(8)\n\
+:SETPOS(0,1)\n\
+:SETANGLE(0)\n\
+:SETPIXELSIZE(2)\n\
+:SETCOLORS("LAVENDER,RED")\n\
+FORWARD(1)\n\
+IF(CHECK("LEFT(90),FORWARD(1)")){\n\
+	LEFT(90)\n\
+}\n\
+IF(INBOUNDS(X,Y)==FALSE){\n\
+	END()\n\
+}\n\
+');
+}
+function snapScreenshot(){
+	var a=document.createElement('a');
+	a.setAttribute('href',canvas.toDataURL());
+	a.setAttribute('download','screenshot.png');
+	a.click();
+}
+window.onbeforeunload=loadOut;
+function getFactors(n){
+	var a=1,b=0;
+	while(a<=Math.floor(n/2)){
+		a++;
+		if(n/a==Math.floor(n/a)) b++;
+	}
+	return b;
+}
+function loadOut(){
+	save();
+	//myWindow=window.open(window.location.href,'','fullscreen=yes');
+}
+function CHECK(a){
+	var Xbackup=X,Ybackup=Y,ANGLEbackup=ANGLE,GRIDbackup=GRID,SCALEbackup=SCALE,c=a.split(',');
+	for(var i=0;i<c.length;i++){eval(c[i]+';')}
+	var x=(canvas.width/2)+X*size,y=(canvas.height/2)+Y*size;
+	X=Xbackup;Y=Ybackup;ANGLE=ANGLEbackup;GRID=GRIDbackup;SCALE=SCALEbackup;
+	if(INBOUNDS(X,Y)){
+		return ctx.getImageData(x,y,1,1).data[3]<=100;
+	}else{
+		return false;
+	}
+}
+function startLoop(){clearInterval(loop);startBtn.innerHTML='Restart';loop=setInterval(step,SPEED)}
+function endLoop(){clearInterval(loop);startBtn.innerHTML='Start'}
+function INBOUNDS(a,b){return (a+1>=-GRID/2&&b+1>=-GRID/2&&a-1<=GRID/2&&b-1<=GRID/2)}
+function END(){endLoop()}
+function SETCOLORS(a){COLORS=a.split(',')}
+function SETTCOLOR(a){TCOLOR=a}
+function SETFONTSIZE(a){FONTSIZE=a}
+function SETSPEED(a){SPEED=a;startLoop()}
+function SETPOS(a,b){X=a;Y=b}
+function SETANGLE(a){ANGLE=a}
+function SETGRID(a){GRID=a}
+function SETSCALE(a){SCALE=a}
+function SETPIXELSIZE(a){GRID=canvas.width/a}
+function LEFT(a){ANGLE-=a}
+function RIGHT(a){ANGLE+=a}
+function MOVEUP(a){Y-=a}
+function MOVEDOWN(a){Y+=a}
+function MOVELEFT(a){X-=a}
+function MOVERIGHT(a){X+=a}
+function FORWARD(a){X-=Math.sin(ANGLE*Math.PI/180)*a;Y-=Math.cos(ANGLE*Math.PI/180)*a}
+function BACKWARD(a){X+=Math.sin(ANGLE*Math.PI/180)*a;Y+=Math.cos(ANGLE*Math.PI/180)*a}
+function RND(a,b){a=a||0;b=b||1;return Math.random()*(b-a+1)+a;}
+function MOD(a,b){a=a||0;return a%b}
+function SQR(a){a=a||0;return Math.sqrt(a)}
+function ABS(a){a=a||0;return Math.abs(a)}
+function INT(a){a=a||0;return Math.floor(a)}
+function ROUND(a){a=a||0;return Math.round(a)}
+function SIN(a){a=a||0;return Math.sin(a)}
+function COS(a){a=a||0;return Math.cos(a)}
+function TAN(a){a=a||0;return Math.tan(a)}
+function SEC(a){a=a||0;return 1/Math.sin(a)}
+function CSC(a){a=a||0;return 1/Math.cos(a)}
+function COT(a){a=a||0;return 1/Math.tan(a)}
+function INVSIN(a){a=a||0;return Math.asin(a)}
+function INVCOS(a){a=a||0;return Math.acos(a)}
+function INVTAN(a){a=a||0;return Math.atan(a)}
+function DIST(a,b,c,d){var e=(c||0)-(a||0);var f=(d||0)-(b||0);return dist=Math.sqrt(e*e+f*f)||0;}
+</script>
+</body>
+</html>

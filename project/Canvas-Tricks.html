@@ -1,0 +1,267 @@
+<html>
+<head>
+<title>HTML Tricks</title>
+<style>
+	body{
+		background-color: hsl(100,30%,15%);
+		font-family: Calibri;
+		font-size: 20px;
+		margin: 10px 50px;
+		padding: 0;
+		cursor: default;
+	}
+	button{
+		transition: all 0.7s ease;
+		-webkit-transition: all 0.7s ease;
+		-moz-transition: all 0.7s ease;
+		-o-transition: all 0.7s ease;
+	}
+	#all{
+		background-color: hsl(100,30%,60%);
+		width: 50%;
+		display: block;
+		margin: 0 -12px;
+		padding: 0;
+		border: solid 5px hsl(100,30%,80%);
+		border-radius: 50px;
+		overflow: hidden;
+		-webkit-touch-callout: none;
+		-webkit-user-select: none;
+		-khtml-user-select: none;
+		-moz-user-select: none;
+		-ms-user-select: none;
+		user-select: none;
+	}
+	#draw,#editor{
+		cursor: default;
+	}
+	#header,#footer{
+		background-color: hsl(100,30%,70%);
+		width: 100%;
+		min-height: 60px;
+		text-align: center;
+		line-height: 60px;
+		font-weight: 900;
+		border-bottom: solid 5px hsl(100,30%,80%);
+	}
+	#footer{
+		border-bottom: none;
+		border-top: solid 5px hsl(100,30%,80%);
+	}
+	.buttonLeft,.buttonRight{
+		background-color: hsl(100,30%,75%);
+		color: #000;
+		font-size: 20px;
+		border: none;
+		min-width: 100px;
+		height: 60px;
+		padding: 20px;
+	}
+	.buttonLeft: hover,.buttonRight: hover{
+		background-color: hsl(100,30%,50%);
+		color: #FFF;
+		min-width: 120px;
+	}
+	.buttonLeft{float: left;}
+	.buttonRight{float: right;}
+	#shape{
+		background-color: hsl(100,30%,40%);
+		width: 100%;
+		text-font: 10px;
+	}
+	#numShapes{
+		width: 100px;
+		height: 50px;
+		font-size: 20px;
+		text-align: center;
+	}
+</style>
+</head>
+<body>
+	<div id='all' style='float:left'>
+		<div id='header'>Editor</div>
+		<canvas id='editor' width='600' height='600'></canvas>
+		<div id='footer'>
+			<tr id='shape'>
+				<label for="shapes">Number of polygons (keep it simple)</label>
+				<input id="numShapes" name="shapes" type="number" min="1" value="2" onchange="numShapesChanged()"/>
+			</tr>
+		</div>
+	</div>
+	<div id='all' style='float:right'>
+		<div id='header'>Output (click to draw)
+			<button id='random' class='buttonLeft' onclick='randomize()'>Randomize</button>
+			<button id='clear' class='buttonRight' onclick='clearDraw()'>Clear</button>
+		</div>
+		<canvas id='draw' width='600' height='600'></canvas>
+		<div id='footer'>
+			<button id='clear' class='buttonLeft' onclick='clearDraw()'>Clear</button>
+			<button id='run' class='buttonRight' onclick='toggleRun()' style="background-color: hsl(150,30%,50%);;">Run</button>
+		</div>
+	</div>
+	<script>
+		var editorCanvas=document.getElementById('editor');
+		var numShapes=document.getElementById('numShapes');
+		var editorCtx=editorCanvas.getContext('2d');
+		var canvas=document.getElementById('draw');
+		var ctx=canvas.getContext('2d');
+		var width=canvas.width,swidth;
+		var height=canvas.height,sheight;
+		var resizeTimeout,count=curX=curY=0,cur=running=false;
+		var selection=-1;
+		canvas.onmousedown=function(){cur=true; step()}
+		canvas.onmouseup=function(){cur=false}
+		canvas.onmousemove=function(e){curX=e.pageX-canvas.offsetLeft;curY=e.pageY-canvas.offsetTop;}
+		function random(a,b){return a+Math.random()*(b-a)}
+		function Shape(x,y,width,height,angle,skewx,skewy){
+			this.x=x||width/2;
+			this.y=y||height/2;
+			this.width=width||10;
+			this.height=height||10;
+			this.angle=angle||0;
+			this.skewX=skewx||0;
+			this.skewY=skewy||0;
+		}
+		function resize(){
+			swidth=window.innerWidth||document.documentElement.clientWidth||document.body.clientWidth;
+			sheight=window.innerHeight||document.documentElement.clientHeight||document.body.clientHeight;
+			width=document.getElementById('all').clientWidth;
+			height=document.getElementById('all').clientHeight;
+			canvas.width=width;
+			canvas.height=height;
+			editorCanvas.width=width;
+			editorCanvas.height=height;
+			document.getElementById('run').innerText='Run';
+			running=false;
+			if(resizeTimeout!=null) clearTimeout(resizeTimeout);
+			resizeTimeout=setTimeout(draw,100);
+		}
+		window.onresize=function(){
+			if(resizeTimeout!=null) clearTimeout(resizeTimeout);
+			resizeTimeout=setTimeout(resize,100);
+		}
+		function draw(){
+			editorCtx.font='50px Calibri';
+			editorCtx.textAlign='center';
+			editorCtx.textBaseline='middle';
+			editorCtx.fillStyle='hsl(100,30%,70%)';
+			editorCtx.strokeStyle='hsl(100,30%,80%)';
+			editorCtx.lineWidth=5;
+			for(var i=0;i<shapes.length;i++){
+				editorCtx.save();
+				editorCtx.transform(1,shapes[i].skewX,shapes[i].skewY,1,shapes[i].x,shapes[i].y);
+				editorCtx.rotate(shapes[i].angle*Math.PI/180);
+				editorCtx.rect(-shapes[i].width/2,-shapes[i].height/2,shapes[i].width,shapes[i].height);
+				editorCtx.restore();
+			}
+			editorCtx.fill();
+			editorCtx.stroke();
+			editorCtx.fillStyle='hsl(100,30%,80%)';
+			editorCtx.strokeStyle='hsl(100,30%,80%)';
+			editorCtx.lineWidth=2;
+			for(var i=0;i<shapes.length;i++){
+				editorCtx.save();
+				editorCtx.transform(1,shapes[i].skewX,shapes[i].skewY,1,shapes[i].x,shapes[i].y);
+				editorCtx.rotate(shapes[i].angle*Math.PI/180);
+				var textWidth=editorCtx.measureText(i+1);
+				editorCtx.fillText(i+1,0,0);
+				editorCtx.restore();
+			}
+		}
+		function toggleRun(){
+			if(running){
+				document.getElementById('run').innerText='Run';
+				running=false;
+			}else{
+				document.getElementById('run').innerText='Pause';
+				running=true;
+				step();
+			}
+		}
+		function clearDraw(){
+			ctx.setTransform(1,0,0,1,0,0);
+			ctx.clearRect(0,0,width,height);
+			ctx.closePath();
+			ctx.beginPath();
+			editorCtx.closePath();
+			editorCtx.beginPath();
+			ctx.setTransform(1,0,0,1,0,0);
+			ctx.clearRect(0,0,width,height);
+			ctx.closePath();
+			ctx.beginPath();
+			editorCtx.closePath();
+			editorCtx.beginPath();
+		}
+		function numShapesChanged(){
+			document.getElementById('run').innerText='Run';
+			running=false;
+			editorCtx.setTransform(1,0,0,1,0,0);
+			editorCtx.clearRect(0,0,editorCanvas.width,editorCanvas.height);
+			if(resizeTimeout!=null) clearTimeout(resizeTimeout);
+			clearDraw();
+			ctx.closePath();
+			ctx.beginPath();
+			editorCtx.closePath();
+			editorCtx.beginPath();
+			if(numShapes.value>shapes.length){
+				while(shapes.length<numShapes.value){
+					var w=random(width/10,width-width/10),h=random(height/10,height-height/10);
+					var x=random(w,width-w),y=random(h,h-height);
+					shapes.push(new Shape(x,y,w,h,random(-360,360),random(-0.5,0.5),random(-0.5,0.5)));
+				}
+			}else{
+				while(shapes.length>numShapes.value){
+					shapes.pop();
+				}
+			}
+			draw();
+		}
+		function randomize(){
+			while(shapes.length>0){
+				shapes.pop();
+			}
+			shapes.push(new Shape(0,0,width,height,random(-360,360)));
+			for(var i=0;i<numShapes.value-1;i++){
+				var w=random(width/10,width-width/10),h=random(height/10,height-height/10);
+				var x=random(w,width-w),y=random(h,h-height);
+				shapes.push(new Shape(x,y,w,h,random(-360,360),random(-0.5,0.5),random(-0.5,0.5)));
+			}
+			document.getElementById('run').innerText='Run';
+			running=false;
+			editorCtx.setTransform(1,0,0,1,0,0);
+			editorCtx.clearRect(0,0,editorCanvas.width,editorCanvas.height);
+			if(resizeTimeout!=null) clearTimeout(resizeTimeout);
+			resizeTimeout=setTimeout(draw,100);
+			clearDraw();
+			ctx.closePath();
+			ctx.beginPath();
+			editorCtx.closePath();
+			editorCtx.beginPath();
+		}
+		var img=new Image();
+		function step(){
+			count++;
+			if(cur){
+				ctx.beginPath();
+				ctx.fillStyle='hsl('+(count*10)+',100%,50%)';
+				ctx.arc(curX,curY,5,0,Math.PI*2);
+				ctx.closePath();
+				ctx.fill();
+			}
+			img.src=canvas.toDataURL();
+			for(var i=0;i<shapes.length;i++){
+				ctx.save();
+				ctx.transform(1,shapes[i].skewX,shapes[i].skewY,1,shapes[i].x,shapes[i].y);
+				ctx.rotate(shapes[i].angle*Math.PI/180);
+				ctx.drawImage(img,-shapes[i].width/2,-shapes[i].height/2,shapes[i].width,shapes[i].height);
+				ctx.restore();
+			}
+			if(running) loop=setTimeout(function(){step()},1000/60);
+		}
+		resize();
+		var shapes=[];
+		randomize();
+		draw();
+	</script>
+</body>
+</html>

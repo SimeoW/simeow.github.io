@@ -1,0 +1,1374 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>Blockchain Simulator</title>
+	<style>
+		body {
+			background-color: #25282E;
+			font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+		}
+
+		.body {
+			background-color: #FFF;
+			border-radius: 20px;
+			margin: 100px auto;
+			padding: 30px;
+			text-align: center;
+			width: 850px;
+			height: 50%;
+			overflow-x: hidden;
+			overflow-y: auto;
+			resize: both;
+		}
+
+		td {padding: 0;}
+
+		#data {
+			width: 100%;
+			height: 50px;
+			text-align: center;
+		}
+
+		canvas {width: 100%;}
+		table {width: 100%;}
+		button {width: 100%;}
+
+		select,
+		option,
+		input,
+		input[type="text"],
+		[type="number"],
+		[type="range"] {
+			width: 100%;
+			text-align: center;
+		}
+
+		input[type="range"] {
+			-webkit-appearance: none;
+			appearance: none;
+			height: 25px;
+			background: #d3d3d3;
+			border-radius: 4px;
+			outline: none;
+			opacity: 1;
+			-webkit-transition: .2s;
+			transition: opacity .2s;
+		}
+
+		input[type="range"]::-webkit-slider-thumb {
+			-webkit-appearance: none;
+			appearance: none;
+			width: 25px;
+			height: 25px;
+			background: #29384C;
+			border-radius: 4px;
+			cursor: pointer;
+		}
+
+		.symbol {width: 45px;}
+		.left {text-align: left;}
+
+		textarea {
+			width: 100%;
+			resize: vertical;
+			text-align: center;
+		}
+
+		#equationCode {
+			height: 28px;
+			font-size: 0.6em;
+		}
+
+		#equationSource {
+			height: 30px;
+			background-color: #1C3135;
+			color: #FFF;
+			border: none;
+		}
+
+		#equationRendering {
+			width: 100%;
+			margin: 0;
+			padding-top: 16px;
+			padding-bottom: 14px;
+			overflow-x: auto;
+			overflow-y: hidden;
+			font-size: 0.9em;
+		}
+
+		#equationRendering2 {
+			width: 100%;
+			margin: 0;
+			padding-top: 16px;
+			padding-bottom: 14px;
+			overflow-x: auto;
+			overflow-y: hidden;
+			font-size: 0.7em;
+		}
+
+		#MathJax_Message {display: none;}
+		input[type="range"].disabledSlider::-webkit-slider-thumb {background: #6F6F6F;}
+
+		#error {
+			color: #000;
+			background-color: #F33;
+		}
+
+		.valDisplay:hover{
+			cursor: pointer;
+			text-decoration: underline;
+		}
+
+		#presetDefinitions2{
+			color: #888;
+		}
+	</style>
+	<!-- <script vsync src="http://nerdamer.com/js/nerdamer.core.js"></script>
+	<script vsync src="http://nerdamer.com/js/Calculus.js"></script>
+	<script vsync src="http://nerdamer.com/js/Algebra.js"></script>
+	<script vsync src="http://nerdamer.com/js/Solve.js"></script>
+	<script vsync src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/5.0.0/math.min.js"></script> -->
+	<script vsync src="math.min.js"></script>
+	<script vsync src="nerdamer.core.js"></script>
+	<script vsync src="Calculus.js"></script>
+	<script vsync src="Algebra.js"></script>
+	<script vsync src="Solve.js"></script>
+	<script vsync src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/latest.js?config=AM_CHTML"></script>
+</head>
+
+<body>
+	<div class="body">
+		<table>
+			<tr>
+				<th><h4><u>Mining Pool Payment v3.2</u></h4></th>
+				<th style="width: 48%;"></th>
+				<th><h4>by Arijet and Simeon</h4></th>
+			</tr>
+		</table>
+		<hr>
+		<table id="presetDefinitions2"></table>
+		<table id="presetDefinitions"></table>
+		<hr>
+		<table id="infinitySelector">
+			<tr>
+				<th style="width: 75%"></th>
+				<th>Define <input style="width:15px" value="∞" class="symbol" onclick="this.select()" readonly> = <input input style="width:75px" type="number" value="100" class="symbol" id="infinitySelectorValue" onchange="changeInfinity()"></th>
+			</tr>
+		</table>
+		<table>
+			<tr>
+				<th style="width: 50px;">Presets</th>
+				<th><select onchange="selectPreset(this.options[this.selectedIndex].text);
+					equationComplete();" id="selectPreset">
+					<option disabled></option>
+					<option disabled>FAW equation:</option>
+					<option>R_A = ((1-τ)*α)/(1-τ*α)+(β/(1-τ*α)+c*τ*α*(1-α-β)/(1-τ*α))*(τ*α)/(β+τ*α)</option>
+					<option disabled></option>
+					<option disabled>Optimal tau for FAW equation:</option>
+					<option>hatτ_"FAW" = ((1-α)*(1-c)*β+β^2*c-β*Math.sqrt((1-α-β)^2*c^2+((1-α-β)*(α*β+α-2))*c-α*(1+β)+1))/(α*(1-α-β)*(c*(1-β)-1))</option>
+					<option disabled></option>
+					<option disabled>Optimal tau for FAW equation (Simplified):</option>
+					<option>hatτ_FAW = β/(1-α+c*(α+β-1)+Math.sqrt((1+c*(α+β-1))*(1-α*(1+β)+c*(α+β-1))))</option>
+					<option disabled></option>
+					<option disabled>------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</option>
+					<option disabled></option>
+					<option disabled>New equation:</option>
+					<option>R_A = (((1-τ)*α)/(1-τ*α))+((β/(1-τ*α))*((τ*α)/(β+τ*α))*(1-Γ))+(c*τ*α*((1-α-β)/(1-τ*α))*(Γ*γ+(1-Γ*γ)*((τ*α)/(β+τ*α))))</option>
+					<option disabled></option>
+					<option disabled>Optimal tau for new equation:</option>
+					<option>hatτ_"AWSR" = (-α*β+c*α*β+α^2*β-c*α^2*β-c*α*β^2+Math.sqrt(α^2*β^2*((1-α+c*(α+β-1))^2-(Γ+c*(β-1)*γ*Γ+α*(c*γ*Γ-1))*(1-α-β+β*Γ+c*(α+β-1)*(1+β*(γ*Γ-1))))))/(α^2*(1-α-β+β*Γ+c*(α+β-1)*(1+β*(γ*Γ-1))))</option>
+					<option disabled></option>
+					<option disabled>Optimal tau for new equation (Simplified):</option>
+					<option>hatτ_"AWSR" = (α*β*(-1+α-c*(α+β-1))+Math.sqrt(-(α^2)*β^2*(-1+Γ+c*(α+β-1)*(γ*Γ-1))*(1-α*(1+β)+β*Γ+c*(α+β-1)*(1+β*γ*Γ))))/(α^2*(1-α+β*(Γ-1)+c*(α+β-1)*(1+β*(γ*Γ-1))))</option>
+					<option disabled></option>
+					<option disabled>Break-even Gamma with Tau</option>
+					<option>Γ_"BE" = (α*(β+(-1+α-c*(α+β-1))*τ))/(β+c*β*(α+β-1)*γ)</option>
+					<option disabled></option>
+					<option disabled>Break-even Gamma with TauHat=0</option>
+					<option>barΓ_"BE" = α/(1+c*(α+β-1)*γ)</option>
+					<option disabled></option>
+					<option disabled>New reward equation (plugging in break-even Gamma with TauHat=0)</option>
+					<option>R_A = (α*(-β+α*(β-1)*τ+α*(1+c*(α+β-1))*τ^2))/((α*τ-1)*(β+α*τ))</option>
+					<option disabled></option>
+					<option disabled>------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</option>
+					<option disabled></option>
+					<option disabled>Examples of usage:</option>
+					<option> = sum_(x=1)^(∞)[y/x^2]</option>
+					<option> = (b+Math.sqrt(b^2-4*a*c))/(2*a)</option>
+					<option> = Math.sin((6*value)/(per))/(10*amp)+0.5</option>
+					<option> = Math.sqrt(x)*x^0.5</option>
+				</select></th>
+			</tr>
+			<tr>
+				<th style="width: 50px;"><a href="http://asciimath.org/#syntax" target="_blank">Equation</a></th>
+				<th><input type="text" id="equationSource" oninput="equationChange();" onchange="equationComplete();"></th>
+			</tr>
+		</table>
+		<b><span id="error"></span></b>
+		<div class="ioArea" id="equationRendering">``</div>
+		<hr>
+		<input type="text" id="mathEquationOutput" onclick="this.select()" readonly>
+		<table>
+			<tr>
+				<th><button onclick="simplifyEquation();">Simplify</button></th>
+				<th><button onclick="expandEquation();">Expand</button></th>
+				<th><button onclick="factorEquation();">Factor</button></th>
+				<th><table>
+					<tr>
+						<th><button onclick="solveEquation();">Solve for:</button></th>
+						<th><select id="variableToSolveFor">
+						</select></th>
+					</tr>
+				</table></th>
+				<th width="8%">at <span class="ioArea" id="equationLeftSide">`R_A` =</th>
+				<th width="10%"><input type="text" id="solveForAt" value="0"></th>
+			</tr>
+			
+		</table>
+		<table>
+			<tr>
+				<th><button onclick="deriveEquation();">Derivative with respect to:</button></th>
+				<th><button onclick="integrateEquation();">Integral with respect to:</button></th>
+				<th><select id="variableForCalculus">
+				</select></th>
+			</tr>
+		</table>
+		<div class="ioArea" id="equationRendering2">``</div>
+		<hr>
+		<table style="text-align: left;">
+			<tr>
+				<th><input type="checkbox" id="enforceBounds" name="enforceBounds"></th>
+				<th><label for="enforceBounds">Enforce α + β = 1</label></th>
+				<th><input type="checkbox" id="compareToLinear" name="compareToLinear" onclick="graph(16);"></th>
+				<th><label for="compareToLinear" onclick="graph(16);">Compare to linear</label></th>
+				<th><input type="checkbox" id="showMax" name="showMax" onclick="graph(16);" checked></th>
+				<th><label for="showMax" onclick="graph(16);">Display maximum</label></th>
+				<th><input type="checkbox" id="freezeGraph" name="freezeGraph" onclick="graph(16)"></th>
+				<th><label for="freezeGraph" onclick="graph(16);">Freeze graph</label></th>
+		</table>
+		<table id="variableSliders">
+			<tr>
+				<th><button onclick="resetVars();">Reset</button></th>
+				<th><textarea id="equationCode" readonly></textarea></th>
+			</tr>
+			<tr>
+				<th>R = <span id="varReward"></span></th>
+				<th><input type="range" min="0" max="10000" value="0" id="valReward" class="disabledSlider" disabled></th>
+			</tr>
+		</table>
+		<hr>
+		<table>
+			<tr>
+				<th>Variable to Analyze (with all others remaining constant):</th>
+				<th><select onchange="selectGraphVar();" id="graphVar">
+				</select></th>
+			</tr>
+		</table>
+		<hr>
+		<canvas id="graph" width="1000px" height="600px" style="display:block; background-color:#FFF;"></canvas>
+		<hr>
+		<button onclick="calculateMaxAndMin(4);">Calculate maximum and minimum for specified variable</button>
+		<table>
+			<tr>
+				<th>From: </th>
+				<th><input type="number" id="varFrom" value="0"></th>
+				<th>To: </th>
+				<th><input type="number" id="varTo" value="1"></th>
+				<th>Precision: </th>
+				<th><input type="number" id="varPrecision" value="512"></th>
+			</tr>
+		</table>
+		<table>
+			<tr>
+				<th>Max: </th>
+				<th id="maxVarName"></th>
+				<th>=</th>
+				<th id="maxVarValue"></th>
+				<th style="width: 18%"></th>
+				<th>~</th>
+				<th style="width: 18%"></th>
+				<th>Reward = </th>
+				<th id="maxRewardValue"></th>
+			</tr>
+			<tr>
+				<th>Min: </th>
+				<th id="minVarName"></th>
+				<th>=</th>
+				<th id="minVarValue"></th>
+				<th style="width: 18%"></th>
+				<th>~</th>
+				<th style="width: 18%"></th>
+				<th>Reward = </th>
+				<th id="minRewardValue"></th>
+			</tr>
+			<tr>
+				<th>Root: </th>
+				<th id="rootVarName"></th>
+				<th>=</th>
+				<th id="rootVarValue"></th>
+				<th style="width: 18%"></th>
+				<th>~</th>
+				<th style="width: 18%"></th>
+				<th>Reward = </th>
+				<th id="rootRewardValue"></th>
+			</tr>
+		</table>
+		<button onclick="calculateRoot(6);">Calculate root for specified variable</button>
+		<!-- <button onclick="gradientDescentMaxMin();">Gradient Descent maximum and minimum for all variables</button> -->
+		<hr>
+		Dual Grapher
+		<canvas id="dualGrapher" width="200px" height="200px" style="display:block; background-color:#000; width: 50%; margin: 0 auto;"></canvas>
+		<table>
+			<tr>
+				<th width="10%"></th>
+				<th>X Axis</th>
+				<th><select id="dualGraphVar1">
+						</select></th>
+				<th>Y Axis</th>
+				<th><select id="dualGraphVar2">
+						</select></th>
+				<th width="10%"></th>
+				<th>
+		<button onclick="dualGraph();">Generate</button></th>
+			</tr>
+		</table>
+		<table>
+			<tr>
+				<th width="30%"></th>
+				<th><input type="checkbox" name="highlight1Active" id="highlight1Active" checked></th>
+				<th><label for="highlight1Active">Highlight</label></th>
+				<th width="60px"><input type="number" id="highlight1Val" value="0.5" step="0.05"></th>
+				<th>with the color</th>
+				<th><input type="color" id="highlight1Color" value="#F4A090"></th>
+				<th width="30%"></th>
+			</tr>
+			<tr>
+				<th width="30%"></th>
+				<th><input type="checkbox" name="highlight2Active" id="highlight2Active" checked></th>
+				<th><label for="highlight2Active">Highlight</label></th>
+				<th width="60px"><input type="number" id="highlight2Val" value="0.4" step="0.05"></th>
+				<th>with the color</th>
+				<th><input type="color" id="highlight2Color" value="#F1E4B3"></th>
+				<th width="30%"></th>
+			</tr>
+			<tr>
+				<th width="30%"></th>
+				<th><input type="checkbox" name="highlight3Active" id="highlight3Active" checked></th>
+				<th><label for="highlight3Active">Highlight</label></th>
+				<th width="60px"><input type="number" id="highlight3Val" value="0.6" step="0.05"></th>
+				<th>with the color</th>
+				<th><input type="color" id="highlight3Color" value="#F26144"></th>
+				<th width="30%"></th>
+			</tr>
+		</table>
+	</div>
+	<script type="text/javascript">
+		var presetDefinitions = [];
+		presetDefinitions["α"] = "Computing power of the attacker. (alpha)";
+		presetDefinitions["β"] = "Computing power of the pool. (beta)";
+		presetDefinitions["τ"] = "Attacker's infiltration mining power as a proportion of α. (tau)";
+		presetDefinitions["c"] = "Probability that the attacker wins the reward given that there is a fork.";
+		presetDefinitions["Γ"] = "Reward fraction of the total reward, given to the miner who solves the FPoW. (Gamma)";
+		presetDefinitions["γ"] = "Reduction factor for Γ (1=no collision/fork). (gamma)";
+
+		var variables = [];
+		var dom = {
+			error: document.getElementById("error"),
+			presetDefinitions: document.getElementById("presetDefinitions"),
+			presetDefinitions2: document.getElementById("presetDefinitions2"),
+			infinitySelector: document.getElementById("infinitySelector"),
+			infinitySelectorValue: document.getElementById("infinitySelectorValue"),
+			equationSource: document.getElementById("equationSource"),
+			equationRendering: document.getElementById("equationRendering"),
+			equationLeftSide: document.getElementById("equationLeftSide"),
+			mathEquationOutput: document.getElementById("mathEquationOutput"),
+			variableToSolveFor: document.getElementById("variableToSolveFor"),
+			variableForCalculus: document.getElementById("variableForCalculus"),
+			solveForAt: document.getElementById("solveForAt"),
+			variableSliders: document.getElementById("variableSliders"),
+			selectPreset: document.getElementById("selectPreset"),
+			enforceBounds: document.getElementById("enforceBounds"),
+			compareToLinear: document.getElementById("compareToLinear"),
+			showMax: document.getElementById("showMax"),
+			freezeGraph: document.getElementById("freezeGraph"),
+			varFrom: document.getElementById("varFrom"),
+			varTo: document.getElementById("varTo"),
+			varPrecision: document.getElementById("varPrecision"),
+			graphCanvas: document.getElementById("graph"),
+			graphCtx: null,
+			graphVar: document.getElementById("graphVar"),
+			dualGraphCanvas: document.getElementById("dualGrapher"),
+			dualGraphCtx: null,
+			dualGraphVar1: document.getElementById("dualGraphVar1"),
+			dualGraphVar2: document.getElementById("dualGraphVar2"),
+			highlight1Active: document.getElementById("highlight1Active"),
+			highlight1Val: document.getElementById("highlight1Val"),
+			highlight1Color: document.getElementById("highlight1Color"),
+			highlight2Active: document.getElementById("highlight2Active"),
+			highlight2Val: document.getElementById("highlight2Val"),
+			highlight2Color: document.getElementById("highlight2Color"),
+			highlight3Active: document.getElementById("highlight3Active"),
+			highlight3Val: document.getElementById("highlight3Val"),
+			highlight3Color: document.getElementById("highlight3Color")
+		}
+		dom.graphCtx = dom.graphCanvas.getContext("2d");
+		dom.dualGraphCtx = dom.dualGraphCanvas.getContext("2d");
+		var graphWidth = dom.graphCanvas.width;
+		var graphHeight = dom.graphCanvas.height;
+		var dualGraphWidth = dom.dualGraphCanvas.width;
+		var dualGraphHeight = dom.dualGraphCanvas.height;
+
+		var variable = {};
+		var infinitySelectorValue = dom.infinitySelectorValue.value;
+		var updateEquation, curx, cury;
+		var selectedGraphVar, highResRenderTimeout;
+		var finalCode = "", summationVars = [];
+		var equationLeftSide = "", equationRightSide = "";
+
+		equationComplete();
+		// Update MathJax in realtime to sync with the equation input
+		window.MathJax = {
+			"fast-preview": {
+				disabled: true
+			},
+			AuthorInit: function() {
+				MathJax.Hub.Register.StartupHook('End', function() {
+					MathJax.Hub.processSectionDelay = 0;
+					updateEquation = function() {
+						var math = MathJax.Hub.getAllJax('equationRendering')[0];
+						var e = dom.equationSource.value.replace(/Math\./g, "");
+						MathJax.Hub.Queue(['Text', math, e]);
+					};
+					updateEquation2 = function() {
+						var math = MathJax.Hub.getAllJax('equationRendering2')[0];
+						var e = dom.mathEquationOutput.value.replace(/Math\./g, "");
+						MathJax.Hub.Queue(['Text', math, e]);
+					};
+					updateLeftSide = function() {
+						var math = MathJax.Hub.getAllJax('equationLeftSide')[0];
+						MathJax.Hub.Queue(['Text', math, equationLeftSide]);
+					};
+					dom.equationSource.addEventListener('input', updateEquation);
+					dom.mathEquationOutput.addEventListener('input', updateEquation2);
+					selectedGraphVar = dom.graphVar.value = "τ";
+					selectPreset(dom.selectPreset.options[2].text); // Preset default equation
+					updateEquation();
+					equationComplete();
+					setVar("α",0.2);
+					setVar("β",0.24);
+					DomCalculateReward();
+				});
+			}
+		}
+
+		// Simplify an equation
+		function simplify(equation){
+			return math.simplify(equation).toString().replace(/\s/g, "").replace(/\+\-/g, "-");
+		}
+		
+		// Solve an equation
+		function solve(equation,variable){
+			equation = equation.replace(/Math\.([a-zA-Z]+)/g, "$1");
+			return nerdamer.solve(equation, variable).toString().replace(/\[/g,"").replace(/\]/g,"").split(",");
+		}
+		
+		// Expand an equation
+		function expand(equation){
+			equation = equation.replace(/Math\.([a-zA-Z]+)/g, "$1");
+			equation = nerdamer(equation, null, 'expand').toString();
+			console.log("Unsimplified expanded equation:");
+			console.log(equation);
+			return simplify(equation);
+		}
+		
+		// Factor an equation
+		function factor(equation){
+			equation = equation.replace(/Math\.([a-zA-Z]+)/g, "$1");
+			equation = nerdamer(equation, null, 'factor').toString();
+			console.log("Unsimplified factored equation:");
+			console.log(equation);
+			return simplify(equation);
+		}
+		
+		// Find the partial derivative
+		function derive(equation, symbol){
+			equation = equation.replace(/Math\.([a-zA-Z]+)/g, "$1");
+			equation = nerdamer.diff(equation, symbol).toString();
+			console.log("Unsimplified derived equation:");
+			console.log(equation);
+			return simplify(equation);
+		}
+		
+		//Integrate an equation
+		function integrate(equation, symbol){
+			equation = equation.replace(/Math\.([a-zA-Z]+)/g, "$1");
+			equation = nerdamer.integrate(equation, symbol).toString();
+			console.log("Unsimplified integrated equation:");
+			console.log(equation);
+			return simplify(equation);
+		}
+		
+		// Initialize symbols
+		//for(var i = 0; i < variables.length; i++) {
+		//	updateVarFromSlider(variables[i]);
+		//}
+
+		//***************** Functions only beyond this point *****************
+
+		function simplifyEquation(){
+			var code = equationRightSide;
+			code = code.replace(/\[/g,"(").replace(/\]/g,")"); //support square
+			code = code.replace(/\{/g,"(").replace(/\}/g,")"); //support curly
+			code = simplify(code);
+			dom.mathEquationOutput.value = code;
+			updateEquation2();
+		}
+
+		function solveEquation(){
+			var code = equationRightSide;
+			code = code.replace(/\[/g,"(").replace(/\]/g,")"); //support square
+			code = code.replace(/\{/g,"(").replace(/\}/g,")"); //support curly
+			if(dom.solveForAt.value != "0"){
+				code = "(" + code + ")-(" + dom.solveForAt.value + ")";
+			}
+			//Solve equation
+			var results = solve(code, dom.variableToSolveFor.value);
+			console.log("Unsimplified solved equation:");
+			console.log(results);
+			code = "";
+			for(var i=0; i < results.length; i++){
+				if(i > 0) code += ", ";
+				code += simplify(results[i]);
+			}
+			dom.mathEquationOutput.value = dom.variableToSolveFor.value + " = " + code;
+			updateEquation2();
+		}
+
+		function expandEquation(){
+			var code = equationRightSide;
+			code = code.replace(/\[/g,"(").replace(/\]/g,")"); //support square
+			code = code.replace(/\{/g,"(").replace(/\}/g,")"); //support curly
+			dom.mathEquationOutput.value = expand(code);
+			updateEquation2();
+		}
+
+		function factorEquation(){
+			var code = equationRightSide;
+			code = code.replace(/\[/g,"(").replace(/\]/g,")"); //support square
+			code = code.replace(/\{/g,"(").replace(/\}/g,")"); //support curly
+			dom.mathEquationOutput.value = factor(code);
+			updateEquation2();
+		}
+
+		function deriveEquation(){
+			var code = equationRightSide;
+			code = code.replace(/\[/g,"(").replace(/\]/g,")"); //support square
+			code = code.replace(/\{/g,"(").replace(/\}/g,")"); //support curly
+			var symbol = dom.variableForCalculus.value;
+			dom.mathEquationOutput.value = derive(code, symbol);
+			updateEquation2();
+		}
+
+		function integrateEquation(){
+			var code = equationRightSide;
+			code = code.replace(/\[/g,"(").replace(/\]/g,")"); //support square
+			code = code.replace(/\{/g,"(").replace(/\}/g,")"); //support curly
+			var symbol = dom.variableForCalculus.value;
+			dom.mathEquationOutput.value = integrate(code, symbol);
+			updateEquation2();
+		}
+		
+		// Trim  a number to a fixed size
+		function formatNum(value, decimals) {
+			return Number.parseFloat(value).toFixed(decimals);
+		}
+
+		// Fires every equation keystroke
+		function equationChange() {
+			DomCalculateReward();
+		}
+
+		// Update's when the value of infinity is changed
+		function changeInfinity(){
+			infinitySelectorValue = parseInt(dom.infinitySelectorValue.value);
+			equationComplete();
+		}
+
+		// Handles variable management
+		// Fires when equation editor loses focus
+		function equationComplete() {
+			var code = dom.equationSource.value;
+			if(!code.includes("=")) code = "=" + code;
+			var sides = code.split("=");
+			equationLeftSide = sides.shift().trim();
+			if(updateEquation !== undefined) updateLeftSide(); // Make the formatting appear
+			code = sides.join("=").trim();
+			code = code.replace(/(?<=[^Math\.])\bsqrt\b/gi, "Math.sqrt");
+			code = code.replace(/\boo\b/gi, "∞");
+			code = code.replace(/\binfty\b/gi, "∞");
+			code = code.replace(/\binfinity\b/gi, "∞");
+			code = code.replace(/\\\[Beta\]/g, "β");
+			code = code.replace(/\\\[Alpha\]/g, "α");
+			code = code.replace(/\\\[Tau\]/g, "τ");
+			code = code.replace(/\\\[Kappa\]/g, "κ");
+			code = code.replace(/\\\[Lambda\]/g, "λ");
+			code = code.replace(/\\\[CapitalGamma\]/g, "Γ");
+			code = code.replace(/\\\[Gamma\]/g, "γ");
+			code = code.replace(/\bbeta\b/g, "β");
+			code = code.replace(/\balpha\b/g, "α");
+			code = code.replace(/\btau\b/g, "τ");
+			code = code.replace(/\bkappa\b/g, "κ");
+			code = code.replace(/\blambda\b/g, "λ");
+			code = code.replace(/\bGamma\b/g, "Γ");
+			code = code.replace(/\bgamma\b/g, "γ");
+			code = code.replace(/\\/g, "");
+			code = code.replace(/\s/g, "");
+			equationRightSide = code;
+			dom.equationSource.value = equationLeftSide + " = " + code;
+
+			if(updateEquation !== undefined) updateEquation();
+
+			if(code.includes("∞")) dom.infinitySelector.hidden = false;
+			else dom.infinitySelector.hidden = true;
+
+			code = code.replace(/Math\.[a-zA-Z]+/g, "");
+			var operators = code.split(/[\s\+\-\*\/\%\=\!\>\<\|\&\~\^\(\[\{\)\]\}0-9\.\∞]/);
+			operators = operators.filter(x => x); // remove empty strings
+			operators = removeDuplicatesFast(operators); // remove duplicates
+			operators = operators.sort(); // Sort elements by unicode
+			operators = operators.sort(function(a,b){ // Then sort elements by length
+			    return b.length - a.length;
+			});
+			variables = operators.slice(0); // Clone variables to operators
+			// Generate the JavaScript. The only place in the code where this is modified.
+			finalCode = equationRightSide;
+			finalCode = finalCode.replace(/\[/g,"(").replace(/\]/g,")"); //support square
+			finalCode = finalCode.replace(/\{/g,"(").replace(/\}/g,")"); //support curly
+			summationVars = [];
+
+			var containsFactorials = finalCode.includes("!");
+			if(containsFactorials)
+				finalCode = applyFactorials(finalCode);
+
+			var sums = applySummations(finalCode);
+			if(sums.output.length > 0) finalCode = sums.output;
+			finalCode = "\nreturn " + finalCode + ";";
+			if(summationVars.length > 0) finalCode = "var " + summationVars.join(" = ") + " = 0; " + sums.precode + finalCode;
+			finalCode = finalCode.replace(/\^/g,"**"); //support exponents brackets
+			finalCode = finalCode.replace(/\∞/g, infinitySelectorValue);
+
+			finalCode = finalCode.trim().replace(/\n\n/g, "\n");
+			if(finalCode == "return ;") finalCode = "";
+			else console.log("Equation converted to JavaScript:\n"+finalCode)
+			for(var v in variable) { // Remove no longer used variables to stay clean
+				if(!variables.includes(v)) delete variable[v];
+			}
+			var sliderCode = "", variableSelectCode = "", saveVarName;
+			for(var i = 0; i < variables.length; i++) {
+				if(variable[variables[i]] == undefined) variable[variables[i]] = 0.5;
+				var n = variable[variables[i]] * 1000000;
+				saveVarName = variables[i].replace(/\'/g, "\\'");
+				// Generate the code for each slider
+				sliderCode += "<tr><th" + (i == 0 ? " style=\"width: 16%\"" : "") + ">" + variables[i] + " = <span class=\"valDisplay\" id=\"var" + (i + 1) + "\" onclick=\"varUserInput('" + saveVarName + "');\">" + formatNum(n / 1000000, 6) + "</span></th><th><input type=\"range\" min=\"0\" max=\"1000000\" value=\"" + n + "\" id=\"val" + (i + 1) + "\" oninput=\"updateVarFromSlider('" + saveVarName + "')\"></th></tr>\n";
+				// Generate the dropdown box to select a variable
+				variableSelectCode += "<option value=\"" + variables[i] + "\"" + (variables[i] == selectedGraphVar ? " selected=\"selected\"" : "") + ">" + variables[i] + "</option>";
+			}
+			// Add the other elements to the end of the sliders
+			sliderCode += "<tr><th><button onclick=\"resetVars();\">Reset</button></th><th><textarea id=\"equationCode\" readonly></textarea></th></tr><tr><th>"+equationLeftSide+" = <span id=\"varReward\"></span></th><th><input type=\"range\" min=\"0\" max=\"10000\" value=\"0\" id=\"valReward\" class=\"disabledSlider\" disabled></th></tr>"
+			variableSliders.innerHTML = sliderCode;
+			dom.graphVar.innerHTML = variableSelectCode;
+			dom.variableToSolveFor.innerHTML = variableSelectCode;
+			dom.variableForCalculus.innerHTML = variableSelectCode;
+			dom.dualGraphVar1.innerHTML = variableSelectCode;
+			dom.dualGraphVar2.innerHTML = variableSelectCode;
+			dom.dualGraphVar1.selectedIndex = 0;
+			dom.dualGraphVar2.selectedIndex = 1;
+			selectGraphVar();
+			DomCalculateReward();
+
+
+			var presetDefinitionsCode = "";
+			for(var v in variable)
+				if(presetDefinitions[v] != undefined)
+					if(presetDefinitionsCode.length == 0)
+						presetDefinitionsCode += "<tr><th style=\"width:80px;\"><input value=\""+v+"\" class=\"symbol\" onclick=\"this.select()\" readonly></th><th class=\"left\">"+presetDefinitions[v]+"</th></tr>";
+					else
+						presetDefinitionsCode += "<tr><th><input value=\""+v+"\" class=\"symbol\" onclick=\"this.select()\" readonly></th><th class=\"left\">"+presetDefinitions[v]+"</th></tr>";
+			dom.presetDefinitions.innerHTML = presetDefinitionsCode;
+			presetDefinitionsCode = "";
+			for(var v in presetDefinitions)
+				if(!variables.includes(v))
+					if(presetDefinitionsCode.length == 0)
+						presetDefinitionsCode += "<tr><th style=\"width:80px;\"><input value=\""+v+"\" class=\"symbol\" onclick=\"this.select()\" readonly></th><th class=\"left\">"+presetDefinitions[v]+"</th></tr>";
+					else
+						presetDefinitionsCode += "<tr><th><input value=\""+v+"\" class=\"symbol\" onclick=\"this.select()\" readonly></th><th class=\"left\">"+presetDefinitions[v]+"</th></tr>";
+			if(presetDefinitionsCode.length) presetDefinitionsCode += "<tr><th><hr></th></tr>";
+			dom.presetDefinitions2.innerHTML = presetDefinitionsCode;
+
+			/*<tr>
+				<th><input value="α" class="symbol" onclick="this.select()" readonly></th>
+				<th class="left">Computing power of the attacker. (alpha)</th>
+			</tr>*/
+		}
+
+		// Quickly calculate a factorial
+		function factorial(n){
+			var out = 1;
+			for (var i=2; i<=n; i++)
+				out *= i;
+			return out;
+		}
+
+		// Convert an expression into tokens
+		function tokenize(expression){
+			var tokens = expression.match(
+				/[a-zA-Z]+|[α-ωΑ-Ω]|[0-9]+|\∞|\!|\$|\%|\^|\&|\*|\(|\)|\_|\+|\||\~|\-|\=|\{|\}|\[|\]|\:|\"|\'|\`|\;|\<|\>|\?|\.|\,|\/|\\/g
+			);
+			return tokens;
+		}
+
+		// Get the first part of an expression, starting at i
+		// If parentheses are given, it will give everything within those parentheses
+		function getFirstPiece(i, tokens){
+			var depth = 0, output = "";
+			do{
+				if(tokens[i] == ")") depth--;
+				if(depth > 0 || tokens[i] != "(")
+					if(depth > 0 || tokens[i] != ")") // Skip the outside parentheses: (*) will just be *
+						output += tokens[i];
+				if(tokens[i] == "(") depth++;
+				i++;
+			}while(depth != 0 && i < tokens.length);
+			return {output: output, index: i};
+		}
+
+		// Get the first part of an expression looking backwards, starting at i
+		// If parentheses are given, it will give everything within those parentheses
+		function getFirstPieceBack(i, tokens){
+			var depth = 0, output = "";
+			do{
+				if(tokens[i] == "(") depth--;
+				if(depth > 0 || tokens[i] != ")")
+					if(depth > 0 || tokens[i] != "(") // Skip the outside parentheses: (*) will just be *
+						output = tokens[i] + output;
+				if(tokens[i] == ")") depth++;
+				i--;
+			}while(depth != 0 && i >= 0);
+			return {output: output, index: i};
+		}
+
+		// Apply factorials to an equation, and return the new code
+		function applyFactorials(code){
+			var tokens = tokenize(code);
+			if(tokens === null) return code; // Nothing to tokenize
+			var j = 0, i = tokens.lastIndexOf("!"), temp;
+			if(i < 0) return code; // No factorials exist
+			do{
+				j = i;
+				temp = getFirstPieceBack(i - 1, tokens);
+				// Allow factorials inside other factorials
+				inner = applyFactorials(temp.output);
+				i = temp.index;
+				console.log("inner: ",inner,"i ",i,"j ",j);
+				for(var k = i + 1; k <= j; k++)
+					tokens[k] = ""; // Clear old factorial chunks away
+				tokens[j] = "factorial("+inner+")";
+				i = tokens.lastIndexOf("!", i);
+			// Iterate from the last factorial to the first
+			}while(i >= 0 && i < tokens.length - 1);
+			return tokens.join("");
+		}
+
+		// Apply summations to an equation if necessary and return the new code and precode
+		function applySummations(code){
+			var tokens = tokenize(code);
+			var currentVar = "";
+			if(tokens === null) return {output:code, precode:""}; // Nothing to tokenize
+			var fors = []; // Contains the JavaScript for loops
+			var j = 0, i = tokens.indexOf("sum"), temp, low, high, inner, v1, v2;
+			if(i < 0) return {output:code, precode:""}; // No summations exist
+			do{
+				j = i;
+				if(tokens[i+1] == "_") i+=2;
+				else console.log("Summation missing _ value");
+				temp = getFirstPiece(i, tokens);
+				low = temp.output;
+				i = temp.index;
+
+				if(tokens[i] == "^") i++;
+				else console.log("Summation missing ^ value");
+				temp = getFirstPiece(i, tokens);
+				high = temp.output;
+				i = temp.index;
+
+				temp = getFirstPiece(i, tokens);
+				inner = temp.output;
+				i = temp.index;
+				
+				temp = low.split("=");
+				if(temp.length != 2) console.log("Invalid summation assignment");
+				v1 = temp[0]; v2 = temp[1];
+				currentVar = "_" + summationVars.length; // Set the variable name
+				summationVars.push(currentVar);
+
+				if(variables.indexOf(v1) >= 0) // Remove variable from editable ones
+					variables.splice(variables.indexOf(v1), 1);
+
+				for(var k = j; k < i; k++)
+					tokens[k] = ""; // Clear old summation code away
+
+				if(!inner.startsWith("sum_")) inner = currentVar + "+" + inner;
+				inner = currentVar + "=" + inner + ";";
+
+				// Recursively work inside the inner code to look for more summations
+				temp = applySummations(inner);
+				inner = temp.precode + temp.output;
+				fors.push("for(var " + v1 + "=" + v2 + "; " + v1 + "<=" + high + "; " + v1 + "++){ " + inner + " }");
+
+				tokens[i - 1] = currentVar;
+				i = tokens.indexOf("sum", i);
+			}while(i >= 0 && i < tokens.length - 1);
+			if(variables.indexOf("sum_") >= 0)
+				variables.splice(variables.indexOf("sum_"), 1);
+			return {
+				output: tokens.join(""),
+				precode: fors.join(""),
+			};
+		}
+
+		// Quickly remove any array duplicates
+		function removeDuplicatesFast(a) {
+			var seen = {};
+			var out = [];
+			var len = a.length;
+			var j = 0;
+			for(var i = 0; i < len; i++) {
+				var item = a[i];
+				if(seen[item] !== 1) {
+					seen[item] = 1;
+					out[j++] = item;
+				}
+			}
+			return out;
+		}
+
+		// Contains contents for all presets
+		function selectPreset(value) {
+			dom.equationSource.value = value;
+			updateEquation();
+			DomCalculateReward();
+			setTimeout(function() {
+				dom.selectPreset.selectedIndex = 0
+			}, 500);
+		}
+		
+		// Set a variable to a value
+		function setVar(symbol, value){
+			var id = variables.indexOf(symbol) + 1;
+			var display = document.getElementById("var" + id);
+			var slider = document.getElementById("val" + id);
+			if(display == null || slider == null) return;
+			
+			variable[symbol] = value;
+			slider.value = Math.round(value * slider.max);
+			display.innerText = formatNum(value, 6);
+			DomCalculateReward();
+		}
+		
+		// Set all variables to 0.5
+		function resetVars() {
+			for(var v in variable) {
+				setVar(v, 0.5);
+			}
+		}
+
+		// Update the variable value from  the slider data
+		// Fired every time a slider is changed
+		function updateVarFromSlider(symbol) {
+			var id = variables.indexOf(symbol) + 1;
+			var display = document.getElementById("var" + id);
+			var slider = document.getElementById("val" + id);
+			if(display == null || slider == null) return;
+			variable[symbol] = slider.value / slider.max;
+			if(dom.enforceBounds.checked&&variable["α"]!==undefined&&variable["β"]!==undefined){
+				// α + β = 1
+				if(variable["α"]+variable["β"]>1){
+					if(symbol == "α") setVar("β", 1 - variable["α"]);
+					else if(symbol == "β") setVar("α", 1 - variable["β"]);
+				}
+			}
+			display.innerText = formatNum(variable[symbol], 6);
+			DomCalculateReward();
+		}
+
+		function getReplacedVarCode(code, variable){
+			// Backup then restore these atomic variable names
+			code = code.split("for").join("\uE831");
+			code = code.split("var").join("\uE832");
+			code = code.split("output").join("\uE833");
+			code = code.split("return").join("\uE834");
+			code = code.split("Math").join("\uE835");
+			code = code.split("factorial").join("\uE836");
+			for(var i=0; i<variables.length; i++) {
+				code = code.split(variables[i]).join("(" + variable[variables[i]] + ")");
+			}
+			code = code.split("\uE836").join("factorial");
+			code = code.split("\uE835").join("Math");
+			code = code.split("\uE834").join("return");
+			code = code.split("\uE833").join("output");
+			code = code.split("\uE832").join("var");
+			code = code.split("\uE831").join("for");
+			return code;
+		}
+
+		// Calculate the output given the slider inputs for each variable value
+		function DomCalculateReward() {
+			var code = getReplacedVarCode(finalCode, variable);
+			document.getElementById("equationCode").innerText = code;
+			try {
+				var reward = Number.parseFloat(new Function(code)());
+				if(isNaN(reward)) return;
+				var rewardSlider = document.getElementById("valReward");
+				var rewardNum = document.getElementById("varReward");
+				rewardNum.innerText = formatNum(reward, 6);
+				rewardSlider.value = reward * rewardSlider.max;
+				graph(16);
+				dom.error.innerText = "";
+			} catch(err) {
+				dom.error.innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;" + err.name + " - " + err.message + "&nbsp;&nbsp;&nbsp;&nbsp;";
+			}
+		}
+
+		// Calculate the output given the variable dictionary object containing all values
+		function calculateReward(variable) {
+			var code = getReplacedVarCode(finalCode, variable);
+			return Number.parseFloat(new Function(code)());
+		}
+
+		// Function to allow users to set variables manually
+		// Fired on variable name click
+		function varUserInput(symbol) {
+			var id = variables.indexOf(symbol) + 1;
+			var x = prompt("Enter a value or expression for \"" + symbol + "\"", variable[symbol]);
+			if(x == null) return; //If user presses Cancel
+			x = x.replace(symbol + " = ", "");
+			for(var i=0; i<variables.length; i++) {
+				x = x.split(variables[i]).join("(" + variable[variables[i]] + ")");
+			}
+			try {
+				var n = eval(x);
+			} catch(err) {
+				console.log("Input " + err.name + " - " + err.message);
+				return;
+			}
+			setVar(symbol, n);
+		}
+
+		// Change the selected variable to graph
+		// Fired on selection box change
+		function selectGraphVar() {
+			selectedGraphVar = dom.graphVar.value;
+			graph(16);
+		}
+
+		// Handle all functionality of the grapher
+		function graph(resolution) {
+			var step = 1 / resolution;
+			var pad = 50;
+			var variable = {}, x, y, px, py;
+			for(var v in this.variable) { //clone variable object
+				variable[v] = this.variable[v];
+			}
+			drawGraphSkeleton();
+			dom.graphCtx.lineWidth = 2;
+			dom.graphCtx.lineCap = "round";
+			dom.graphCtx.lineJoin="round";
+			
+			// Compare to linear
+			if(dom.compareToLinear.checked) {
+				dom.graphCtx.strokeStyle = "#AAA";
+				dom.graphCtx.beginPath();
+				dom.graphCtx.moveTo(pad, graphHeight - pad);
+				dom.graphCtx.lineTo(graphWidth, 0);
+				dom.graphCtx.stroke();
+			}
+			
+			dom.graphCtx.moveTo(pad, graphHeight - pad);
+			dom.graphCtx.beginPath();
+			var lastAboveLinear = false;
+			for(x = 0; x <= 1; x += step) {
+				variable[selectedGraphVar] = x;
+				try {
+					y = calculateReward(variable);
+					if(y > 1000000000000) y=-y; //workaround to sign flip bug
+					// evaluate
+				} catch(err) {
+					console.log("Graphing " + err.name + " - " + err.message);
+					return;
+				}
+				px = pad + x * (graphWidth - pad);
+				py = graphHeight - pad - y * (graphHeight - pad);
+
+				//if(x == 0) dom.graphCtx.lineTo(px, py);
+				dom.graphCtx.lineTo(px, py);
+				
+				// Compare to linear
+				if(dom.compareToLinear.checked) {
+					if(x < y){
+						if(!lastAboveLinear) {
+							// Position of intersection text
+							dom.graphCtx.arc(px, py, 2, 0, 2 * Math.PI);
+							dom.graphCtx.save();
+							dom.graphCtx.rotate(-Math.PI / 2);
+							dom.graphCtx.font = "14px Arial";
+							dom.graphCtx.fillText("( " + formatNum(x, 6) + ", " + formatNum(y, 6) + " )", -py + 85, px);
+							dom.graphCtx.restore();
+							lastAboveLinear = false;
+							dom.graphCtx.lineTo(px, py);
+						}
+						lastAboveLinear = true;
+						dom.graphCtx.arc(px, py, 1, 0, 2 * Math.PI);
+						dom.graphCtx.lineTo(px, py);
+					} else if(lastAboveLinear) {
+						// Position of intersection text
+						dom.graphCtx.arc(px, py, 2, 0, 2 * Math.PI);
+						dom.graphCtx.save();
+						dom.graphCtx.rotate(-Math.PI / 2);
+						dom.graphCtx.font = "14px Arial";
+						dom.graphCtx.fillText("( " + formatNum(x, 6) + ", " + formatNum(y, 6) + " )", -py + 85, px);
+						dom.graphCtx.restore();
+						lastAboveLinear = false;
+						dom.graphCtx.lineTo(px, py);
+					} else lastAboveLinear = false;
+				}
+			}
+			dom.graphCtx.lineTo(graphWidth, py);
+			dom.graphCtx.lineTo(graphWidth, graphHeight - pad);
+			dom.graphCtx.lineTo(pad, graphHeight - pad);
+			// Add replaced variable functionality back
+			x = this.variable[selectedGraphVar];
+			y = calculateReward(this.variable);
+			px = pad + x * (graphWidth - pad);
+			py = graphHeight - pad - y * (graphHeight - pad);
+			
+			dom.graphCtx.strokeStyle = "#000";
+			dom.graphCtx.fillStyle = "#92D1E8";
+			dom.graphCtx.closePath();
+			dom.graphCtx.fill();
+			dom.graphCtx.stroke();
+			
+			
+			// Unprecise Quick Max
+			if(dom.showMax.checked && resolution < 128){
+				var variable = {}, maxx, maxy, maxpx, maxpy;
+				for(var v in this.variable) { //clone variable object
+					variable[v] = this.variable[v];
+				}
+				maxx = recursiveMax(selectedGraphVar, 0, 1, 3, 10);
+				variable[selectedGraphVar] = maxx;
+				maxy = calculateReward(variable);
+				maxpx = pad + maxx * (graphWidth - pad);
+				maxpy = graphHeight - pad - maxy * (graphHeight - pad);
+				dom.graphCtx.strokeStyle = "#FFF";
+				dom.graphCtx.beginPath();
+				dom.graphCtx.moveTo(maxpx, maxpy + 2);
+				dom.graphCtx.lineTo(maxpx, maxpy + 32);
+				dom.graphCtx.moveTo(maxpx, maxpy);
+				dom.graphCtx.stroke();
+			}
+			
+			// Variable line
+			dom.graphCtx.beginPath();
+			dom.graphCtx.strokeStyle = "#193441";
+			dom.graphCtx.moveTo(px, py);
+			dom.graphCtx.lineTo(px, graphHeight - pad);
+			dom.graphCtx.stroke();
+			// Variable dot
+			dom.graphCtx.fillStyle = "#193441";
+			dom.graphCtx.beginPath();
+			dom.graphCtx.arc(px, py, 6, 0, 2 * Math.PI);
+			dom.graphCtx.fill();
+			// Variable text
+			dom.graphCtx.font = "14px Arial";
+			dom.graphCtx.save();
+			dom.graphCtx.rotate(-Math.PI / 2);
+			dom.graphCtx.fillStyle = "#000";
+			dom.graphCtx.fillText("( " + formatNum(x, 6) + ", " + formatNum(y, 6) + " )", -py + 85, px);
+			dom.graphCtx.restore();
+			
+			dom.graphCtx.strokeStyle = "#000";
+			dom.graphCtx.rect(pad, dom.graphCtx.lineWidth / 2, graphWidth - pad - dom.graphCtx.lineWidth / 2, graphHeight - pad - dom.graphCtx.lineWidth / 2);
+			dom.graphCtx.stroke();
+			
+			// Key
+			dom.graphCtx.strokeStyle = "#000";
+			if (variables.length > 0) {
+				dom.graphCtx.textAlign = "left";
+				dom.graphCtx.textBaseline = "middle";
+				dom.graphCtx.font = "bold 14px Courier";
+				var keyx = pad * 1.25, keyy = pad * 0.25 + dom.graphCtx.lineWidth / 2, keyl = variables[0].length;
+				dom.graphCtx.beginPath();
+				dom.graphCtx.rect(keyx, keyy, 78 + keyl * 9, keyy + 15 * variables.length - 6);
+				dom.graphCtx.stroke();
+				dom.graphCtx.fillStyle = "rgba(255,255,255,0.7)";
+				dom.graphCtx.fill();
+				dom.graphCtx.fillStyle = "#000";
+				for(var i=0; i<variables.length; i++) {
+					dom.graphCtx.fillText(variables[i] + " = " + formatNum(this.variable[variables[i]], 3), keyx + 6, keyy + 10 + 15 * i);
+				}
+			}
+			
+			clearTimeout(highResRenderTimeout);
+			if(resolution <= dom.graphCanvas.width) {
+				highResRenderTimeout = setTimeout(function(){ graph(resolution * 2); }, resolution * 4);
+			}
+		}
+
+		// Dual Graph
+		function dualGraph(){
+			var varX = dom.dualGraphVar1.value, varY = dom.dualGraphVar2.value;
+			var imgData = imgData = dom.dualGraphCtx.createImageData(dualGraphWidth, dualGraphHeight), data = imgData.data;
+			var h1, h2, h3, c, red1=red2=red3=gre1=gre2=gre3=blu1=blu2=blu3=0;
+			if(dom.highlight1Active.checked){
+				h1 = Math.round(dom.highlight1Val.value * 255);
+				c = hexToRgb(dom.highlight1Color.value);
+				red1 = c.r;
+				gre1 = c.g;
+				blu1 = c.b;
+			}
+			if(dom.highlight2Active.checked){
+				h2 = Math.round(dom.highlight2Val.value * 255);
+				c = hexToRgb(dom.highlight2Color.value);
+				red2 = c.r;
+				gre2 = c.g;
+				blu2 = c.b;
+			}
+			if(dom.highlight3Active.checked){
+				h3 = Math.round(dom.highlight3Val.value * 255);
+				c = hexToRgb(dom.highlight3Color.value);
+				red3 = c.r;
+				gre3 = c.g;
+				blu3 = c.b;
+			}
+
+			var count = 0, out = 0, stepx = 1/dualGraphWidth, stepy = 1/dualGraphHeight;
+			var variable = {};
+			for(var v in this.variable) { //clone variable object
+				variable[v] = this.variable[v];
+			}
+			for(var y = 0; y <= 1; y += stepy){
+				for(var x = 0; x <= 1; x += stepx){
+					variable[varX] = x;
+					variable[varY] = 1 - y;
+					out = Math.round(calculateReward(variable) * 255);
+					if(out == h1){
+						data[count] = red1;
+						data[count+1] = gre1;
+						data[count+2] = blu1;
+					}else if(out == h2){
+						data[count] = red2;
+						data[count+1] = gre2;
+						data[count+2] = blu2;
+					}else if(out == h3){
+						data[count] = red3;
+						data[count+1] = gre3;
+						data[count+2] = blu3;
+					}else{
+						data[count] = out;
+						data[count+1] = out;
+						data[count+2] = out;
+					}
+					data[count+3] = 255; // alpha
+					count+=4;
+				}
+			}
+			dom.dualGraphCtx.putImageData(imgData, 0, 0);
+		}
+
+		// Convert a hex color into RGB components
+		function hexToRgb(hex) {
+			var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+			return result ? {
+				r: parseInt(result[1], 16),
+				g: parseInt(result[2], 16),
+				b: parseInt(result[3], 16)
+			} : null;
+		}
+
+		// Draw the outline of the graph
+		function drawGraphSkeleton() {
+			let size = 50;
+			dom.graphCtx.lineWidth = 2;
+			dom.graphCtx.lineCap = "round";
+			dom.graphCtx.lineJoin="round";
+			dom.graphCtx.fillStyle = "#FFF";
+			dom.graphCtx.fillRect(0, 0, graphWidth, graphHeight);
+			dom.graphCtx.textAlign = "center";
+			dom.graphCtx.textBaseline = "middle";
+			dom.graphCtx.fillStyle = "#000";
+			dom.graphCtx.strokeStyle = "#000";
+			dom.graphCtx.beginPath();
+
+			// X axis
+			//dom.graphCtx.moveTo(size, graphHeight - size);
+			//dom.graphCtx.lineTo(graphWidth, graphHeight - size);
+			dom.graphCtx.font = "14px Arial";
+			var a = size + 16, b = graphWidth - 16, step = (b - a) / 10;
+			for(var x = a; x < b + step; x += step) {
+				dom.graphCtx.fillText(formatNum((x - a) / (b - a), 2), x, graphHeight - size / 1.4);
+			}
+			dom.graphCtx.font = "bold 16px Arial";
+			dom.graphCtx.fillText("Value of " + selectedGraphVar, graphWidth / 2, graphHeight - size / 4);
+			
+			// Y axis
+			//dom.graphCtx.moveTo(size, 0);
+			//dom.graphCtx.lineTo(size, graphHeight - size);
+			dom.graphCtx.font = "14px Arial";
+			var a = graphHeight - size - 8, b = 8, step = (a - b) / 10;
+			for(var y = a; y > b - step; y -= step) {
+				dom.graphCtx.fillText(formatNum((y - a) / (b - a), 2), size / 1.55, y);
+			}
+			dom.graphCtx.font = "bold 16px Arial";
+			dom.graphCtx.save();
+			dom.graphCtx.rotate(-Math.PI / 2);
+			dom.graphCtx.fillText(equationLeftSide, -graphHeight / 2, size / 7);
+			dom.graphCtx.restore();
+			
+			dom.graphCtx.stroke();
+		}
+		drawGraphSkeleton();
+
+		// Calculate the first max value recursively with high precision
+		function recursiveMax(varName, a, b, depth, stepSize) {
+			if(a > b) b = [a, a = b][0]; //sort a and b
+			var step = (b - a) / stepSize;
+			if(depth <= 0 || step < 0.000000000001) return(a + b) / 2;
+			var max, maxVal = Number.MIN_VALUE;
+			var variable = {}, n;
+			for(var v in this.variable) { //clone variable object
+				variable[v] = this.variable[v];
+			}
+			for(var i = a; i <= b - step; i += step) {
+				variable[varName] = i + step / 2;
+				n = calculateReward(variable);
+				if(n > maxVal) {
+					maxVal = n;
+					max = variable[varName];
+				}
+			}
+			a = max - step / 2;
+			b = max + step / 2;
+			return recursiveMax(varName, a, b, depth - 1, stepSize);
+		}
+
+		// Calculate the first min value recursively with high precision
+		function recursiveMin(varName, a, b, depth, stepSize) {
+			if(a > b) b = [a, a = b][0]; //sort a and b
+			var step = (b - a) / stepSize;
+			if(depth <= 0 || step < 0.000000000001) return(a + b) / 2;
+			var min, minVal = Number.MAX_VALUE;
+			var variable = {}, n;
+			for(var v in this.variable) { //clone variable object
+				variable[v] = this.variable[v];
+			}
+			for(var i = a; i <= b - step; i += step) {
+				variable[varName] = i + step / 2;
+				n = calculateReward(variable);
+				if(n < minVal) {
+					minVal = n;
+					min = variable[varName];
+				}
+			}
+			a = min - step / 2;
+			b = min + step / 2;
+			return recursiveMin(varName, a, b, depth - 1, stepSize);
+		}
+
+		// Calculate the first root recursively with high precision
+		function recursiveRoot(varName, a, b, depth, stepSize) {
+			if(a > b) b = [a, a = b][0]; //sort a and b
+			var step = (b - a) / stepSize;
+			if(depth <= 0 || step < 0.000000000001) return(a + b) / 2;
+			var variable = {}, root = Number.MAX_VALUE, n, oldn;
+			for(var v in this.variable) { //clone variable object
+				variable[v] = this.variable[v];
+			}
+			for(var i = a; i <= b - step; i += step) {
+				variable[varName] = i + step / 2;
+				n = calculateReward(variable);
+				if(i == a) oldn = n;
+				if((n>0)^(oldn>0)) {
+					root = variable[varName];
+					break;
+				}
+				oldn = n;
+			}
+			if(root == Number.MAX_VALUE){
+				// At the end, just check first and last values
+				variable[varName] = a;
+				n = calculateReward(variable);
+				if(n == 0) return a;
+				variable[varName] = b;
+				n = calculateReward(variable);
+				if(n == 0) return b;
+
+				return; // Otherwise, NO ROOT
+			}
+			a = root - step / 2;
+			b = root + step / 2;
+			return recursiveMin(varName, a, b, depth - 1, stepSize);
+		}
+
+		// Fired on button press
+		function calculateMaxAndMin(steps) {
+			var varA = parseFloat(dom.varFrom.value), varB = parseFloat(dom.varTo.value);
+			var precision = parseFloat(dom.varPrecision.value);
+			var maximum = formatNum(recursiveMax(selectedGraphVar, varA, varB, steps, precision), 11);
+			var minimum = formatNum(recursiveMin(selectedGraphVar, varA, varB, steps, precision), 11);
+			var variable = {};
+			for(var v in this.variable) { //clone variable object
+				variable[v] = this.variable[v];
+			}
+			variable[selectedGraphVar] = maximum;
+			var maxVal = formatNum(calculateReward(variable), 11);
+			variable[selectedGraphVar] = minimum;
+			var minVal = formatNum(calculateReward(variable), 11);
+			document.getElementById("maxVarName").innerText = selectedGraphVar;
+			document.getElementById("maxVarValue").innerText = maximum;
+			document.getElementById("maxRewardValue").innerText = maxVal;
+			document.getElementById("minVarName").innerText = selectedGraphVar;
+			document.getElementById("minVarValue").innerText = minimum;
+			document.getElementById("minRewardValue").innerText = minVal;
+			setVar(selectedGraphVar, maximum);
+			graph(16);
+		}
+
+		// Fired on button press
+		function calculateRoot(steps) {
+			var varA = parseFloat(dom.varFrom.value), varB = parseFloat(dom.varTo.value);
+			var precision = parseFloat(dom.varPrecision.value);
+			var root = formatNum(recursiveRoot(selectedGraphVar, varA, varB, steps, precision), 11);
+			if(isNaN(root)) {
+				document.getElementById("rootVarName").innerText = "";
+				document.getElementById("rootVarValue").innerText = "NO ROOT";
+				document.getElementById("rootRewardValue").innerText = "";
+				return;
+			}
+			var variable = {};
+			for(var v in this.variable) { //clone variable object
+				variable[v] = this.variable[v];
+			}
+			variable[selectedGraphVar] = root;
+			var rootVal = formatNum(calculateReward(variable), 11);
+			document.getElementById("rootVarName").innerText = selectedGraphVar;
+			document.getElementById("rootVarValue").innerText = root;
+			document.getElementById("rootRewardValue").innerText = rootVal;
+			setVar(selectedGraphVar, root);
+			graph(16);
+		}
+	</script>
+</body>
+
+</html>

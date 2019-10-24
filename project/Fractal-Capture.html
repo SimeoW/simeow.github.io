@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html>
+<style>
+	body {
+		background-color: #0C1824;
+		color: #FFF;
+		font-size: 1.1em;
+	}
+	canvas {
+		background-color: #000;
+		width: 100%;
+	}
+	table {
+		margin: 0 5%;
+		width: 90%;
+	}
+	input, button, select {
+		font-size: 1.1em;
+		text-align: center;
+		width: 100%;
+	}
+	p, b {
+		font-size: 1.1em;
+		padding: 0 30px;
+		margin: 0;
+	}
+	.container {
+		background-color: #192E40;
+		border-color: #334A5A;
+		border-radius: 30px;
+		border-style: dotted;
+		border-width: 20px;
+		display: block;
+		margin: 50px auto;
+		max-width: 1080px;
+		min-width: 200px;
+		overflow: hidden;
+		width: 70%;
+	}
+</style>
+<head>
+	<meta charset="utf-8">
+	<title>Fractal Capture</title>
+	<script src="lib/CCapture.all.min.js"></script>
+</head>
+<body>
+	<div class="container">
+		<hr>
+		<center><b>Fractal Capture</b></center>
+		<p>This application can be used to generate high quality fractal video animations. By using the controls at the bottom of the page, you can navigate through the fractal, and change different parameters. Clicking "Draw" will generate a high resolution image. Clicking "Start Capture" will begin the video generation, then you can stop the capture at any time to save it, or wait until it finishes which will give a seemless infinite looping animation.</p>
+		<hr>
+		<canvas id="draw" width="1080px" height="1080px"></canvas>
+		<table>
+			<tr>
+				<td colspan="2"><select id="fractalSelect" onchange="updateFractalInput()">
+					<option value="mandelbrot">Mandelbrot</option>
+					<option value="juliaset" selected>Julia Set</option>
+					<option value="burningship">Burning Ship</option>
+					<option value="buddhabrot">Buddhabrot</option>
+				</select><hr></td>
+			</tr>
+			<tr>
+				<td>Width</td>
+				<td><input id="canvasWidth" type="number" value="1080" min="1" onchange="updateFractalInput()"></td>
+			</tr>
+			<tr>
+				<td>Height</td>
+				<td><input id="canvasHeight" type="number" value="1080" min="1" onchange="updateFractalInput()"><hr></td>
+			</tr>
+			<tr>
+				<td>X off</td>
+				<td><input id="fractalXOff" type="number" value="-0.23" step="0.01" oninput="updateFractalInput()"></td>
+			</tr>
+			<tr>
+				<td>Y off</td>
+				<td><input id="fractalYOff" type="number" value="0.35" step="0.01" oninput="updateFractalInput()"></td>
+			</tr>
+			<tr>
+				<td>Zoom</td>
+				<td><input id="fractalZoom" type="number" value="1500" step="10" oninput="updateFractalInput()"></td>
+			</tr>
+			<tr>
+				<td>Real</td>
+				<td><input id="fractalReal" type="number" value="-0.1" step="0.01" oninput="updateFractalInput()"></td>
+			</tr>
+			<tr>
+				<td>Complex</td>
+				<td><input id="fractalComplex" type="number" value="-0.1" step="0.01" oninput="updateFractalInput()"></td>
+			</tr>
+			<tr>
+				<td>Detail</td>
+				<td><input id="fractalDetail" type="number" value="20" step="0.1" oninput="updateFractalInput()"></td>
+			</tr>
+			<tr>
+				<td>Iterations</td>
+				<td><input id="fractalIterations" type="number" value="50" step="1" oninput="updateFractalInput()"></td>
+			</tr>
+			<tr><td colspan="2"><hr></td></tr>
+			<tr>
+				<td><input id="autoDraw" type="checkbox" checked>Auto draw</input></td>
+				<td><button onclick="draw()">Draw</button></td>
+			</tr>
+			<tr><td colspan="2"><hr></td></tr>
+			<tr><td colspan="2"><button id="toggler" onclick="toggleCapture()">Start Capture</button></td></tr>
+		</table>
+		<br>
+	</div>
+</body>
+<script>
+	let fps = 30;
+	let canvas = document.getElementById("draw");
+	let ctx = canvas.getContext("2d");
+	let width = canvas.width, height = canvas.height;
+	let imageData = ctx.createImageData(width, height);
+
+	let running = false, frames = 0, count = 0;
+	var capturer = new CCapture({format: 'webm', framerate: fps});
+
+	function toggleCapture() {
+		running = !running;
+		if(running) {
+			console.log("Start");
+			document.getElementById("toggler").innerText = "Stop Capture";
+			init();
+			capturer.start();
+			next();
+		} else {
+			capturer.stop();
+			console.log("Stop");
+			document.getElementById("toggler").innerText = "Start Capture";
+			capturer.save();
+		}
+	}
+
+	// Generate a random integer from A to B
+	function r(a, b) {
+		return Math.floor(a + Math.random() * (b - a + 1));
+	}
+
+	// Linear interpolation
+	function lerp(start, end, value){
+		if(value == 1) return end;
+		if(value == 0) return start;
+		return start * (1 - value) + end * value;
+	}
+
+	// Sets a pixel's color
+	function setPixel(imageData, x, y, r, g, b, a) {
+		if(x < 0 || y < 0 || x > width || y > height) return;
+		index = (x + y * imageData.width) * 4;
+		if(a != 255) {
+			imageData.data[index+0] = lerp(imageData.data[index+0], r, a / 255);
+			imageData.data[index+1] = lerp(imageData.data[index+1], g, a / 255);
+			imageData.data[index+2] = lerp(imageData.data[index+2], b, a / 255);
+		} else {
+			imageData.data[index+0] = r;
+			imageData.data[index+1] = g;
+			imageData.data[index+2] = b;
+		}
+		imageData.data[index+3] = 255;
+	}
+
+	// Ran before the video begins
+	function init() {
+		noise.seed(Math.random());
+		fractal.t = 0;
+	}
+
+	// Ran every frame
+	function next() {
+		let domIterations = Number(document.getElementById("fractalIterations").value);
+		if(fractal.t >= Math.PI * 2) {
+			toggleCapture();
+			return;
+		}
+		fractal.t += Math.PI * 2 / 300;
+		let tx = Math.sin(fractal.t) / 2;
+		let ty = Math.cos(fractal.t) / 2;
+
+		imageData = ctx.createImageData(width, height);
+		if(fractal.iterations == 0) return;
+		ctx.fillStyle = "#000";
+		ctx.fillRect(0, 0, width, height);
+		let x0, y0, value, alpha = 255, resolution = 1;
+		for(var y = 0; y < height; y += resolution) {
+			for(var x = 0; x < width; x += resolution) {
+				let sx = noise.simplex3(x / 700, y / 1000, 1000);
+				let sy = noise.simplex3(y / 700, x / 1000, -1000);
+				fractal.iterations = Math.floor((noise.simplex2(sx + tx, sy + ty) + 1) / 2 * domIterations);
+				x0 = (x - width / 2) / fractal.zoom + fractal.xoff;
+				y0 = (y - height / 2) / fractal.zoom + fractal.yoff;
+				value = fractal.function(x0, y0, 14);
+				if(value == null) continue;
+				value %= 255;
+				setPixel(imageData, x, y, value, value, value, alpha);
+			}
+		}
+		ctx.putImageData(imageData, 0, 0);
+		capturer.capture(canvas);
+		frames++;
+		console.log("Frame #" + frames + " Time " + (Math.floor(frames / fps * 100) / 100) + "s");
+
+		if(running) setTimeout(next, 0);
+	}
+
+	function draw(resolution = 1) {
+		imageData = ctx.createImageData(width, height);
+		if(fractal.iterations == 0) return;
+		ctx.fillStyle = "#000";
+		ctx.fillRect(0, 0, width, height);
+		let x0, y0, value, alpha = 255;
+		if(resolution == 1) {
+			for(var y = 0; y < height; y += resolution) {
+				for(var x = 0; x < width; x += resolution) {
+					x0 = (x - width / 2) / fractal.zoom + fractal.xoff;
+					y0 = (y - height / 2) / fractal.zoom + fractal.yoff;
+					value = fractal.function(x0, y0, 14);
+					if(value == null) continue;
+					value %= 255;
+					setPixel(imageData, x, y, value, value, value, alpha);
+				}
+			}
+			ctx.putImageData(imageData, 0, 0);
+		} else {
+			alpha /= 255;
+			for(var y = -Math.floor(resolution / 2); y < height; y += resolution) {
+				for(var x = -Math.floor(resolution / 2); x < width; x += resolution) {
+					x0 = (x - width / 2) / fractal.zoom + fractal.xoff;
+					y0 = (y - height / 2) / fractal.zoom + fractal.yoff;
+					value = fractal.function(x0, y0);
+					if(value == null) continue;
+					value %= 255;
+					if(fractal.function !== buddhabrot) {
+						ctx.fillStyle = "rgba(" + value + ", " + value + ", " + value + ", " + alpha + ")";
+						ctx.fillRect(x, y, resolution, resolution);
+					}
+				}
+			}
+			if(value == null) {
+				ctx.putImageData(imageData, 0, 0);
+			}
+		}
+	}
+
+	let fractal = {
+		xoff: 0, yoff: 0, zoom: 0, real: 0, complex: 0, detail: 0, iterations: 0
+	}
+
+	function updateFractalInput() {
+		width = Number(document.getElementById("canvasWidth").value) || 1;
+		height = Number(document.getElementById("canvasHeight").value) || 1;
+		if(canvas.width != width || canvas.height != height) {
+			canvas.width = width;
+			canvas.height = height;
+			imageData = ctx.createImageData(canvas.width, canvas.height);
+		}
+		var container = document.getElementsByClassName("container")[0];
+		container.style.maxWidth = width + "px";
+		try {
+			fractal.function = window[document.getElementById("fractalSelect").selectedOptions[0].value];
+		} catch(e) {
+			fracta.function = mandelbrot;
+		}
+		fractal.xoff = Number(document.getElementById("fractalXOff").value);
+		fractal.yoff = Number(document.getElementById("fractalYOff").value);
+		fractal.zoom = Number(document.getElementById("fractalZoom").value);
+		fractal.real = Number(document.getElementById("fractalReal").value);
+		fractal.complex = Number(document.getElementById("fractalComplex").value);
+		fractal.detail = Number(document.getElementById("fractalDetail").value);
+		fractal.iterations = Number(document.getElementById("fractalIterations").value);
+		draw(15);
+		//if(document.getElementById("autoDraw").checked) SetTimeout(draw, 10);
+	}
+
+	function mandelbrot(x0, y0) {
+		let xreal = fractal.real, ycomp = fractal.complex, x2, c;
+		for(var i = 0; i < fractal.iterations; i++) {
+			x2 = xreal * xreal - ycomp * ycomp + x0 - 0.6;
+			ycomp = 2 * xreal * ycomp + y0;
+			c = x2 * x2 + ycomp * ycomp;
+			xreal = x2;
+			if(c>=16) break;
+		}
+		return (i + 1 - Math.log(Math.abs(Math.log(Math.abs(Math.sqrt(c))))) / 0.693147) * fractal.detail;
+	}
+
+	function juliaset(x0, y0) {
+		let xreal = x0, ycomp = y0, x2, c;
+		x0 = fractal.real + 0.312;
+		y0 = fractal.complex + 0.687;
+		for(var i = 0; i < fractal.iterations; i++) {
+			x2 = xreal * xreal - ycomp * ycomp + x0;
+			ycomp = 2 * xreal * ycomp + y0;
+			xreal = x2;
+			c = x2 * x2 + ycomp * ycomp;
+			if(c>=4) break;
+		}
+		return (i + 1 - Math.log(Math.abs(Math.log(Math.abs(Math.sqrt(c))))) / 0.693147) * fractal.detail;
+	}
+
+	function burningship(x0, y0) {
+		let xreal = x0 / 4 + 0.4 - fractal.real, ycomp = y0 / 4 + 0.33 - fractal.complex, x2, c;
+		x0 = -2 + (xreal + fractal.real + 1.5 / fractal.zoom / 30) * 4;
+		y0 = -2 + (ycomp + fractal.complex + 1 / fractal.zoom / 30) * 4;
+		for(var i = 0; i < fractal.iterations; i++) {
+			x2 = xreal * xreal - ycomp * ycomp + x0;
+			ycomp = 2 * Math.abs(xreal * ycomp) + y0;
+			xreal = x2;
+			c = x2 * x2 + ycomp * ycomp;
+			if(c>=4) break;
+		}
+		return (i + 1 - Math.log(Math.abs(Math.log(Math.abs(Math.sqrt(c))))) / 0.693147) * fractal.detail;
+	}
+
+	function buddhabrot(x0, y0, alpha = 1) {
+		let xreal = fractal.real, ycomp = fractal.complex, x2, c;
+		let _x0, _y0;
+		for(var i = 0; i < fractal.iterations; i++) {
+			x2 = xreal * xreal - ycomp * ycomp + x0 - 0.6;
+			ycomp = 2 * xreal * ycomp + y0;
+			c = x2 * x2 + ycomp * ycomp;
+			xreal = x2;
+			if(i == 0) continue;
+			if(c >= 10) break;
+			_x0 = Math.floor((xreal - fractal.xoff) * (fractal.zoom) + width / 2);
+			_y0 = Math.floor((ycomp - fractal.yoff) * (fractal.zoom) + height / 2);
+			if(_x0 < 0 || _y0 < 0 || _x0 > width || _y0 > height) continue;
+			index = (_x0 + _y0 * imageData.width) * 4;
+			imageData.data[index+0] = lerp(imageData.data[index+0], 255, alpha);
+			imageData.data[index+1] = lerp(imageData.data[index+1], 255, alpha);
+			imageData.data[index+2] = lerp(imageData.data[index+2], 255, alpha);
+			imageData.data[index+3] = 255;
+		}
+		return null;
+	}
+
+	// Simplex noise and Perlin noise minified implementations
+	!function(t){var o=t.noise={};function r(t,o,r){this.x=t,this.y=o,this.z=r}r.prototype.dot2=function(t,o){return this.x*t+this.y*o},r.prototype.dot3=function(t,o,r){return this.x*t+this.y*o+this.z*r};var n=[new r(1,1,0),new r(-1,1,0),new r(1,-1,0),new r(-1,-1,0),new r(1,0,1),new r(-1,0,1),new r(1,0,-1),new r(-1,0,-1),new r(0,1,1),new r(0,-1,1),new r(0,1,-1),new r(0,-1,-1)],e=[151,160,137,91,90,15,131,13,201,95,96,53,194,233,7,225,140,36,103,30,69,142,8,99,37,240,21,10,23,190,6,148,247,120,234,75,0,26,197,62,94,252,219,203,117,35,11,32,57,177,33,88,237,149,56,87,174,20,125,136,171,168,68,175,74,165,71,134,139,48,27,166,77,146,158,231,83,111,229,122,60,211,133,230,220,105,92,41,55,46,245,40,244,102,143,54,65,25,63,161,1,216,80,73,209,76,132,187,208,89,18,169,200,196,135,130,116,188,159,86,164,100,109,198,173,186,3,64,52,217,226,250,124,123,5,202,38,147,118,126,255,82,85,212,207,206,59,227,47,16,58,17,182,189,28,42,223,183,170,213,119,248,152,2,44,154,163,70,221,153,101,155,167,43,172,9,129,22,39,253,19,98,108,110,79,113,224,232,178,185,112,104,218,246,97,228,251,34,242,193,238,210,144,12,191,179,162,241,81,51,145,235,249,14,239,107,49,192,214,31,181,199,106,157,184,84,204,176,115,121,50,45,127,4,150,254,138,236,205,93,222,114,67,29,24,72,243,141,128,195,78,66,215,61,156,180],a=new Array(512),i=new Array(512);o.seed=function(t){t>0&&t<1&&(t*=65536),(t=Math.floor(t))<256&&(t|=t<<8);for(var o=0;o<256;o++){var r;r=1&o?e[o]^255&t:e[o]^t>>8&255,a[o]=a[o+256]=r,i[o]=i[o+256]=n[r%12]}},o.seed(0);var d=.5*(Math.sqrt(3)-1),f=(3-Math.sqrt(3))/6,h=1/6;function u(t){return t*t*t*(t*(6*t-15)+10)}function s(t,o,r){return(1-r)*t+r*o}o.simplex2=function(t,o){var r,n,e=(t+o)*d,h=Math.floor(t+e),u=Math.floor(o+e),s=(h+u)*f,l=t-h+s,w=o-u+s;l>w?(r=1,n=0):(r=0,n=1);var v=l-r+f,M=w-n+f,c=l-1+2*f,p=w-1+2*f,y=i[(h&=255)+a[u&=255]],x=i[h+r+a[u+n]],m=i[h+1+a[u+1]],q=.5-l*l-w*w,z=.5-v*v-M*M,A=.5-c*c-p*p;return 70*((q<0?0:(q*=q)*q*y.dot2(l,w))+(z<0?0:(z*=z)*z*x.dot2(v,M))+(A<0?0:(A*=A)*A*m.dot2(c,p)))},o.simplex3=function(t,o,r){var n,e,d,f,u,s,l=(t+o+r)*(1/3),w=Math.floor(t+l),v=Math.floor(o+l),M=Math.floor(r+l),c=(w+v+M)*h,p=t-w+c,y=o-v+c,x=r-M+c;p>=y?y>=x?(n=1,e=0,d=0,f=1,u=1,s=0):p>=x?(n=1,e=0,d=0,f=1,u=0,s=1):(n=0,e=0,d=1,f=1,u=0,s=1):y<x?(n=0,e=0,d=1,f=0,u=1,s=1):p<x?(n=0,e=1,d=0,f=0,u=1,s=1):(n=0,e=1,d=0,f=1,u=1,s=0);var m=p-n+h,q=y-e+h,z=x-d+h,A=p-f+2*h,b=y-u+2*h,g=x-s+2*h,j=p-1+.5,k=y-1+.5,B=x-1+.5,C=i[(w&=255)+a[(v&=255)+a[M&=255]]],D=i[w+n+a[v+e+a[M+d]]],E=i[w+f+a[v+u+a[M+s]]],F=i[w+1+a[v+1+a[M+1]]],G=.6-p*p-y*y-x*x,H=.6-m*m-q*q-z*z,I=.6-A*A-b*b-g*g,J=.6-j*j-k*k-B*B;return 32*((G<0?0:(G*=G)*G*C.dot3(p,y,x))+(H<0?0:(H*=H)*H*D.dot3(m,q,z))+(I<0?0:(I*=I)*I*E.dot3(A,b,g))+(J<0?0:(J*=J)*J*F.dot3(j,k,B)))},o.perlin2=function(t,o){var r=Math.floor(t),n=Math.floor(o);t-=r,o-=n;var e=i[(r&=255)+a[n&=255]].dot2(t,o),d=i[r+a[n+1]].dot2(t,o-1),f=i[r+1+a[n]].dot2(t-1,o),h=i[r+1+a[n+1]].dot2(t-1,o-1),l=u(t);return s(s(e,f,l),s(d,h,l),u(o))},o.perlin3=function(t,o,r){var n=Math.floor(t),e=Math.floor(o),d=Math.floor(r);t-=n,o-=e,r-=d;var f=i[(n&=255)+a[(e&=255)+a[d&=255]]].dot3(t,o,r),h=i[n+a[e+a[d+1]]].dot3(t,o,r-1),l=i[n+a[e+1+a[d]]].dot3(t,o-1,r),w=i[n+a[e+1+a[d+1]]].dot3(t,o-1,r-1),v=i[n+1+a[e+a[d]]].dot3(t-1,o,r),M=i[n+1+a[e+a[d+1]]].dot3(t-1,o,r-1),c=i[n+1+a[e+1+a[d]]].dot3(t-1,o-1,r),p=i[n+1+a[e+1+a[d+1]]].dot3(t-1,o-1,r-1),y=u(t),x=u(o),m=u(r);return s(s(s(f,v,y),s(h,M,y),m),s(s(l,c,y),s(w,p,y),m),x)}}(this);
+
+	updateFractalInput();
+</script>
+</html>
+
+
+<!--
+	// Draws a circle
+	function circle(x, y, radius, fill = "#FFF"){
+		ctx.fillStyle = fill;
+		ctx.beginPath();
+		ctx.arc(x, y, r, 0, 2 * Math.PI, true);
+		ctx.fill();
+	}
+-->

@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Lights Out</title>
+</head>
+<body>
+<style>
+body{
+	background-color:#303030;
+	margin:0px;
+}
+#game{
+	display:table;
+	margin-left:auto;
+	margin-right:auto;
+}
+#input{
+	display:table;
+	margin-left:auto;
+	margin-right:auto;
+	text-align:center;
+}
+#all{
+	background-color:#CCCCCC;
+	border-style:ridge;
+	border-width:10px;
+	border-color:#00AAFF;
+	display:table;
+	margin-left:auto;
+	margin-right:auto;
+	text-align:center;
+}
+</style>
+<div id="all">
+<div id="game"></div>
+<hr>
+<div id="input"></div>
+Amount of Boxes: <input type="number" min=1 value=5 defaultValue=5 id="gridAmount" style="text-align:right; width:50px; margin-left:20px;"/><br>
+<button type="button" onclick="javascript:randomize();" style="width:40%;" title="Randomize Button - Its impossible to land on all blacks or all whites">Randomize</button><button type="button" onclick="javascript:reset();" style="width:60%;" title="Refresh Button - Deletes then re-creates the grid with it's size relative to the size of your browser">Refresh Game</button>
+<div id="solution"></div>
+<button type="button" onclick="javascript:checkSolution();" style="width:100%;" id="calcSol">Calculate Solution</button>
+</div>
+<script type="text/javascript">
+	var w=window.innerWidth||document.documentElement.clientWidth||document.body.clientWidth;
+	var h=window.innerHeight||document.documentElement.clientHeight||document.body.clientHeight;
+	var grid=5;
+	var size=0;
+	var numTurns=0
+	var numIterations=0;
+	var iterationsMade=0;
+	var passedWarning=false;
+	var numberOfSolutions=0;
+	var currentSolutionNumber=1;
+	var solutionsFinal=false;
+	function checkSolution(){
+		if(grid!=document.getElementById("gridAmount").value){
+			reset();
+		}
+		numIterations=0;
+		for(var i=0;i<grid;i++){
+			numIterations+=Math.pow(2,i);
+		}
+		if(numIterations>1023&passedWarning==false){
+			alert("WARNING\n"+numIterations+" iterations could crash your browser!\nIf you wish to continue then click the Calculate Solution button again.");
+			passedWarning=true;
+		}else{
+			calculateSolution();
+		}
+	}
+	function calculateSolution(){
+		initalizeGame("solution");
+		window.scrollTo(0,document.body.scrollHeight);
+		var won=true;
+		var bin="";
+		var done=false;
+		i=iterationsMade;
+		solve: //used to break out of any inner loops
+		//for(var i=1;i<=numIterations;i++){
+		while(!done){
+			i++;
+			if(i>numIterations){
+				currentSolutionNumber=1;
+				i=1;
+				solutionsFinal=true;
+			}
+			q=i;
+			bin="";
+			while(q!=0){ //calculates every combination that the top row can have using binary counting
+				bin=(q%2)+""+bin;
+				q=Math.floor(q/2);
+			}
+			for(var j=bin.length;j<grid;j++){
+				bin="0"+bin; //fill in the blank binary #s with 0s to make the binary string the same length as the grid size
+			}
+			for(var j=1;j<=grid;j++){ //set first row to the binary string
+				if(bin.charAt(j-1)=="1"){
+					solutionClick(j,1);
+				}
+			}
+			for(var y=2;y<=grid;y++){ //solve the rest of the grid from the top row's data
+				for(var x=1;x<=grid;x++){
+					if(document.getElementById("solution"+x+","+(y-1)).style.backgroundColor=="rgb(255, 255, 255)"){
+						solutionClick(x,y);
+					}
+				}
+			}
+			
+			won=true;
+			for(var y=1;y<=grid;y++){
+				for(var x=1;x<=grid;x++){
+					var btn=document.getElementById("solution"+x+","+y);
+					if(btn.style.backgroundColor=="rgb(255, 255, 255)"){ //if any button is white, incomplete
+						won=false;
+					}
+					
+					var btn0=document.getElementById(x+","+y);
+					if(btn0.name=="clicked"){ //set the solution to fit the current grid's data that the user made
+						if(btn.name=="solution"){
+							btn.name="";
+						}else{
+							btn.name="solution";
+						}
+					}
+				}
+			}
+			for(var y=1;y<=grid;y++){
+				for(var x=1;x<=grid;x++){
+					var btn=document.getElementById("solution"+x+","+y)
+					btn.style.backgroundColor="#FFFFFF";
+					if(won){
+						if(btn.name=="solution"){
+							btn.style.backgroundColor="#0000FF";
+						}
+					}
+					btn.name="";
+				
+				}
+			}
+			iterationsMade=(i+1);
+			if(solutionsFinal){
+				document.getElementById("solutionTitle").innerText="Solution #"+currentSolutionNumber+"/"+numberOfSolutions+":";
+			}else{
+				document.getElementById("solutionTitle").innerText="Solution #"+currentSolutionNumber+":";
+			}
+			if(won){
+				currentSolutionNumber++;
+				if(currentSolutionNumber>numberOfSolutions){
+					numberOfSolutions=currentSolutionNumber-1;
+				}
+				break solve;
+			}
+		}
+		if(!won){
+			alert("No Solution Found");
+		}
+	}
+	function solutionClick(x,y){
+		check(x,y,"solution");
+		check(x+1,y,"solution");
+		check(x-1,y,"solution");
+		check(x,y+1,"solution");
+		check(x,y-1,"solution");
+		document.getElementById("solution"+x+","+y).name="solution";
+	}
+	function clicked(x,y,checkForWin){
+		var btn=document.getElementById(x+","+y);
+		numTurns++;
+		check(x,y,"");
+		check(x+1,y,"");
+		check(x-1,y,"");
+		check(x,y+1,"");
+		check(x,y-1,"");
+		if(checkForWin){
+			checkIfWon();
+		}
+		if(btn.name==""){
+			btn.name="clicked";
+		}else{
+			btn.name="";
+		}
+		if(document.getElementById("solution"+x+","+y)){
+			var btn2=document.getElementById("solution"+x+","+y);
+			if(btn2.style.backgroundColor=="rgb(255, 255, 255)"){
+				btn2.style.backgroundColor="#0000FF";
+			}else{
+				btn2.style.backgroundColor="#FFFFFF";
+			}
+		}
+	}
+	function check(x,y,idExtention){
+		if(x>=1&y>=1&x<=grid&y<=grid){
+			var btn=document.getElementById(idExtention+x+","+y);
+			if(btn.style.backgroundColor=="rgb(255, 255, 255)"){
+				btn.style.backgroundColor="#000000";
+			}else{
+				btn.style.backgroundColor="#FFFFFF";
+			}
+		}
+	}
+	function initalizeGame(location){
+		document.getElementById("solution").innerHTML="";
+		w=window.innerWidth||document.documentElement.clientWidth||document.body.clientWidth;
+		h=window.innerHeight||document.documentElement.clientHeight||document.body.clientHeight;
+		var size=50;
+		if(w<=h-110){
+			size=(w/grid)-2;
+		}else{
+			size=(h/grid);
+			size-=(110/grid);
+		}
+		if(location=="solution"){ //make solution smaller than normal grid
+			size=size/2.5;
+			if(solutionsFinal){
+				document.getElementById("solution").innerHTML="<hr><p id='solutionTitle' title='Iterations made: "+(iterationsMade+1)+"\nThe blue buttons indicate the positions that need to be clicked'>Solution #"+currentSolutionNumber+"/"+numberOfSolutions+":</p><hr>";
+			}else{
+				document.getElementById("solution").innerHTML="<hr><p id='solutionTitle' title='Iterations made: "+(iterationsMade+1)+"\nThe blue buttons indicate the positions that need to be clicked'>Solution #"+currentSolutionNumber+":</p><hr>";
+			}
+		}
+		numIterations=0;
+		for(var y=1;y<=grid;y++){
+			numIterations+=Math.pow(2,y-1);
+			for(var x=1;x<=grid;x++){
+				var btn = document.createElement("button");
+				btn.setAttribute("title",x+","+y);
+				btn.setAttribute("style","height:"+size+"px; width:"+size+"px; background-color:#FFFFFF;");
+				if(location=="game"){
+					btn.setAttribute("id",x+","+y);
+					btn.setAttribute("onclick","javascript:clicked("+x+","+y+",true);");
+				}else{
+					btn.setAttribute("id","solution"+x+","+y);
+					btn.setAttribute("onclick","javascript:clicked("+x+","+y+",true);");
+					btn.setAttribute("disabled",true);
+				}
+				document.getElementById(location).appendChild(btn); 
+			}
+			document.getElementById(location).innerHTML+="<br>";
+		}
+		if(document.getElementById("solution1,1")){
+			document.getElementById("calcSol").innerText="Calculate Next Solution (Max iterations:"+numIterations+")";
+		}else{
+			document.getElementById("calcSol").innerText="Calculate Solution (Max iterations:"+numIterations+")";
+		}
+		document.title=grid+" by "+grid+" Lights Out Game";
+	}
+	function reset(){
+		numberOfSolutions=0;
+		currentSolutionNumber=1;
+		solutionsFinal=false;
+		passedWarning=false;
+		numTurns=0;
+		grid=document.getElementById("gridAmount").value;
+		if(grid<=0){
+			grid=1;
+			document.getElementById("gridAmount").value=1;
+		}
+		document.getElementById("game").innerHTML="";
+		initalizeGame("game");
+		
+		document.getElementById("input").style.width=(size*grid)+"px;";
+	}
+	function randomize(){
+		var allBlack=true;
+		var allWhite=true;
+		if(grid!=document.getElementById("gridAmount").value){
+			reset();
+		}
+		if(grid!=1){
+			while(allBlack|allWhite){ //repeat until a successful randomization
+				for(var i=1;i<=grid*grid;i++){
+					clicked(Math.floor(1+Math.random()*grid),Math.floor(1+Math.random()*grid),false);
+				}
+				allBlack=true;
+				allWhite=true;
+				for(var y=1;y<=grid;y++){
+					for(var x=1;x<=grid;x++){
+						var btn=document.getElementById(x+","+y);
+						if(btn.style.backgroundColor=="rgb(255, 255, 255)"){
+							allBlack=false;
+						}
+						if(btn.style.backgroundColor=="rgb(0, 0, 0)"){
+							allWhite=false;
+						}
+					}
+				}
+			}
+		}
+		numTurns=0;
+	}
+	function checkIfWon(){
+		var won=true
+		for(var y=1;y<=grid;y++){
+			for(var x=1;x<=grid;x++){
+				var btn=document.getElementById(x+","+y);
+				if(btn.style.backgroundColor=="rgb(255, 255, 255)"){ //if any button is white, incomplete
+					won=false;
+				}
+			}
+		}
+		if(won){
+			var t
+			if(numTurns==1){
+				t=numTurns+" turn!"
+			}else{
+				t=numTurns+" turns."
+			}
+			if(document.getElementById("solution1,1")){ //if the user cheated
+				alert("Good job! You solved the "+grid+" by "+grid+".\nThat took you "+t+"\n\nNow try the "+(Number(grid)+1)+" by "+(Number(grid)+1)+"...");
+			}else{
+				alert("CONGRATULATIONS YOU COMPLETED THE "+grid+" BY "+grid+" WITHOUT CHEATING!!!\nThat took you "+t+"\n\nNow try the "+(Number(grid)+1)+" by "+(Number(grid)+1)+"...");
+			}
+			document.getElementById("gridAmount").value=Number(document.getElementById("gridAmount").value)+1;
+			grid=document.getElementById("gridAmount").value;
+			if(grid<=0){
+				grid=1;
+				document.getElementById("gridAmount").value=1;
+			}
+			reset()
+		}
+	}
+	window.onresize=function(event){
+		w=window.innerWidth||document.documentElement.clientWidth||document.body.clientWidth;
+		h=window.innerHeight||document.documentElement.clientHeight||document.body.clientHeight;
+		var size=50;
+		if(w<=h-90){
+			size=(w/grid)-20;
+		}else{
+			size=(h/grid);
+			size-=(110/grid);
+		}
+		for(var y=1;y<=grid;y++){
+			for(var x=1;x<=grid;x++){
+				var btn=document.getElementById(x+","+y);
+				btn.style.width=size+"px";
+				btn.style.height=size+"px";
+				if(document.getElementById("solution"+x+","+y)){
+				var btn2=document.getElementById("solution"+x+","+y);
+					btn2.style.width=(size/2.5)+"px";
+					btn2.style.height=(size/2.5)+"px";
+				}
+			}
+		}
+		document.getElementById("all").style.width=(size*grid)+"px;";
+	}
+	initalizeGame("game")
+	document.getElementById("all").style.width=(size*grid)+"px;";
+</script>
+</body>
+</html>

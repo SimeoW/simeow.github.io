@@ -1,0 +1,376 @@
+<html>
+<style>
+	* {
+		font-family: "Arial";
+	}
+
+	body {
+		background-color: #000;
+	}
+
+	button{
+		width: 100%;
+		height: 40px;
+	}
+
+	#explorer {
+		background-color: #FFDEC3;
+		border-radius: 18px;
+		border: 5px solid #BA9487;
+		display: block;
+		margin: 0 auto;
+		min-height: 100px;
+		overflow: hidden;
+		padding: 10px;
+		text-align: center;
+		width: 80%;
+	}
+
+	#explorer-toolbox, select {
+		width: 100%;
+	}
+
+	#explorer-blockHeight {
+		text-align: center;
+		width: 100px;
+	}
+
+	#explorer-fetch {
+		width: 100%;
+	}
+
+	.div {
+		background-color: #40332D;
+		border-radius: 18px;
+		border: 5px solid #BA9487;
+		color: #FFF;
+		font-family: "Courier New";
+		max-width: 100%;
+		padding: 10px 20px;
+		width: 100%;
+	}
+
+	.container {
+		background-color: #BA9487;
+		border-radius: 5px;
+		color: #FFF;
+		height: 100%;
+		text-align: center;
+	}
+
+	#stats-json {
+		background-color: #BA9487;
+	}
+
+	#lister-format {
+		font-family: "Lucida Console";
+		background-color: #40332D;
+		color: #FFF;
+		border: none;
+		border-radius: 5px;
+		height: 30px;
+	}
+
+	#lister-startHeight, #lister-endHeight, #lister-format, #lister-interval {
+		text-align: center;
+		width: 100%;
+	}
+
+	#lister-begin, #lister-clear {
+		display: inline;
+		height:20px;
+		margin: 0;
+		padding: 0;
+		width: calc(50% - 3px);
+	}
+
+	#lister-results {
+		-moz-tab-size : 15;
+		-o-tab-size : 15;
+		tab-size : 15;
+	}
+</style>
+
+<body>
+	<div id="explorer">
+		<b>Real-time Bitcoin Block Explorer</b>
+		<br><br>
+
+		<textarea id="stats-json" class="div" rows="17" readonly>
+		</textarea>
+		<br><br>
+		<i id="explorer_blockNumber"></i>
+
+		<textarea id="explorer-json" class="div" rows="30" readonly>
+		</textarea>
+		<br><br>
+		<table id="explorer-toolbox">
+			<tr>
+				<td>
+					<label for="explorer-blockHeight">Block height</label>
+					<input id="explorer-blockHeight" type="number" value="100" />
+				</td>
+				<td>
+					<label for="explorer-toggleTransactions">Hide transactions</label>
+					<input id="explorer-toggleTransactions" type="checkbox" checked />
+				</td>
+				<td><button id="stats-fetch" type="submit" onclick="updateStats()">Get Stats</button></td>
+				<td><button id="explorer-fetchLatest" type="submit" onclick="updateExplorerLatest()">Get Latest</button></td>
+				<td><button id="explorer-fetch" type="submit" onclick="updateExplorer()">Fetch Data</button></td>
+			</tr>
+		</table>
+		<br><br>
+		<b>Block Lister</b>
+
+		<table id="explorer-toolbox">
+			<tr>
+				<td width="100px">
+					<label for="lister-format">Format</label>
+				</td>
+				<td colspan="2">
+					<input id="lister-format" type="text" value="block.height+'\t'+block.difficulty+'\t'+block.time+'\t'+block.size+'\t'+block.reward+'\t'+block.version+'\t'+block.confirmations" />
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<label for="lister-startHeight">Start block</label>
+				</td>
+				<td>
+					<input id="lister-startHeight" type="number" value="0" oninput="document.getElementById('lister-endHeight').value=this.value;"/>
+				</td>
+				<td rowspan="2" class="container">
+					<div id="lister-status" class="container"></div>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<label for="lister-endHeight">End block</label>
+				</td>
+				<td>
+					<input id="lister-endHeight" type="number" value="10" />
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<label for="lister-interval">Interval (ms)</label>
+				</td>
+				<td>
+					<input id="lister-interval" type="number" step="100" value="2000" />
+				</td>
+				<td style="height:100%">
+					<button id="lister-clear" onclick="clearLister()" disabled>Clear</button>
+					<button id="lister-begin" onclick="toggleLister()">Begin</button>
+				</td>
+			</tr>
+		</table>
+		<hr>
+		<textarea id="lister-results" class="div" rows="20" readonly></textarea>
+	</div>
+</body>
+<script>
+	let listerTimeout = null;
+	let lister = { start: 0, current: 0, end: 0, interval: 0, format: "", retrys: 10 };
+
+	updateExplorer();
+
+	function toggleLister(state) {
+		if(state === undefined) state = (listerTimeout == null);
+		if(state) {
+			lister.start = Number(document.getElementById("lister-startHeight").value);
+			lister.end = Number(document.getElementById("lister-endHeight").value);
+			lister.format = document.getElementById("lister-format").value;
+			if(document.getElementById("lister-results").value == "") {
+				let header;
+				try {
+					"use strict"
+					let block = {
+						"hash": "Hash",
+						"size": "Size",
+						"height": "Height",
+						"version": "Version",
+						"merkleroot": "Merkle Root",
+						"tx": "Transactions",
+						"time": "Time",
+						"nonce": "Nonce",
+						"bits": "Bits",
+						"difficulty": "Difficulty",
+						"chainwork": "Chainwork",
+						"confirmations": "Confirmations",
+						"previousblockhash": "Prev Block",
+						"nextblockhash": "Next Block",
+						"reward": "Reward",
+						"isMainChain": "Is Main Chain",
+						"poolInfo": "Pool Info",
+					}
+					header = eval(lister.format) + "\n";
+				} catch {
+					header = lister.format + "\n";
+				}
+				document.getElementById("lister-results").value = header;
+				lister.current = lister.start;
+			} else if(lister.current == lister.end) return; // Finished
+
+			document.getElementById("lister-clear").disabled = true;
+			lister.interval = Number(document.getElementById("lister-interval").value);
+			document.getElementById("lister-begin").innerText = "Pause";
+			document.getElementById("lister-startHeight").disabled = true;
+			document.getElementById("lister-endHeight").disabled = true;
+			listerTimeout = setTimeout(listStep, lister.interval);
+		} else {
+			clearTimeout(listerTimeout);
+			listerTimeout = null;
+			document.getElementById("lister-begin").innerText = "Start";
+			document.getElementById("lister-startHeight").disabled = false;
+			document.getElementById("lister-endHeight").disabled = false;
+			document.getElementById("lister-clear").disabled = false;
+		}
+	}
+
+	function clearLister() {
+		lister.current = lister.start;
+		document.getElementById("lister-status").innerText = "";
+		document.getElementById("lister-results").value = "";
+		document.getElementById("lister-clear").disabled = true;
+	}
+
+	function listStep() {
+		fetchBlock(lister.current).then(block => {
+			"use strict";
+			if(block === undefined) {
+				if(lister.retrys <= 0) {
+					console.log("Stopping.");
+					document.getElementById("lister-results").value += "Error detection mechanism triggered.\n";
+				} else {
+					console.log("Retrying... " + lister.retrys);
+					lister.retrys--;
+					listerTimeout = setTimeout(listStep, lister.interval);
+				}
+				return;
+			} else {
+				let output;
+				try {
+					output = eval(lister.format);
+				} catch(e) {
+					output = e;
+				}
+				document.getElementById("lister-results").value += output + "\n";
+
+				let direction = (lister.start > lister.end) ? -1 : 1;
+				document.getElementById("lister-status").innerText = "Block #" + lister.current + "\n\nProgress " + Math.floor((lister.current - lister.start) / (lister.end - lister.start) * 100) + "%";
+				let toggleText = document.getElementById("lister-begin").innerText;
+				if(toggleText == "Start" || lister.current * direction >= lister.end * direction) {
+					toggleLister(false); // Done
+				} else {
+					listerTimeout = setTimeout(listStep, lister.interval);
+				}
+				lister.current += direction;
+				lister.retrys = 10;
+			}
+		});
+	}
+
+	function updateStats() {
+		document.getElementById("stats-fetch").disabled = true;
+		document.getElementById("stats-json").value = "";
+		fetchStats().then(output => {
+			let str = "";
+			for(v in output) {
+				str += v + output[v] + "\n";
+			}
+			document.getElementById("stats-json").value = str//JSON.stringify(output, null, 2);
+			document.getElementById("stats-fetch").disabled = false;
+		});
+	}
+
+	function updateExplorer() {
+		document.getElementById("explorer-fetch").innerText = "Fetching ...";
+		document.getElementById("explorer-fetch").disabled = true;
+		let blockHeight = document.getElementById("explorer-blockHeight").value;
+		let hideTransactions = document.getElementById("explorer-toggleTransactions").checked;
+
+		fetchBlock(blockHeight).then(block => {
+			if(hideTransactions && block.tx !== undefined) {
+				block.tx = ["length: " + block.tx.length];
+			}
+			document.getElementById("explorer-json").value
+			= JSON.stringify(block, null, 2);
+
+			document.getElementById("explorer-fetch").innerText = "Fetch";
+			document.getElementById("explorer-fetch").disabled = false;
+			document.getElementById("explorer_blockNumber").innerText = "Block #" + block.height;
+		});
+	}
+
+	function updateExplorerLatest() {
+		document.getElementById("explorer-fetchLatest").disabled = true;
+		fetchLatestHeight().then(height => {
+			if(height !== undefined) {
+				document.getElementById("explorer-blockHeight").value = height;
+				updateExplorer();
+			}
+			document.getElementById("explorer-fetchLatest").disabled = false;
+		});
+	}
+
+	async function fetchStats() {
+		let stats = {};
+
+		let difficulty = await fetchUrl("https://blockchain.info/q/getdifficulty?cors=true", "");
+		//let threshhold = "0000000000000000000000000000000000000000000000000000000000000000" + Number(difficulty).toString(16);
+		//threshhold = threshhold.substring(threshhold.length - 5);
+
+		stats["Block Difficulty:\t\t\t"] = difficulty
+		//stats["Difficulty Threshhold:\t\t\t"] = threshhold
+		stats["Blocks Height:\t\t\t\t"] = await fetchUrl("https://blockchain.info/q/getblockcount?cors=true", "");
+		stats["Global Hashrate:\t\t\t"] = await fetchUrl("https://blockchain.info/q/hashrate?cors=true", "") + " GH/s";
+		stats["Block Height for Next Difficulty:\t"] = await fetchUrl("https://blockchain.info/q/nextretarget?cors=true", "");
+		stats["Block Reward:\t\t\t\t"] = Number(await fetchUrl("https://blockchain.info/q/bcperblock?cors=true", "")) * 0.00000001 + " BTC";
+		stats["Average Time Between Blocks:\t\t"] = await fetchUrl("https://blockchain.info/q/interval?cors=true", "") + " ms";
+		stats["Estimated Time Until Next Block:\t"] = await fetchUrl("https://blockchain.info/q/eta?cors=true", "") + " ms";
+		stats["BTC in Circulation:\t\t\t"] = Number(await fetchUrl("https://blockchain.info/q/totalbc?cors=true", "")) * 0.00000001 + " BTC";
+		stats["Probabilty of Finding a Block:\t\t"] = await fetchUrl("https://blockchain.info/q/probability?cors=true", "");
+		stats["Average Hashes to Find a Block:\t\t"] = await fetchUrl("https://blockchain.info/q/hashestowin?cors=true", "") + " hashes";
+		stats["Average Transactions Per Block:\t\t"] = await fetchUrl("https://blockchain.info/q/avgtxnumber?cors=true", "") + " tx";
+		stats["Average Transaction Size:\t\t"] = await fetchUrl("https://blockchain.info/q/avgtxsize?cors=true", "") + " tx";
+		stats["Unconfirmed Transactions:\t\t"] = await fetchUrl("https://blockchain.info/q/unconfirmedcount?cors=true", "") + " tx";
+		stats["Bitcoin 24 Hour Price:\t\t\t"] = "$" + await fetchUrl("https://blockchain.info/q/24hrprice?cors=true", "");
+		stats["Transactions in the Past 24 Hours:\t"] = await fetchUrl("https://blockchain.info/q/24hrtransactioncount?cors=true", "") + " tx";
+		stats["BTC Sent in the Past 24 Hours:\t\t"] = Number(await fetchUrl("https://blockchain.info/q/24hrbtcsent?cors=true", "")) * 0.00000001 + " BTC";
+		//stats["Average Transaction Value:\t\t"] = await fetchUrl("https://blockchain.info/q/avgtxvalue?cors=true", "");
+		return stats;
+	}
+
+	async function fetchBlock(blockHeight) {
+		//let block = await fetchUrl("https://blockchain.info/block-height/" + blockHeight + "?format=json&cors=true");
+		let blockHash = (await fetchUrl("https://blockexplorer.com/api/block-index/" + blockHeight + "?format=json&cors=true", "")).blockHash;
+		if(blockHash === undefined) return;
+		let block = await fetchUrl("https://blockexplorer.com/api/block/" + blockHash, "");
+		//let block = await fetchUrl("https://chainquery.lbry.com/api/sql?query=SELECT * FROM block WHERE height=" + blockHeight + " LIMIT 1", "");
+		//if(block.data !== undefined) block = block.data[0];
+		//if(block.blocks !== undefined) block = block.blocks[0];
+		return block;
+	}
+
+	async function fetchLatestHeight() {
+		const sync = await fetchUrl("https://blockexplorer.com/api/sync", "");
+		return sync.height;
+	}
+
+	async function fetchUrl(url, proxy = "") {
+		try {
+			const response = await fetch(proxy + url);
+			const data = await response.json();
+			return data;
+		} catch (e) {
+			return {Error: e.toString()}
+		}
+	}
+	// On enter, update the block explorer
+	document.getElementById("explorer-toolbox").addEventListener("keypress", function(e) {
+		if(e.keyCode == 13) {
+			e.preventDefault();
+			document.getElementById("explorer-fetch").click();
+		}
+	});
+</script>
+</html>

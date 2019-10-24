@@ -1,0 +1,291 @@
+<html>
+<head>
+<style>
+	body {
+		background-color: #000;
+		color: #fff;
+	}
+
+	table {
+		border: none;
+		text-align: center;
+		width: 100%;
+	}
+	
+	button, input {
+		background: #fff;
+		border-radius: 20px;   
+		border: none;
+		height: 25px;
+		outline: none;
+		text-align: center;
+		width: 100%;
+	}
+	
+	.wrapper {
+		background-color: #222;
+		border-color: #fff;
+		border-radius: 30px;
+		border-style: solid;
+		border-width: 1px;
+		display: block;
+		margin: 10px auto;
+		min-width: 510px;
+		padding: 20px;
+		text-align: center;
+		width: 60%;
+	}
+
+	canvas {
+		border-radius: 10px;
+	}
+
+	.slider {
+		-webkit-appearance: none;
+		width: 100%;
+		height: 9px;
+		border-radius: 5px;   
+		background: #444;
+		outline: none;
+		-webkit-transition: .2s;
+		transition: opacity .2s;
+	}
+
+	.slider::-webkit-slider-thumb {
+		-webkit-appearance: none;
+		appearance: none;
+		background: #fff;
+		border-radius: 50%; 
+		cursor: pointer;
+		height: 20px;
+		width: 20px;
+	}
+
+	.slider::-moz-range-thumb {
+		background: #fff;
+		border-radius: 50%;
+		cursor: pointer;
+		height: 20px;
+		width: 20px;
+	}
+</style>
+</head>
+<body>
+<div class="wrapper">
+	<b>Particle Packing Simulator</b>
+	<hr>
+	<canvas id="draw" width="512px" height = "512px"></canvas>
+	<hr>
+	<table>
+		<tr>
+			<td width="30%"><label for="numParticles" id="numPointsLabel">Particles = 16</label></td>
+			<td><input id="numParticles" type="number" min="0" max="1000" value="16" onchange="resetPoints()"/></td>
+		</tr>
+		<tr>
+			<td><label for="radiusSlider" id="radiusLabel">Radius = 246</label></td>
+			<td><input id="radiusSlider" type="range" class="slider" min="0" max="500" value="246" oninput="radiusLabel.innerText='Radius = '+radiusSlider.value;draw();"/></td>
+		</tr>
+		<tr>
+			<td><label for="pressure" id="pressureLabel"><hr>Pressure = 150</label></td>
+			<td><input id="pressure" type="range" class="slider" min="0" max="900" value="150" oninput="pressureLabel.innerHTML='<hr>Pressure = '+pressure.value;"/></td>
+		</tr>
+		<tr>
+			<td width="30%"><label for="smoothing" id="smoothingLabel">Smoothing = 0</label></td>
+			<td><input id="smoothing" type="range" class="slider" min="0" max="40" value="0" oninput="smoothingLabel.innerText='Smoothing = '+smoothing.value;"/></td>
+		</tr>
+		<tr>
+			<td><label for="exponent"><hr>Gravitational Exponent</label></td>
+			<td><input id="exponent" type="number" min="0" max="30" value="3"/></td>
+		</tr>
+	</table>
+	<hr>
+	<table>
+		<tr>
+			<td><button onclick="resetPoints()">Reset particles</button></td>
+			<td><button onclick="getStats()">Stats</button></td>
+			<td><button id="toggleButton" onclick="toggleSimulation()">Start simulation</button></td>
+		</tr>
+	<table>
+</div>
+<script>
+	let loop = null;
+	let canvas = document.getElementById("draw");
+	let width = canvas.width, height = canvas.height;
+	let ctx = canvas.getContext("2d");
+
+	let radius = Math.min(width, height) / 2 - 10;
+	let smooth = 8;
+	let particles, nParticles;
+
+	let mouseX = 0, mouseY = 0, draggedPoint = -1;
+
+	class Point {
+		constructor() {
+			let dx, dy;
+			do {
+				this.x = width / 2 - radius + Math.random() * radius * 2;
+				this.y = height / 2 - radius + Math.random() * radius * 2;
+				dx = this.x - width / 2;
+				dy = this.y - height / 2;
+			} while(Math.sqrt(dx * dx + dy * dy) > radius);
+			this.vx = 0;
+			this.vy = 0;
+		}
+	}
+
+	resetPoints();
+	toggleSimulation();
+
+	function resetPoints() {
+		particles = []
+		nParticles = document.getElementById("numParticles").value;
+		for(let i = 0; i < nParticles; i++) {
+			particles.push(new Point());
+		}
+		draw();
+	}
+
+	function toggleSimulation() {
+		if(loop === null) {
+			loop = setInterval(step, 1000 / 50);
+			document.getElementById("toggleButton").innerText = "Stop simulation";
+			document.getElementById("toggleButton").style.backgroundColor = "";
+			document.getElementById("toggleButton").style.color = "";
+		} else {
+			clearInterval(loop);
+			loop = null;
+			document.getElementById("toggleButton").innerText = "Start simulation";
+			document.getElementById("toggleButton").style.backgroundColor = "#777";
+			document.getElementById("toggleButton").style.color = "#fff";
+		}
+	}
+
+	function step() {
+		let pressure = document.getElementById("pressure").value;
+		let exponent = document.getElementById("exponent").value;
+		let smooth = document.getElementById("smoothing").value;
+		for(let i = 0; i < particles.length; i++) {
+			let forcex = 0, forcey = 0;
+			for(let j = 0; j < particles.length; j++) {
+				if(i == j) continue;
+				let dx = particles[i].x - particles[j].x;
+				let dy = particles[i].y - particles[j].y;
+				if(dx == 0) dx = Math.random() * 2 - 1;
+				if(dy == 0) dy = Math.random() * 2 - 1;
+				let dt = Math.sqrt(dx * dx + dy * dy);
+				forcex += (dx / dt) / Math.pow(dt / pressure, exponent) / nParticles;
+				forcey += (dy / dt) / Math.pow(dt / pressure, exponent) / nParticles;
+			}
+			particles[i].vx = (particles[i].vx * smooth + forcex) / (smooth + 1);
+			particles[i].vy = (particles[i].vy * smooth + forcey) / (smooth + 1);
+		}
+		for(let i = 0; i < particles.length; i++) {
+			particles[i].x += particles[i].vx;
+			particles[i].y += particles[i].vy;
+			if(i != draggedPoint) {
+				particles[i].x += particles[i].vx;
+				particles[i].y += particles[i].vy;
+			} else {
+				particles[i].x = mouseX;
+				particles[i].y = mouseY;
+			}
+		}
+		draw();
+	}
+
+	function draw() {
+		radius = document.getElementById("radiusSlider").value;
+		ctx.fillStyle = "#000";
+		ctx.fillRect(0, 0, width, height);
+		ctx.fillStyle = "#fff";
+		ctx.strokeStyle = "#fff";
+		ctx.beginPath();
+		ctx.arc(width / 2, height / 2, radius, 0, 2 * Math.PI);
+		ctx.stroke();
+		for(let i = 0; i < particles.length; i++) {
+
+			dx = particles[i].x - width / 2;
+			dy = particles[i].y - height / 2;
+			dt = Math.sqrt(dx * dx + dy * dy);
+			if(dt > radius) {
+				particles[i].x = width / 2 + dx / dt * radius;
+				particles[i].y = height / 2 + dy / dt * radius;
+			}
+
+			ctx.beginPath();
+			ctx.arc(particles[i].x, particles[i].y, 5, 0, 2 * Math.PI);
+			ctx.fill();
+		}
+	}
+
+	canvas.addEventListener("mousedown", mouseDownListener, false);
+	window.addEventListener("mousemove", mouseMoveListener, false);
+	window.addEventListener("mouseup", mouseUpListener, false);
+
+	function mouseDownListener(e) {
+		let canvasBound = canvas.getBoundingClientRect();
+		mouseX = (e.clientX - canvasBound.left)*(canvas.width/canvasBound.width);
+		mouseY = (e.clientY - canvasBound.top)*(canvas.height/canvasBound.height);
+
+		let minDist = Number.MAX_VALUE;
+		draggedPoint = -1;
+		for(let i = 0; i < particles.length; i++) {
+
+			dx = mouseX - particles[i].x;
+			dy = mouseY - particles[i].y;
+			dt = Math.sqrt(dx * dx + dy * dy);
+			if(dt < minDist) {
+				minDist = dt;
+				draggedPoint = i;
+			}
+		}
+
+		particles[draggedPoint].x = mouseX;
+		particles[draggedPoint].y = mouseY;
+		draw();
+	}
+
+	function mouseMoveListener(e) {
+		if(draggedPoint < 0) return;
+		let canvasBound = canvas.getBoundingClientRect();
+		mouseX = (e.clientX - canvasBound.left)*(canvas.width/canvasBound.width);
+		mouseY = (e.clientY - canvasBound.top)*(canvas.height/canvasBound.height);
+		particles[draggedPoint].x = mouseX;
+		particles[draggedPoint].y = mouseY;
+		draw();
+
+	}
+
+	function mouseUpListener(e) {
+		draggedPoint = -1;
+	}
+
+	function getStats() {
+		let minDist = Number.MAX_VALUE;
+		let maxDist = Number.MIN_VALUE;
+		let avgDist = 0, modeDist;
+		let dx, dy, dt;
+		for(let i = 0; i < particles.length; i++) {
+			for(let j = 0; j < particles.length; j++) {
+				if(i == j) continue;
+				dx = particles[i].x - particles[j].x;
+				dy = particles[i].y - particles[j].y;
+				dt = Math.sqrt(dx * dx + dy * dy);
+				if(dt > maxDist) maxDist = dt;
+				if(dt < minDist) minDist = dt;
+				avgDist += dt;
+			}
+		}
+		avgDist /= particles.length * particles.length -particles.length;
+		modeDist = (maxDist + minDist) / 2;
+
+		let msg = "";
+		msg += "Minimum Distance: " + Math.floor(minDist * 1000000) / 1000000 + "\n";
+		msg += "Average Distance: " + Math.floor(avgDist * 1000000) / 1000000 + "\n";
+		msg += "Maximum Distance: " + Math.floor(maxDist * 1000000) / 1000000;
+		console.log(msg);
+		alert(msg);
+	}
+</script>
+</body>
+</html>

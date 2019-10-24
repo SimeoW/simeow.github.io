@@ -1,0 +1,453 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Design and Analysis of Algorithms - Homework 3 - Simeon Wuthier</title>
+<script type="text/javascript">
+	//Open this file with an internet browser to test it out.
+
+
+	/*
+	Here is the code for the second problem
+	*/
+	var swapCounter=0, swaps="";
+	
+	function MergeSort(data){
+		var len=data.length;
+		if(len===0) return [];
+		if(len===1) return data;
+		var mid=Math.floor(len/2);
+		return merge(MergeSort(data.slice(0,mid)),MergeSort(data.slice(mid,len)));
+	}
+	
+	function merge(left,right){
+		var data=[];
+		while(left.length||right.length){
+			if(left.length&&right.length){
+				if(left[0]<=right[0]){
+					data.push(left.shift());
+				}else{
+					//This is detected as a swapping of the values, the swap counter is incremented
+					swapCounter+=left.length;
+					for(var i=left.length-1;i>=0;i--) //log this swap, so we can show our work later
+						swaps+="("+left[i]+","+right[0]+")";
+						
+					data.push(right.shift());
+				}
+			}else if(left.length){
+				data.push(left.shift());
+			}else{
+				data.push(right.shift());
+			}
+		}
+		return data;
+	}
+
+	
+	//This function is called first, it is all the overhead to setting up the mergesort function
+	//It also shows it's work when proving that the inversion is correct
+	function GetMergeSortSwaps(data){
+		swapCounter=0; //reset global counter variables
+		swaps="";
+		var sorted=MergeSort(data);
+		
+		//Now we swap the data back, to prove our work and that the solution works
+		//array contains all the numbers parsed out of the swaps list
+		var array=(")"+swaps+"(").replace(/\)\(/g,",").split(",").filter(Number);
+		swaps+="\n\n"+data.join(" ")+" ~ original      " ;
+		for(var i=0,j,k,n1,n2;i<array.length;i+=2){
+			n1=parseInt(array[i]);
+			n2=parseInt(array[i+1]);
+			j=data.lastIndexOf(n1);
+			k=data.lastIndexOf(n2);
+			var swapTemp=data[j]; //swap two elements from our array of swaps
+			data[j]=data[k];
+			data[k]=swapTemp;
+			swaps+="\n"+data.join(" ")+" ~ swapping ("+n1+","+n2+")"; //show our work
+		}
+		//1 2 10 4 3 4 ~ swapping (2,1)
+		return{
+			data:sorted,
+			swapCounter:swapCounter,
+			swaps:swaps
+		};
+	}
+</script>
+<style>
+	body{
+		background-color: #1A4C3A;
+		font-family: Monospace;
+	}
+	div{
+		background-color: #FFF;
+		border-radius: 30px;
+		margin: 100px auto;
+		padding: 30px;
+		text-align: center;
+		width: 60%;
+		height: 50%;
+		overflow: hidden;
+	}
+	table{width: 100%;}
+	td{padding: 0;}
+	button{width: 100%;}
+	#data,#swaps{
+		width: 100%;
+		height: 50px;
+		text-align: center;
+	}
+	input{text-align: center;}
+</style>
+</head>
+<body>
+<div>
+	<b style="color: #1A4C3A">Homework 3 by Simeon Wuthier</b><br>
+	<i style="color: #1A4C3A">Counting Inversion Problem</i>
+	<hr>
+	<p style="color: #1A4C3A">A brute-force algoritm would need to list every permutation using swaps, keeping track of the number of swaps taken. When a permutaion is found that is indeed sorted, then the number of swaps will be counted, and the solution will be found. Since we would be dealing with permutations, the worst-case time complexity would be O(n!), or factorial time which would be very inefficient and more trouble than it's worth. So divide-and-conquer can be used:</p>
+	<hr>
+	Enter some numbers in the textbox below:
+	<textarea id='data' style="resize: vertical;" onchange="formatData()">2 4 1 3 5</textarea>
+	
+	<table>
+		<td><button onclick="fillRnd()">Random data</button></td>
+		<td><button onclick="calcSwaps()">Calculate swaps</button></td>
+	</table>
+	
+	<textarea id='swaps' style="resize: vertical; height:130px;" readonly></textarea>
+	Number of swaps: <b id="numSwaps">0</b><br>
+	Returned array: <b id="returnedArray">[]</b>
+	<hr>
+	
+	
+	<b style="color: #1A4C3A">Graphing the divide-and-conquer algorithm</b><br>
+	<i style="color: #1A4C3A">This is an interactive graph, click Start Simulation to graph out the data.</i><hr>
+	<table style="background-color:#6FB88F; border-radius:10px;">
+		<td><canvas id="graph" width="600px" height="500px" style="background-color: #10291B;"></canvas></td>
+		<td><textarea id="console" style="width:300px; height:500px; resize: none; background-color:#10291B; color:#FFF;" readonly></textarea></td>
+	<table>
+	<hr>
+	<table>
+		<td>Random array size maximum: 
+		<input id="to" type="number" style="width: 100px;" value="10000" onchange="clearSimulation()"/></td>
+		<td><button id="toggleInterval" onclick="toggleSimulation()">Start simulation</button></td>
+	</table>
+	<hr>
+	<p style="color: #1A4C3A; text-align:left;">
+		This algorithm is a modified version of mergesort. I implemented mergesort, but when merging the sub-arrays together, when it checks if an element is in the wrong order I added a counter so it continues the operations, but also counts how many items were out or order.
+	</p>
+	<i style="color: #1A4C3A">The time complexity of this is the same as the mergesort, it's time complexity is <b>O(n*log(n))<b></i><hr>
+	<h3 style="color: #1A4C3A">Verifying the algorithm's success</h3><br>
+	<p style="color: #1A4C3A; text-align:left;">If you input <b style="color: #449991;">"2,4,1,3,5"</b> into the first textbox, it will return <b style="color: #449991;">(2,1)(4,1)(4,3)</b></p>
+	<ul style="text-align:left;">
+		<li><i>(As given by the homework)</i></li>
+	</ul>
+	<p style="color: #1A4C3A; text-align:left;">If you input <b style="color: #449991;">"1 5 3 4 2"</b> into the first textbox, it will return <b style="color: #449991;">(4,2)(3,2)(5,2)(5,3)(5,4)</b></p>
+	<ul style="text-align:left;">
+		<li>1 5 3 4 2 ~ original</li>
+		<li>1 5 3 2 4 ~ swapping (4,2)</li>
+		<li>1 5 2 3 4 ~ swapping (3,2)</li>
+		<li>1 2 5 3 4 ~ swapping (5,2)</li>
+		<li>1 2 3 5 4 ~ swapping (5,3)</li>
+		<li>1 2 3 4 5 ~ swapping (5,4)</li>
+	</ul>
+	<p style="color: #1A4C3A; text-align:left;">If you input <b style="color: #449991;">"2 1 10 4 3 4"</b> into the first textbox, it will return <b style="color: #449991;">(2,1)(4,3)(10,3)(10,4)(10,4)</b></p>
+	<ul style="text-align:left;">
+		<li>2 1 10 4 3 4 ~ original</li>
+		<li>1 2 10 4 3 4 ~ swapping (2,1)</li>
+		<li>1 2 10 4 4 3 ~ swapping (4,3)</li>
+		<li>1 2 3 4 4 10 ~ swapping (10,3)</li>
+		<li>1 2 3 4 10 4 ~ swapping (10,4)</li>
+		<li>1 2 3 4 4 10 ~ swapping (10,4)</li>
+	</ul>
+	<p style="color: #1A4C3A; text-align:left;">If you input <b style="color: #449991;">"100 6 3 1"</b> into the first textbox, it will return <b style="color: #449991;">(100,6)(3,1)(100,1)(6,1)(100,3)(6,3)</b></p>
+	<ul style="text-align:left;">
+		<li>100 6 3 1 ~ original</li>
+		<li>6 100 3 1 ~ swapping (100,6)</li>
+		<li>6 100 1 3 ~ swapping (3,1)</li>
+		<li>6 1 100 3 ~ swapping (100,1)</li>
+		<li>1 6 100 3 ~ swapping (6,1)</li>
+		<li>1 6 3 100 ~ swapping (100,3)</li>
+		<li>1 3 6 100 ~ swapping (6,3)</li>
+	</ul>
+	<p style="color: #1A4C3A; text-align:left;">If you input <b style="color: #449991;">"1111 222 33 4 3 2 1"</b> into the first textbox, it will return <b style="color: #449991;">(222,33)(1111,33)(1111,222)(4,3)(2,1)(4,1)(3,1)(4,2)(3,2)(1111,1)(222,1)(33,1)(1111,2)(222,2)(33,2)(1111,3)(222,3)(33,3)(1111,4)(222,4)(33,4)</b></p>
+	<ul style="text-align:left;">
+		<li>1111 222 33 4 3 2 1 ~ original</li>
+		<li>1111 33 222 4 3 2 1 ~ swapping (222,33)</li>
+		<li>33 1111 222 4 3 2 1 ~ swapping (1111,33)</li>
+		<li>33 222 1111 4 3 2 1 ~ swapping (1111,222)</li>
+		<li>33 222 1111 3 4 2 1 ~ swapping (4,3)</li>
+		<li>33 222 1111 3 4 1 2 ~ swapping (2,1)</li>
+		<li>33 222 1111 3 1 4 2 ~ swapping (4,1)</li>
+		<li>33 222 1111 1 3 4 2 ~ swapping (3,1)</li>
+		<li>33 222 1111 1 3 2 4 ~ swapping (4,2)</li>
+		<li>33 222 1111 1 2 3 4 ~ swapping (3,2)</li>
+		<li>33 222 1 1111 2 3 4 ~ swapping (1111,1)</li>
+		<li>33 1 222 1111 2 3 4 ~ swapping (222,1)</li>
+		<li>1 33 222 1111 2 3 4 ~ swapping (33,1)</li>
+		<li>1 33 222 2 1111 3 4 ~ swapping (1111,2)</li>
+		<li>1 33 2 222 1111 3 4 ~ swapping (222,2)</li>
+		<li>1 2 33 222 1111 3 4 ~ swapping (33,2)</li>
+		<li>1 2 33 222 3 1111 4 ~ swapping (1111,3)</li>
+		<li>1 2 33 3 222 1111 4 ~ swapping (222,3)</li>
+		<li>1 2 3 33 222 1111 4 ~ swapping (33,3)</li>
+		<li>1 2 3 33 222 4 1111 ~ swapping (1111,4)</li>
+		<li>1 2 3 33 4 222 1111 ~ swapping (222,4)</li>
+		<li>1 2 3 4 33 222 1111 ~ swapping (33,4)</li>
+	</ul>
+	<p style="color: #1A4C3A; text-align:left;">If you input <b style="color: #449991;">"999999999 88888888 7777777 666666 55555 4444 333 22 1"</b> into the first textbox, it will return <b style="color: #449991;">(999999999,88888888)(7777777,666666)(999999999,666666)(88888888,666666)(999999999,7777777)(88888888,7777777)(55555,4444)(22,1)(333,1)(333,22)(55555,1)(4444,1)(55555,22)(4444,22)(55555,333)(4444,333)(999999999,1)(88888888,1)(7777777,1)(666666,1)(999999999,22)(88888888,22)(7777777,22)(666666,22)(999999999,333)(88888888,333)(7777777,333)(666666,333)(999999999,4444)(88888888,4444)(7777777,4444)(666666,4444)(999999999,55555)(88888888,55555)(7777777,55555)(666666,55555)</b></p>
+	<ul style="text-align:left;">
+		<li>999999999 88888888 7777777 666666 55555 4444 333 22 1 ~ original      </li>
+		<li>88888888 999999999 7777777 666666 55555 4444 333 22 1 ~ swapping (999999999,88888888)</li>
+		<li>88888888 999999999 666666 7777777 55555 4444 333 22 1 ~ swapping (7777777,666666)</li>
+		<li>88888888 666666 999999999 7777777 55555 4444 333 22 1 ~ swapping (999999999,666666)</li>
+		<li>666666 88888888 999999999 7777777 55555 4444 333 22 1 ~ swapping (88888888,666666)</li>
+		<li>666666 88888888 7777777 999999999 55555 4444 333 22 1 ~ swapping (999999999,7777777)</li>
+		<li>666666 7777777 88888888 999999999 55555 4444 333 22 1 ~ swapping (88888888,7777777)</li>
+		<li>666666 7777777 88888888 999999999 4444 55555 333 22 1 ~ swapping (55555,4444)</li>
+		<li>666666 7777777 88888888 999999999 4444 55555 333 1 22 ~ swapping (22,1)</li>
+		<li>666666 7777777 88888888 999999999 4444 55555 1 333 22 ~ swapping (333,1)</li>
+		<li>666666 7777777 88888888 999999999 4444 55555 1 22 333 ~ swapping (333,22)</li>
+		<li>666666 7777777 88888888 999999999 4444 1 55555 22 333 ~ swapping (55555,1)</li>
+		<li>666666 7777777 88888888 999999999 1 4444 55555 22 333 ~ swapping (4444,1)</li>
+		<li>666666 7777777 88888888 999999999 1 4444 22 55555 333 ~ swapping (55555,22)</li>
+		<li>666666 7777777 88888888 999999999 1 22 4444 55555 333 ~ swapping (4444,22)</li>
+		<li>666666 7777777 88888888 999999999 1 22 4444 333 55555 ~ swapping (55555,333)</li>
+		<li>666666 7777777 88888888 999999999 1 22 333 4444 55555 ~ swapping (4444,333)</li>
+		<li>666666 7777777 88888888 1 999999999 22 333 4444 55555 ~ swapping (999999999,1)</li>
+		<li>666666 7777777 1 88888888 999999999 22 333 4444 55555 ~ swapping (88888888,1)</li>
+		<li>666666 1 7777777 88888888 999999999 22 333 4444 55555 ~ swapping (7777777,1)</li>
+		<li>1 666666 7777777 88888888 999999999 22 333 4444 55555 ~ swapping (666666,1)</li>
+		<li>1 666666 7777777 88888888 22 999999999 333 4444 55555 ~ swapping (999999999,22)</li>
+		<li>1 666666 7777777 22 88888888 999999999 333 4444 55555 ~ swapping (88888888,22)</li>
+		<li>1 666666 22 7777777 88888888 999999999 333 4444 55555 ~ swapping (7777777,22)</li>
+		<li>1 22 666666 7777777 88888888 999999999 333 4444 55555 ~ swapping (666666,22)</li>
+		<li>1 22 666666 7777777 88888888 333 999999999 4444 55555 ~ swapping (999999999,333)</li>
+		<li>1 22 666666 7777777 333 88888888 999999999 4444 55555 ~ swapping (88888888,333)</li>
+		<li>1 22 666666 333 7777777 88888888 999999999 4444 55555 ~ swapping (7777777,333)</li>
+		<li>1 22 333 666666 7777777 88888888 999999999 4444 55555 ~ swapping (666666,333)</li>
+		<li>1 22 333 666666 7777777 88888888 4444 999999999 55555 ~ swapping (999999999,4444)</li>
+		<li>1 22 333 666666 7777777 4444 88888888 999999999 55555 ~ swapping (88888888,4444)</li>
+		<li>1 22 333 666666 4444 7777777 88888888 999999999 55555 ~ swapping (7777777,4444)</li>
+		<li>1 22 333 4444 666666 7777777 88888888 999999999 55555 ~ swapping (666666,4444)</li>
+		<li>1 22 333 4444 666666 7777777 88888888 55555 999999999 ~ swapping (999999999,55555)</li>
+		<li>1 22 333 4444 666666 7777777 55555 88888888 999999999 ~ swapping (88888888,55555)</li>
+		<li>1 22 333 4444 666666 55555 7777777 88888888 999999999 ~ swapping (7777777,55555)</li>
+		<li>1 22 333 4444 55555 666666 7777777 88888888 999999999 ~ swapping (666666,55555)</li>
+	</ul>
+
+	
+	<hr>
+	<i>(to view the source code, please open this in a text editor, and the function GetMergeSortSwaps(data) is at the top of the code)</i><br>
+	<b>Simeon Wuthier</b>
+	<hr>
+	<textarea style="width: 800px; height:400px; background-color: #AAEBC4;" readonly>var swapCounter=0, swaps="";
+
+function MergeSort(data){
+	var len=data.length;
+	if(len===0) return [];
+	if(len===1) return data;
+	var mid=Math.floor(len/2);
+	return merge(MergeSort(data.slice(0,mid)),MergeSort(data.slice(mid,len)));
+}
+
+function merge(left,right){
+	var data=[];
+	while(left.length||right.length){
+		if(left.length&&right.length){
+			if(left[0]<=right[0]){
+				data.push(left.shift());
+			}else{
+				//This is detected as a swapping of the values, the swap counter is incremented
+				swapCounter+=left.length;
+				for(var i=left.length-1;i>=0;i--) //log this swap, so we can show our work later
+					swaps+="("+left[i]+","+right[0]+")";
+				
+				data.push(right.shift());
+			}
+		}else if(left.length){
+			data.push(left.shift());
+		}else{
+			data.push(right.shift());
+		}
+	}
+	return data;
+}</textarea>
+</div>
+
+</body>
+
+<script type="text/javascript">
+	var dom={
+		text: document.getElementById("data"),
+		swaps: document.getElementById("swaps"),
+		numSwaps: document.getElementById("numSwaps"),
+		returnedArray: document.getElementById("returnedArray"),
+		canvas: document.getElementById("graph"),
+		toggleInterval: document.getElementById("toggleInterval"),
+		simulationTo: document.getElementById("to"),
+		simulationConsole: document.getElementById("console")
+	}
+	var canvasContext=dom.canvas.getContext("2d");
+	var canvasWidth=dom.canvas.width,canvasHeight=dom.canvas.height;
+	var simulation=null,simulationTo;
+	var maxSimulationTime=0, simulationCount, simulationConsoleTemp;
+	
+	initalizeSimulation();
+	clearSimulation();
+	
+	function calcSwaps(){
+		var a=retrieveData(dom.text.value); //get the array
+		var o=GetMergeSortSwaps(a);
+		dom.swaps.value=o.swaps;
+		dom.numSwaps.innerText=o.swapCounter;
+		dom.returnedArray.innerText="["+o.data+"]";
+	}
+	
+	//Convert string to number array using regular expression
+	function retrieveData(s){
+		//Parse out numbers from string, filter out empty elements, then map them to number values
+		var a=s.split(/[^0-9]*([0-9]+)[^0-9]*/).filter(Number).map(Number);
+		return a;
+	}
+	
+	function formatData(){
+		var data=retrieveData(dom.text.value);
+		dom.text.value=data.join(" ");
+	}
+	
+	function fillRnd(){
+		var n=parseInt(prompt("How many values?",8));
+		n=Math.max(0,n); //no negative numbers
+		var a=new Array(n);
+		for(var i=0;i<n;i++)
+			a[i]=i+1;
+		for(var i=0;i<n;i++){
+			var r=Math.floor(Math.random()*n);
+			var temp=a[r];
+			a[r]=a[i];
+			a[i]=temp;
+		}
+		dom.text.value=a.join(" ");
+	}
+	
+	
+	
+	
+	/*******************************
+		Simulation functions below
+	*******************************/
+	
+	
+	function clearSimulation(){
+		if(simulation){
+			clearInterval(simulation);
+			simulation=null;
+		}
+		toggleInterval.innerText="Start simulation";
+		simulationCount=0;
+		simulationConsoleTemp="";
+		dom.simulationConsole.value="";
+		
+		maxSimulationTime=0;
+		simulationTo=dom.simulationTo.value;
+		for(var i=1;i<10;i++)
+			maxSimulationTime=Math.max(maxSimulationTime,runTest(Math.floor(simulationTo*1.5)));
+		canvasContext.fillStyle="#10291B";
+		canvasContext.fillRect(0,0,dom.canvas.width,dom.canvas.height);
+		canvasContext.fillStyle="#FFF";
+		
+		drawGraphSkeleton();
+	}
+	
+	function toggleSimulation(){
+		if(simulation){
+			clearInterval(simulation);
+			simulation=null;
+			toggleInterval.innerText="Resume simulation";
+		}else{
+			initalizeSimulation();
+			simulation=setInterval(step,maxSimulationTime);
+			toggleInterval.innerText="Stop simulation";
+		}
+		
+	}
+	
+	function initalizeSimulation(){
+		toggleInterval.innerText="Resume simulation";
+		simulationTo=dom.simulationTo.value;
+		simulationCount=0;
+		simulationConsoleTemp="";
+		dom.simulationConsole.value="";
+		dom.simulationConsole.value="";
+		canvasContext.fillStyle="#FFF";
+		canvasContext.strokeStyle="#FFF";
+		canvasContext.textAlign="center";
+		canvasContext.textBaseline="Hanging";
+		canvasContext.beginPath();
+	}
+	
+	function drawGraphSkeleton(){
+		canvasContext.fillStyle="#10291B";
+		canvasContext.fillRect(0,0,dom.canvas.width,dom.canvas.height);
+		canvasContext.fillStyle="#FFF";
+		canvasContext.beginPath();
+		canvasContext.moveTo(20,0);
+		canvasContext.lineTo(20,canvasHeight);
+		canvasContext.moveTo(0,canvasHeight-20);
+		canvasContext.lineTo(canvasWidth,canvasHeight-20);
+	
+		canvasContext.font="14px Arial";
+		canvasContext.fillText("Size of array",canvasWidth/2,canvasHeight-5);
+		 
+		canvasContext.save();
+		canvasContext.rotate(-Math.PI/2);
+		canvasContext.fillText("Time taken (milliseconds)",-canvasHeight/2,15);
+		canvasContext.fillText(Math.floor(maxSimulationTime*100)/100,-30,15);
+		canvasContext.restore();
+		canvasContext.font="12px Arial";
+		canvasContext.fillText("0",10,canvasHeight-5);
+		canvasContext.fillText(simulationTo,canvasWidth-40,canvasHeight-5);
+		canvasContext.stroke();
+	}
+	
+	//interval calls this
+	function step(){
+		var r=Math.random(),n=Math.floor(1+r*simulationTo);
+		var t=runTest(n);
+		graph(r,t/maxSimulationTime);
+		
+		simulationCount++;
+		simulationConsoleTemp+=" Array size "+n+" took "+Math.round(t*1000)/1000+"ms.\n";
+		if(simulationCount%10==0){
+			canvasContext.fill();
+			canvasContext.beginPath();
+		}
+		if(simulationCount%33==0){
+			dom.simulationConsole.value=simulationConsoleTemp.slice(0,-1);
+			simulationConsoleTemp="";
+		}
+	}
+	
+	//simulate a test of a given size, with random values, and return the time taken
+	function runTest(sz){
+		//create a randomized array of random values
+		var data=[]; data.length=sz;
+		data.fill(Math.floor(Math.random()*sz));
+		
+		var t1=performance.now();
+		GetMergeSortSwaps(data);
+		var t2=performance.now();
+		return t2-t1;
+	}
+	
+	function graph(x,y){
+		var pad=20,size=3;
+		x=pad+x*(canvasWidth-pad);
+		y=canvasHeight-pad-y*(canvasHeight-pad);
+		canvasContext.rect(x-size/2,y-size/2,size,size);
+	}
+</script>
+
+
+</html>

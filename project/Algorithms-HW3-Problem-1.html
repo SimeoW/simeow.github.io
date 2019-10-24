@@ -1,0 +1,311 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Design and Analysis of Algorithms - Homework 3 - Simeon Wuthier</title>
+<script type="text/javascript">
+	//Open this file with an internet browser to test it out.
+
+
+	/*
+	Here is the code for the first problem
+	*/
+	function kthSmallest(data,k){
+		var mini=[]; //mini will keep an unsorted record of the k smallest elements
+		mini.length=k;
+		mini.fill(Number.MAX_SAFE_INTEGER); //initalize the elements of mini to infinity
+		
+		var big=0; //big keeps track of the biggest number inside mini
+		
+		for(var i in data)
+			if(data[i]<=mini[big]){
+				mini[big]=data[i]; //overwrite the biggest element in mini
+				for(var j in mini) //find the next biggest element
+					if(mini[j]>mini[big]) big=j;
+			}
+		//data.sort(function(a, b){return a-b});
+		//alert("Verifying answer: "+data[k-1]);
+		
+		return mini[big];
+	}
+
+</script>
+<style>
+	body{
+		background-color: #7B2A3B;
+		font-family: Monospace;
+	}
+	div{
+		background-color: #FFF;
+		border-radius: 30px;
+		margin: 100px auto;
+		padding: 30px;
+		text-align: center;
+		width: 60%;
+		height: 50%;
+		overflow: hidden;
+	}
+	table{width: 100%;}
+	td{padding: 0;}
+	button{width: 100%;}
+	#data{
+		width: 100%;
+		height: 50px;
+		text-align: center;
+	}
+	input{text-align: center;}
+</style>
+</head>
+<body>
+<div>
+	<b style="color: #7B2A3B">Homework 3 by Simeon Wuthier</b><br>
+	<i style="color: #7B2A3B">Small Statistic Problem/Selection Problem</i>
+	<hr>
+	Enter some numbers in the textbox below:
+	<textarea id='data' style="resize: vertical;">3 1 4 1 5 9 2 6 5</textarea>
+	<table>
+		<td><button onclick="fillRnd()">Fill data with random numbers</button></td>
+		<td><button onclick="formatData()">Format</button></td>
+		<td><button onclick="sortData()">View sorted list</button></td>
+	</table>
+	<tr>
+	<table>
+		<td>k=<input id="k" type="number" style="width: 50px;" value="4"/></td>
+		<td><button onclick="findVal()"><b>Find the kth smallest element</b></button></td>
+	</table>
+	<hr>
+	<b style="color: #7B2A3B">Part 2</b><br>
+	<p>Data graphing and visualizing the data:</p>
+	<i style="color: #7B2A3B">This is an interactive graph, click Start Simulation to graph out the data.</i><hr>
+	<table style="background-color:#A35F74; border-radius:10px;">
+		<td><canvas id="graph" width="600px" height="500px" style="background-color: #301117;"></canvas></td>
+		<td><textarea id="console" style="width:300px; height:500px; resize: none; background-color:#301117; color:#FFF;" readonly></textarea></td>
+	<table>
+	<hr>
+	<table>
+		<td>Random array size maximum: 
+		<input id="to" type="number" style="width: 100px;" value="1000" onchange="clearSimulation()"/>
+		with k=
+		<input id="simulationK" type="number" style="width: 50px;" value="500" onchange="clearSimulation();"/>
+		<input id="randomK" type="checkbox" value="false" onchange="drawGraphSkeleton()">Or a random k value</input></td>
+		<td><button id="toggleInterval" onclick="toggleSimulation()">Start simulation</button></td>
+	</table>
+	<hr>
+	<b style="color: #7B2A3B">Pseudo-code</b><br>
+	<ol style="color: #7B2A3B; text-align:left;">
+		<li>Define function to take an array, A and k value as parameters</li>
+		<li>Initalize a second array, A2 with k elements, all set to infinity</li>
+		<li>Loop though A, using i as an iterator</li>
+		<li>If biggest element in A2 is greater than A(i)</li>
+		<li>Then replace biggest element in A2 with A(i)</li>
+		<li>//At end of loop, A2 contains an unsorted list of k smallest elements in A</li>
+		<li>Return the largest element in A2</li>
+	</ol>
+	<i style="color: #7B2A3B">This algorithm runs in linear time, with a maximum time complexity of <b>O(k*n)</b> where k is the index of the smallest element we want to retrieve.</i><hr>
+	<b style="color: #7B2A3B">Does the time taken conform?</b><br>
+	<p style="color: #7B2A3B; text-align:left;">With a random k value, the graph never seems to conform, but always has a maximum time linear with the number of array elements that k is tested with. When k is a specific value, the graph does conform into a specific structure, and the time taken can be estimated before even graphing the algorithm.</p>
+	<hr>
+	<i>(to view the source code, please open this in a text editor, and the function kthSmallest(data,k) is at the top of the code)</i><br>
+	<b>Simeon Wuthier</b>
+	<hr>
+	<textarea style="width: 800px; height:400px; background-color: #FAC3CB;" readonly>function kthSmallest(data,k){
+	var mini=[];	//mini will keep an unsorted record of the k smallest elements
+	mini.length=k;
+	mini.fill(Number.MAX_SAFE_INTEGER);	//initalize the elements of mini to infinity
+	
+	var big=0;		//big keeps track of the biggest number (index) inside mini
+	
+	for(var i in data){
+		if(data[i]<=mini[big]){
+			mini[big]=data[i];	//overwrite the biggest element in mini
+			for(var j in mini){	//find the next biggest element
+				if(mini[j]>mini[big]) big=j;
+			}
+		}
+	}
+	return mini[big];
+}
+//I made this algorithm, and assignment up from scratch. Everything is unique made by me.</textarea>
+</div>
+
+</body>
+
+<script type="text/javascript">
+	var dom={
+		text: document.getElementById("data"),
+		k: document.getElementById("k"),
+		canvas: document.getElementById("graph"),
+		toggleInterval: document.getElementById("toggleInterval"),
+		simulationTo: document.getElementById("to"),
+		simulationK: document.getElementById("simulationK"),
+		simulationConsole: document.getElementById("console"),
+		randomK: document.getElementById("randomK")
+	}
+	var canvasContext=dom.canvas.getContext("2d");
+	var canvasWidth=dom.canvas.width,canvasHeight=dom.canvas.height;
+	var simulation=null,simulationTo,simulationK;
+	var maxSimulationTime=0, simulationCount, simulationConsoleTemp;
+	
+	initalizeSimulation();
+	clearSimulation();
+	
+	function fillRnd(){
+		var n=parseInt(prompt("How many values?",500)),str="";
+		n=Math.max(0,n); //no negative numbers
+		for(var i=0;i<n;i++)
+			str+=Math.floor(1+Math.random()*n)+" ";
+		dom.text.value=str;
+	}
+	
+	function formatData(){
+		var data=retrieveData(dom.text.value);
+		dom.text.value=data.join(" ");
+	}
+	
+	function sortData(){
+		var data=retrieveData(dom.text.value);
+		data.sort(function(a, b){return a-b});
+		alert(data.join(" "));
+	}
+	
+	//Convert string to number array using regular expression
+	function retrieveData(s){
+		//Parse out numbers from string, filter out empty elements, then map them to number values
+		var a=s.split(/[^0-9]*([0-9]+)[^0-9]*/).filter(Number).map(Number);
+		return a;
+	}
+	function findVal(){
+		var a=retrieveData(dom.text.value); //get the array
+		var k=dom.k.value;
+		if(k<1||k>a.length) alert("k must be between 1 and "+a.length);
+		else alert("The "+k+"th smallest value is "+kthSmallest(a,k)+".");
+	}
+	
+	
+	
+	
+	
+	
+	
+	/*******************************
+		Simulation functions below
+	*******************************/
+	
+	
+	function clearSimulation(){
+		if(simulation){
+			clearInterval(simulation);
+			simulation=null;
+		}
+		toggleInterval.innerText="Start simulation";
+		simulationCount=0;
+		simulationConsoleTemp="";
+		dom.simulationConsole.value="";
+		simulationTo=dom.simulationTo.value;
+		simulationK=dom.simulationK.value;
+		
+		maxSimulationTime=0;
+		for(var i=1;i<30;i++)
+			maxSimulationTime=Math.max(maxSimulationTime,runTest(Math.floor(simulationTo*1.5)));
+		canvasContext.fillStyle="#301117";
+		canvasContext.fillRect(0,0,dom.canvas.width,dom.canvas.height);
+		canvasContext.fillStyle="#FFF";
+		
+		drawGraphSkeleton();
+	}
+	
+	function toggleSimulation(){
+		if(simulation){
+			clearInterval(simulation);
+			simulation=null;
+			toggleInterval.innerText="Resume simulation";
+		}else{
+			initalizeSimulation();
+			simulation=setInterval(step,maxSimulationTime/1.5);
+			toggleInterval.innerText="Stop simulation";
+		}
+		
+	}
+	
+	function initalizeSimulation(){
+		toggleInterval.innerText="Resume simulation";
+		simulationTo=dom.simulationTo.value;
+		simulationK=dom.simulationK.value;
+		simulationCount=0;
+		simulationConsoleTemp="";
+		randomK=dom.randomK.checked;
+		dom.simulationConsole.value="";
+		dom.simulationConsole.value="";
+		canvasContext.fillStyle="#FFF";
+		canvasContext.strokeStyle="#FFF";
+		canvasContext.textAlign="center";
+		canvasContext.textBaseline="Hanging";
+		canvasContext.beginPath();
+	}
+	
+	function drawGraphSkeleton(){
+		randomK=dom.randomK.checked;
+		canvasContext.fillStyle="#301117";
+		canvasContext.fillRect(0,0,dom.canvas.width,dom.canvas.height);
+		canvasContext.fillStyle="#FFF";
+		canvasContext.beginPath();
+		canvasContext.moveTo(20,0);
+		canvasContext.lineTo(20,canvasHeight);
+		canvasContext.moveTo(0,canvasHeight-20);
+		canvasContext.lineTo(canvasWidth,canvasHeight-20);
+	
+		canvasContext.font="14px Arial";
+		canvasContext.fillText("Size of array (k="+(randomK?"Random":simulationK)+")",canvasWidth/2,canvasHeight-5);
+		 
+		canvasContext.save();
+		canvasContext.rotate(-Math.PI/2);
+		canvasContext.fillText("Time taken (milliseconds)",-canvasHeight/2,15);
+		canvasContext.fillText(Math.floor(maxSimulationTime*100)/100,-30,15);
+		canvasContext.restore();
+		canvasContext.font="12px Arial";
+		canvasContext.fillText("0",10,canvasHeight-5);
+		canvasContext.fillText(simulationTo,canvasWidth-40,canvasHeight-5);
+		canvasContext.stroke();
+	}
+	
+	//interval calls this
+	function step(){
+		var r=Math.random(),n=Math.floor(1+r*simulationTo);
+		var t=runTest(n);
+		graph(r,t/maxSimulationTime);
+		
+		simulationCount++;
+		simulationConsoleTemp+=" Array size "+n+" took "+Math.round(t*1000)/1000+"ms.\n";
+		if(simulationCount%10==0){
+			canvasContext.fill();
+			canvasContext.beginPath();
+		}
+		if(simulationCount%33==0){
+			dom.simulationConsole.value=simulationConsoleTemp.slice(0,-1);
+			simulationConsoleTemp="";
+		}
+	}
+	
+	//simulate a test of a given size, with random values, and return the time taken
+	function runTest(sz){
+		if(randomK) simulationK=Math.floor(1+Math.random()*sz);
+		//create a randomized array of random values
+		var data=[]; data.length=sz;
+		data.fill(Math.floor(Math.random()*sz));
+		
+		var t1=performance.now();
+		kthSmallest(data,simulationK);
+		var t2=performance.now();
+		return t2-t1;
+	}
+	
+	function graph(x,y){
+		var pad=20,size=3;
+		x=pad+x*(canvasWidth-pad);
+		y=canvasHeight-pad-y*(canvasHeight-pad);
+		canvasContext.rect(x-size/2,y-size/2,size,size);
+	}
+</script>
+
+
+</html>

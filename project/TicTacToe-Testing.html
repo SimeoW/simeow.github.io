@@ -1,0 +1,295 @@
+<html>
+<head>
+<style>
+	body{
+		background-color: #000;
+		margin:0;
+		-moz-transition:all 2s ease;
+		-webkit-transition:all 2s ease;
+		-o-transition:all 2s ease;
+		transition:all 2s ease;
+	}
+	#content{
+		background-color: #000;
+		width: 0;
+		height: 0;
+		display: block;
+		margin: 0 auto;
+	}
+	#content button{
+		background-color: #000;
+		background-size: 100%;
+		border: none;
+	}
+	#overlayControls{
+		position: fixed;
+		margin:5px;
+		padding:0;
+		top: 0px;
+		left: 0px;
+		opacity: 0.1;
+	}
+	#overlayControls:hover{
+		opacity: 0.6;
+	}
+	#overlayControls button{
+		background-color: rgb(0,0,0);
+		color: #FFF;
+		margin: 0;
+		padding: 3px 10px;
+		border-radius: 5px;
+		border: none;
+	}
+</style>
+</head>
+<body onresize='resize()'>
+<div id='content'>
+	<button id='1' onclick='set(1)'> </button><button id='2' onclick='set(2)'> </button><button id='3' onclick='set(3)'> </button><br>
+	<button id='4' onclick='set(4)'> </button><button id='5' onclick='set(5)'> </button><button id='6' onclick='set(6)'> </button><br>
+	<button id='7' onclick='set(7)'> </button><button id='8' onclick='set(8)'> </button><button id='9' onclick='set(9)'> </button>
+</div>
+<div id='overlayControls'>
+	<button id='download' onclick='download()'>Download AI Data</button>
+	<button id='upload' onclick='upload()'>Upload AI Data</button>
+	<input type='file' accept='.AIDATA' id='fileInput' style='display:none'/>
+</div>
+<script>
+	var width,height,min,boxSize,hue,spriteX,spriteO,spriteSize,type,data,lastSet,algorithms=[],wins=0,loses=0;
+	
+	function init(){
+		type=type=='X'?'O':'X'; data=[]; lastSet=0;
+		resize();
+		changeColorScheme();
+		getSprites();
+		for(var i=1;i<=9;i++) data[i]='';
+		if(type=='O') AI();
+		draw();
+	}
+	
+	function rnd(a,b,c){
+		return c?Math.random()*(b-a+1)+a:Math.floor(Math.random()*(b-a+1))+a;
+	}
+	
+	function resize(){
+		width=window.innerWidth||document.documentElement.clientWidth||document.body.clientWidth;
+		height=window.innerHeight||document.documentElement.clientHeight||document.body.clientHeight;
+		if(height<=48) height=48;
+		min=width>=height?height:width;
+		boxSize=min/3;
+		document.getElementById('content').style['width']=min+'px';
+		document.getElementById('content').style['height']=min+'px';
+		document.getElementById('content').style['marginTop']=(height-min)/2+'px';
+		for(var i=1;i<=9;i++){
+			document.getElementById(i).style['width']=boxSize+'px';
+			document.getElementById(i).style['height']=boxSize+'px';
+		}
+	}
+	
+	function set(num,reDraw){
+		document.activeElement.blur();
+		if(min/3!=spriteSize) getSprites();
+		if(data[num]==''){
+			lastSet=num;
+			data[num]=type;
+			AI();
+			if(reDraw!=false) draw();
+		}
+		score=checkForWin();
+		if(score[0]>0){
+			var a1='',a2='',a3='',a4='',l1,l2,l3,l4;
+			for(var i=1;i<=9;i++){
+				x=i%3||3;
+				y=Math.ceil(i/3);
+				var i1=i,i2=y+(3*((4-x)-1)),i3=10-i2,i4=10-i1;
+				if(i==lastSet){
+					l1=i1;l2=i2;l3=i3;l4=i4;
+				}else{
+					if(data[i]==type){a1+=i1;a2+=i2;a3+=i3;a4+=i4;}
+				}
+			}
+			a1=l1+a1.split('').sort().join('');
+			a2=l2+a2.split('').sort().join('');
+			a3=l3+a3.split('').sort().join('');
+			a4=l4+a4.split('').sort().join('');
+			if(algorithms.indexOf(a4)==-1) algorithms.splice(0,0,a4);
+			if(algorithms.indexOf(a3)==-1) algorithms.splice(0,0,a3);
+			if(algorithms.indexOf(a2)==-1) algorithms.splice(0,0,a2);
+			if(algorithms.indexOf(a1)==-1) algorithms.splice(0,0,a1);
+			document.getElementById('download').innerText='Download AI Data ('+algorithms.length+')';
+		}
+		if(score[0]>0||score[1]>0){draw()}
+		if(score[0]==1&&score[1]==0){alert('You Won!');wins++;init()}
+		if(score[0]==2&&score[1]==0){alert('DOUBLE WIN!!');wins++;init()}
+		if(score[0]==0&&score[1]==1){alert('You Lost!');loses++;init()}
+		if(score[0]==0&&score[1]==2){alert('Double Lose!!');loses++;init()}
+		if(score[0]==1&&score[1]==1){alert('Tie Breaker!');wins+=0.5;loses+=0.5;init()}
+		if(score[0]==-1&&score[1]==-1){alert('Nobody Won!');init()}
+	}
+	
+	function AI(){
+		freeSpaces='';
+		for(var i=1;i<=9;i++) if(data[i]=='') freeSpaces+=i
+		if(freeSpaces){
+			decision=freeSpaces.charAt(rnd(0,freeSpaces.length-1))
+			var a='';
+			for(var i=1;i<=9;i++) if(data[i]==type) a+=i;
+			for(var i=0;i<algorithms.length;i++){
+				if(algorithms[i].substr(1)==a){
+					decision=algorithms[i].charAt(0);
+					break;
+				}
+			}
+			data[decision]=type=='X'?'O':'X';
+		}
+	}
+	
+	function isCanvasSupported(){
+		var elem = document.createElement('canvas');
+		return !!(elem.getContext && elem.getContext('2d'));
+	}
+	
+	function draw(){
+		for(var i=1;i<=9;i++){
+			if(isCanvasSupported()){
+				if(data[i]=='') document.getElementById(i).style['backgroundImage']='';
+				if(data[i]=='X') document.getElementById(i).style['backgroundImage']='url('+spriteX+')';
+				if(data[i]=='O') document.getElementById(i).style['backgroundImage']='url('+spriteO+')';
+			}else{
+				document.getElementById(i).innerText=data[i]==''?'\n':data[i];
+			}
+		}
+	}
+	
+	function checkForWin(){
+		var wins=0,loses=0,combos='123456789147258369159357';
+		for(var i=0;i<combos.length;i+=3){
+			if(data[combos.charAt(i)]!=''&&data[combos.charAt(i)]==data[combos.charAt(i+1)]&&data[combos.charAt(i)]==data[combos.charAt(i+2)]){
+				if(data[combos.charAt(i)]==type){wins++}else{loses++}
+			}
+		}
+		freeSpaces='';
+		for(var i=1;i<=9;i++) if(data[i]=='') freeSpaces+=i
+		if(wins==0&&loses==0&&freeSpaces==''){
+			wins=-1;
+			loses=-1;
+		}
+		return [wins,loses];
+	}
+	
+	function getSprites(){
+		if(isCanvasSupported()){
+			var canvas=document.createElement('canvas');
+			canvas.width=min/3;
+			canvas.height=min/3;
+			spriteSize=min/3;
+			var context=canvas.getContext('2d');
+			context.strokeStyle='hsl('+hue+',100%,90%)';
+			context.lineWidth=min/20;
+			context.lineCap='round';
+			context.beginPath();
+			context.moveTo(min/20,min/20);
+			context.lineTo(canvas.width-min/20,canvas.height-min/20);
+			context.stroke();
+			context.moveTo(canvas.width-min/20,min/20);
+			context.lineTo(min/20,canvas.height-min/20);
+			context.stroke();
+			spriteX=canvas.toDataURL();
+			context.clearRect(0,0,canvas.width,canvas.height);
+			context.beginPath();
+			context.arc(canvas.width/2,canvas.height/2,(canvas.width/2)-min/20,0,2*Math.PI,false);
+			context.stroke();
+			spriteO=canvas.toDataURL();
+		}
+	}
+	
+	function changeColorScheme(){
+		hue=rnd(0,360);
+		document.body.style['backgroundColor']='hsl('+hue+',30%,35%)';
+		document.getElementById('content').style['backgroundColor']='hsl('+hue+',30%,70%)';
+		document.getElementById('1').style['backgroundColor']='hsl('+hue+',30%,60%)';
+		document.getElementById('2').style['backgroundColor']='hsl('+hue+',30%,60%)';
+		document.getElementById('3').style['backgroundColor']='hsl('+hue+',30%,60%)';
+		document.getElementById('4').style['backgroundColor']='hsl('+hue+',30%,60%)';
+		document.getElementById('5').style['backgroundColor']='hsl('+hue+',30%,60%)';
+		document.getElementById('6').style['backgroundColor']='hsl('+hue+',30%,60%)';
+		document.getElementById('7').style['backgroundColor']='hsl('+hue+',30%,60%)';
+		document.getElementById('8').style['backgroundColor']='hsl('+hue+',30%,60%)';
+		document.getElementById('9').style['backgroundColor']='hsl('+hue+',30%,60%)';
+	}
+	
+	function upload(){
+		document.getElementById("fileInput").click();
+	}
+	
+	function download(){
+		var str=algorithms.sort().toString().replace(/,/g,'0');
+		var a=document.createElement('a');
+		a.setAttribute('href','data:text/plain;charset=utf-8,'+encodeURIComponent(str));
+		a.setAttribute('download','data.AIDATA');
+		a.click();
+	}
+	
+	function readFile(e){
+		if(window.File&&window.FileReader&&window.FileList&&window.Blob){
+			var file=e.target.files[0];
+			if(file){
+				reader=new FileReader();
+				reader.onload=function(data){
+					if(file.name.substr(file.name.length-7).toUpperCase()=='.AIDATA'){
+						var pass=true,contents=data.target.result.split('0');
+						newAlgorithms=[];
+						for(var i=0;i<contents.length;i++){
+							if(isNaN(Number(contents[i]))){pass=false;break;}
+							newAlgorithms.push(contents[i]);
+						}
+						if(pass){
+							algorithms=[];
+							algorithms=newAlgorithms.slice(0);
+							newAlgorithms=[];
+							document.getElementById('download').innerText='Download AI Data ('+algorithms.length+')';
+							alert('AI data successfully uploaded!\nNumber of algorithms: '+algorithms.length);
+						}else{
+							alert('AI data contains unknown characters!');
+						}
+					}else{
+						alert('Invalid file type.');
+					}
+				}
+				reader.readAsText(file)
+			}else{
+				alert('Failed to load file.');
+			}
+		}else{
+			alert('The File APIs are not fully supported by your browser.');
+		}
+	}
+	
+	document.body.onkeydown=function(e){
+		var evtobj=window.event?event:e;
+		var unicode=evtobj.charCode?evtobj.charCode:evtobj.keyCode;
+		if(unicode==27){
+			freeSpaces='';
+			for(var i=1;i<=9;i++) if(data[i]=='') freeSpaces+=i
+			if(freeSpaces){
+				set(freeSpaces.charAt(rnd(0,freeSpaces.length-1)),false);
+				return false;
+			}
+		}
+		if(unicode==192){
+			alert('Current Score:\n\nWins: '+wins+'\nLoses: '+loses)
+		}
+	}
+	document.body.onkeyup=function(e){
+		var evtobj=window.event?event:e;
+		var unicode=evtobj.charCode?evtobj.charCode:evtobj.keyCode;
+		if(unicode==27){
+			draw();
+			return false;
+		}
+	}
+	
+	document.getElementById('fileInput').addEventListener('change',readFile,false);
+	init();
+</script>
+</body>
+</html>

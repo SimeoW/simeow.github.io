@@ -1,0 +1,102 @@
+<html>
+<head>
+<title>Wobble Draw</title>
+<style>
+	body{
+		margin:0;
+		padding:0;
+	}
+	#draw{
+		background-color:#000;
+	}
+</style>
+</head>
+<body onresize='resize()'>
+<canvas id='draw'>Please switch to a browser that supports the HTML5 Canvas</canvas>
+<script>
+	var width,height,loop,curX,curY,iterations=0;
+	var canvas=document.getElementById('draw');
+	var ctx=canvas.getContext('2d');
+	var x=[],y=[],a=[],r=[],t=[];
+	
+	function init(){
+		resize();
+	}
+	
+	function resize(){
+		width=window.innerWidth||document.documentElement.clientWidth||document.body.clientWidth;
+		height=window.innerHeight||document.documentElement.clientHeight||document.body.clientHeight;
+		curX=width/2;curY=height/2;curX2=width/2;curY2=height/2;
+		document.getElementById('draw').width=width;
+		document.getElementById('draw').height=height;
+		run();
+	}
+	
+	canvas.addEventListener("touchstart",mousedown,false);
+	canvas.addEventListener("mousedown",mousedown,false);
+	function mousedown(e){
+		clearInterval(loop)
+		loop=setInterval(run,1000/60);
+	}
+	
+	canvas.addEventListener("touchend",mouseup,false);
+	canvas.addEventListener("mouseup",mouseup,false);
+	function mouseup(){
+		clearInterval(loop)
+		console.log('Simulation Paused');
+	}
+	
+	canvas.addEventListener("touchmove",mousemove,false);
+	canvas.addEventListener("mousemove",mousemove,false);
+	function mousemove(e){
+		if(e.changedTouches!==undefined) e=e.changedTouches[0];
+		curX=e.pageX-canvas.offsetLeft;
+		curY=e.pageY-canvas.offsetTop;
+	}
+	
+	function run(){
+		curX2=((curX2*19)+curX)/20;
+		curY2=((curY2*19)+curY)/20;
+		iterations++;
+		var alpha=Math.atan((curX2-width/2)/(curY2-height/2));
+		a.push(curY2-height/2<0?alpha:alpha+Math.PI);
+		x.push(curX2);
+		y.push(curY2);
+		r.push(20+Math.abs(Math.floor(Math.sin(iterations/20)*30)));
+		t.push(0);
+		ctx.clearRect(0,0,width,height);
+		var nearestIndex=0,nearestDist=width+height;
+		for(var i=0;i<r.length;i++){
+			t[i]++;
+			a[i]+=Math.sin(t[i]/10)/20;
+			x[i]+=Math.sin(a[i])*2;
+			y[i]+=Math.cos(a[i])*2;
+			ctx.beginPath();
+			ctx.arc(x[i],y[i],r[i]*3,0,Math.PI*2);
+			try{
+				var g=ctx.createRadialGradient(x[i],y[i],0,x[i],y[i],r[i]*3);
+				g.addColorStop(0,'rgba(255,255,255,0)');
+				g.addColorStop(0.1,'hsl('+50+(360*i/x.length)+','+100+'%,'+50+'%)');
+				g.addColorStop(0.2,'hsl('+(360*i/x.length)+','+100+'%,'+50+'%)');
+				g.addColorStop(0.2,'hsla('+(360*i/x.length)+','+100+'%,'+50+'%,0.02)');
+				g.addColorStop(1,'rgba(255,255,255,0)');
+				ctx.fillStyle=g;
+			}catch(e){}
+			ctx.fill();
+			if(x[i]>width+r[i]||y[i]>height+r[i]||x[i]<-r[i]||y[i]<-r[i]){
+				x.splice(i,1);
+				y.splice(i,1);
+				r.splice(i,1);
+				a.splice(i,1);
+				t.splice(i,1);
+			}
+		}
+		if(iterations%30==0){ //every second
+			console.clear();
+			console.log('Circles='+r.length);
+		}
+	}
+	init();
+</script>
+</body>
+</html>
