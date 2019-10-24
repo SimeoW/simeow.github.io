@@ -366,19 +366,19 @@ li {
 /* font awesome icons */
 
 .social a:nth-of-type(1):before {
-	content: '\f1bd';
+	content: '\f09b';
 }
 .social a:nth-of-type(2):before {
-	content: '\f16d';
+	content: '\f1bd';
 }
 .social a:nth-of-type(3):before {
-	content: '\f1fc';
+	content: '\f16d';
 }
 .social a:nth-of-type(4):before {
-	content: '\f099';
+	content: '\f1fc';
 }
 .social a:nth-of-type(5):before {
-	content: '\f2ac';
+	content: '\f099';
 }
 #bingCited{
 	opacity: 0;
