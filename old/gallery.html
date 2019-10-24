@@ -23,7 +23,7 @@
 			<h3>My Gallery</h3>
 			<h4>An unsorted collection of my digital and traditional artwork from the past.</h4>
 			<div id="gallery">
-				<script>
+				<p>
 					<?php
 						function isIMG($var){
 							return (endsWith($var,".jpg")||endsWith($var,".png"));
@@ -43,10 +43,9 @@
 						shuffle($order);
 						array_multisort($order, $galleryLinks, $thumbnailImages);
 
-						echo "var galleryLinks = [\n\t\t\t\t\t\t\"old/art/".implode("\",\n\t\t\t\t\t\t\"old/art/",$galleryLinks)."\"\n\t\t\t\t\t];\n";
-						echo "\t\t\t\t\tvar thumbnailImages = [\n\t\t\t\t\t\t\"old/art/thumbnail/".implode("\",\n\t\t\t\t\t\t\"old/art/thumbnail/",$thumbnailImages)."\"\n\t\t\t\t\t];\n";
+						echo "<script>var galleryLinks = [\n\t\t\t\t\t\t\"old/art/".implode("\",\n\t\t\t\t\t\t\"old/art/",$galleryLinks)."\"\n\t\t\t\t\t];\n\t\t\t\t\tvar thumbnailImages = [\n\t\t\t\t\t\t\"old/art/thumbnail/".implode("\",\n\t\t\t\t\t\t\"old/art/thumbnail/",$thumbnailImages)."\"\n\t\t\t\t\t];\n</script>";
 					?>
-				</script>
+				</p>
 			</div>
 			<br>
 			<h3>Find me at</h3>
@@ -74,9 +73,6 @@
 	<?php require_once "include/init.php"?></div>
 	<div class="hidden">
 		<ul>
-			<!--<li>
-				<a href="/"><img src="profile.jpg" alt="" class=""/></a>
-			</li>-->
 			<li><a href="/old">Home</a></li>
 			<li><a href="gallery.html" class="selected">Artwork</a></li>
 			<li><a href="projects.html">Projects</a></li>
