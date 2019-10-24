@@ -23,7 +23,7 @@
 			<h3>My Gallery</h3>
 			<h4>An unsorted collection of my digital and traditional artwork from the past.</h4>
 			<div id="gallery">
-				<p>
+				<script>
 					<?php
 						function isIMG($var){
 							return (endsWith($var,".jpg")||endsWith($var,".png"));
@@ -43,9 +43,9 @@
 						shuffle($order);
 						array_multisort($order, $galleryLinks, $thumbnailImages);
 
-						echo "<script>var galleryLinks = [\n\t\t\t\t\t\t\"art/".implode("\",\n\t\t\t\t\t\t\"art/",$galleryLinks)."\"\n\t\t\t\t\t];\n\t\t\t\t\tvar thumbnailImages = [\n\t\t\t\t\t\t\"art/thumbnail/".implode("\",\n\t\t\t\t\t\t\"art/thumbnail/",$thumbnailImages)."\"\n\t\t\t\t\t];\n</script>";
+						echo "var galleryLinks = [\n\t\t\t\t\t\t\"art/".implode("\",\n\t\t\t\t\t\t\"art/",$galleryLinks)."\"\n\t\t\t\t\t];\n\t\t\t\t\tvar thumbnailImages = [\n\t\t\t\t\t\t\"art/thumbnail/".implode("\",\n\t\t\t\t\t\t\"art/thumbnail/",$thumbnailImages)."\"\n\t\t\t\t\t];\n";
 					?>
-				</p>
+				</script>
 			</div>
 			<br>
 			<h3>Find me at</h3>

@@ -31,7 +31,7 @@
 				</a>
 			</div>
 			<div id="gallery">
-				<p>
+				<script>
 					<?php
 						function isHTML($var){
 							return (endsWith($var,".html")||endsWith($var,".php"));
@@ -60,9 +60,12 @@
 						shuffle($order);
 						array_multisort($order, $galleryLinks, $thumbnailImages);
 
-						echo "<script>var galleryLinks = [\n\t\t\t\t\t\t\"".implode("\",\n\t\t\t\t\t\t\"",$galleryLinks)."\"\n\t\t\t\t\t];\n\t\t\t\t\tvar thumbnailImages = [\n\t\t\t\t\t\t\"".implode("\",\n\t\t\t\t\t\t\"",$thumbnailImages)."\"\n\t\t\t\t\t];\n</script>";
+						echo "var galleryLinks = [\n";
+						echo "\t\t\t\t\t\t\"".implode("\",\n\t\t\t\t\t\t\"",$galleryLinks)."\"\n\t\t\t\t\t];\n";
+						echo "\t\t\t\t\tvar thumbnailImages = [\n";
+						echo "\t\t\t\t\t\t\"".implode("\",\n\t\t\t\t\t\t\"",$thumbnailImages)."\"\n\t\t\t\t\t];\n";
 					?>
-				</p>
+				</script>
 			</div>
 			<h4 style="text-align: left">
 				<a href="http://smilebasicsource.com/page?pid=630" target="_blank">3D Parkour</a> - I spent 2015 to 2017 developing this masssive 3D game for the Nintendo 3DS using the SmileBASIC programming language.<br>
