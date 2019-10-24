@@ -33,8 +33,8 @@
 							return $l===0||(substr($a,-$l)===$b);
 						}
 						
-						$galleryLinks=array_slice(scandir("old/art"),2);
-						$thumbnailImages=array_slice(scandir("old/art/thumbnail"),2);
+						$galleryLinks=array_slice(scandir("art"),2);
+						$thumbnailImages=array_slice(scandir("art/thumbnail"),2);
 						$galleryLinks=array_filter($galleryLinks,"isIMG");
 						$thumbnailImages=array_filter($thumbnailImages,"isIMG");
 
@@ -43,7 +43,7 @@
 						shuffle($order);
 						array_multisort($order, $galleryLinks, $thumbnailImages);
 
-						echo "<script>var galleryLinks = [\n\t\t\t\t\t\t\"old/art/".implode("\",\n\t\t\t\t\t\t\"old/art/",$galleryLinks)."\"\n\t\t\t\t\t];\n\t\t\t\t\tvar thumbnailImages = [\n\t\t\t\t\t\t\"old/art/thumbnail/".implode("\",\n\t\t\t\t\t\t\"old/art/thumbnail/",$thumbnailImages)."\"\n\t\t\t\t\t];\n</script>";
+						echo "<script>var galleryLinks = [\n\t\t\t\t\t\t\"art/".implode("\",\n\t\t\t\t\t\t\"art/",$galleryLinks)."\"\n\t\t\t\t\t];\n\t\t\t\t\tvar thumbnailImages = [\n\t\t\t\t\t\t\"art/thumbnail/".implode("\",\n\t\t\t\t\t\t\"art/thumbnail/",$thumbnailImages)."\"\n\t\t\t\t\t];\n</script>";
 					?>
 				</p>
 			</div>

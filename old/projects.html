@@ -44,13 +44,13 @@
 							return $l===0||(substr($a,-$l)===$b);
 						}
 						
-						$galleryLinks=array_slice(scandir("old/project"),2);
-						$thumbnailImages=array_slice(scandir("old/project/thumbnail"),2);
+						$galleryLinks=array_slice(scandir("project"),2);
+						$thumbnailImages=array_slice(scandir("project/thumbnail"),2);
 						$galleryLinks=array_filter($galleryLinks,"isHTML");
 						$thumbnailImages=array_filter($thumbnailImages,"isIMG");
 						
-						$galleryLinks=explode("~","old/project/".implode("~old/project/",$galleryLinks));
-						$thumbnailImages=explode("~","old/project/thumbnail/".implode("~old/project/thumbnail/",$thumbnailImages));
+						$galleryLinks=explode("~","project/".implode("~project/",$galleryLinks));
+						$thumbnailImages=explode("~","project/thumbnail/".implode("~project/thumbnail/",$thumbnailImages));
 						
 						array_push($galleryLinks,"projectBALL");
 						array_push($thumbnailImages,"projectBALL/thumbnail.jpg");
