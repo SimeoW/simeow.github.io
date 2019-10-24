@@ -43,7 +43,7 @@
 						shuffle($order);
 						array_multisort($order, $galleryLinks, $thumbnailImages);
 
-						echo "var galleryLinks = [\n\t\t\t\t\t\t\"old/art/".implode("\",\n\t\t\t\t\t\t\"art/",$galleryLinks)."\"\n\t\t\t\t\t];\n";
+						echo "var galleryLinks = [\n\t\t\t\t\t\t\"old/art/".implode("\",\n\t\t\t\t\t\t\"old/art/",$galleryLinks)."\"\n\t\t\t\t\t];\n";
 						echo "\t\t\t\t\tvar thumbnailImages = [\n\t\t\t\t\t\t\"old/art/thumbnail/".implode("\",\n\t\t\t\t\t\t\"old/art/thumbnail/",$thumbnailImages)."\"\n\t\t\t\t\t];\n";
 					?>
 				</script>
