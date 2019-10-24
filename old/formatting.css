@@ -369,13 +369,13 @@ li {
 	content: '\f09b';
 }
 .social a:nth-of-type(2):before {
-	content: '\f1bd';
-}
-.social a:nth-of-type(3):before {
 	content: '\f16d';
 }
-.social a:nth-of-type(4):before {
+.social a:nth-of-type(3):before {
 	content: '\f1fc';
+}
+.social a:nth-of-type(4):before {
+	content: '\f1bd';
 }
 .social a:nth-of-type(5):before {
 	content: '\f099';
