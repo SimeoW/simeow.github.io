@@ -13,9 +13,9 @@ if ($_POST["g-recaptcha-response"]) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-	if (!($response != null && $response->success)) {
+	/*if (!($response != null && $response->success)) {
 		$error .= "Invalid reCAPTCHA\r\n";
-	}
+	}*/
 	
 	if (empty($_POST["name"])) {
 		$error .= "Name field is required\r\n";
