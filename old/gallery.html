@@ -33,8 +33,8 @@
 							return $l===0||(substr($a,-$l)===$b);
 						}
 						
-						$galleryLinks=array_slice(scandir("art"),2);
-						$thumbnailImages=array_slice(scandir("art/thumbnail"),2);
+						$galleryLinks=array_slice(scandir("old/art"),2);
+						$thumbnailImages=array_slice(scandir("old/art/thumbnail"),2);
 						$galleryLinks=array_filter($galleryLinks,"isIMG");
 						$thumbnailImages=array_filter($thumbnailImages,"isIMG");
 
@@ -43,8 +43,8 @@
 						shuffle($order);
 						array_multisort($order, $galleryLinks, $thumbnailImages);
 
-						echo "var galleryLinks = [\n\t\t\t\t\t\t\"art/".implode("\",\n\t\t\t\t\t\t\"art/",$galleryLinks)."\"\n\t\t\t\t\t];\n";
-						echo "\t\t\t\t\tvar thumbnailImages = [\n\t\t\t\t\t\t\"art/thumbnail/".implode("\",\n\t\t\t\t\t\t\"art/thumbnail/",$thumbnailImages)."\"\n\t\t\t\t\t];\n";
+						echo "var galleryLinks = [\n\t\t\t\t\t\t\"old/art/".implode("\",\n\t\t\t\t\t\t\"art/",$galleryLinks)."\"\n\t\t\t\t\t];\n";
+						echo "\t\t\t\t\tvar thumbnailImages = [\n\t\t\t\t\t\t\"old/art/thumbnail/".implode("\",\n\t\t\t\t\t\t\"old/art/thumbnail/",$thumbnailImages)."\"\n\t\t\t\t\t];\n";
 					?>
 				</script>
 			</div>
@@ -52,12 +52,9 @@
 			<h3>Find me at</h3>
 			<div class="social">
 				<a href="https://s1meon.deviantart.com/" target="_blank"><span>DeviantArt</span></a>
-				<a href="https://www.instagram.com/simsta97/" target="_blank"><span>Instagram</span></a>
+				<a href="https://www.instagram.com/simewu/" target="_blank"><span>Instagram</span></a>
 				<a href="http://colorslive.com/author?id=95735" target="_blank"><span>Colors3D</span></a>
 				<a href="https://twitter.com/monstre180" target="_blank"><span>Twitter</span></a>
-				<a href="snapchat.png" target="_blank"><span style="width:143px;">
-					<img src="snapchat-thumbnail.png">@s1meon314<hr>Snapchat
-				</span></a>
 			</div>
 			<h4>You can show your support by clicking the link down below!</h4>
 			<div class="social">

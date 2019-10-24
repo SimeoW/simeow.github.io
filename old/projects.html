@@ -44,13 +44,13 @@
 							return $l===0||(substr($a,-$l)===$b);
 						}
 						
-						$galleryLinks=array_slice(scandir("project"),2);
-						$thumbnailImages=array_slice(scandir("project/thumbnail"),2);
+						$galleryLinks=array_slice(scandir("old/project"),2);
+						$thumbnailImages=array_slice(scandir("old/project/thumbnail"),2);
 						$galleryLinks=array_filter($galleryLinks,"isHTML");
 						$thumbnailImages=array_filter($thumbnailImages,"isIMG");
 						
-						$galleryLinks=explode("~","project/".implode("~project/",$galleryLinks));
-						$thumbnailImages=explode("~","project/thumbnail/".implode("~project/thumbnail/",$thumbnailImages));
+						$galleryLinks=explode("~","old/project/".implode("~old/project/",$galleryLinks));
+						$thumbnailImages=explode("~","old/project/thumbnail/".implode("~old/project/thumbnail/",$thumbnailImages));
 						
 						array_push($galleryLinks,"projectBALL");
 						array_push($thumbnailImages,"projectBALL/thumbnail.jpg");
@@ -75,12 +75,9 @@
 			<h3>Find me at</h3>
 			<div class="social">
 				<a href="https://s1meon.deviantart.com/" target="_blank"><span>DeviantArt</span></a>
-				<a href="https://www.instagram.com/simsta97/" target="_blank"><span>Instagram</span></a>
+				<a href="https://www.instagram.com/simewu/" target="_blank"><span>Instagram</span></a>
 				<a href="http://colorslive.com/author?id=95735" target="_blank"><span>Colors3D</span></a>
 				<a href="https://twitter.com/monstre180" target="_blank"><span>Twitter</span></a>
-				<a href="snapchat.png" target="_blank"><span style="width:143px;">
-					<img src="snapchat-thumbnail.png">@s1meon314<hr>Snapchat
-				</span></a>
 			</div>
 			<h4>You can show your support by clicking the link down below!</h4>
 			<div class="social">
