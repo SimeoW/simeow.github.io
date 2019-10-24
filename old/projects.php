@@ -100,9 +100,9 @@
 				<a href="/"><img src="profile.jpg" alt="" class=""/></a>
 			</li>-->
 			<li><a href="">Home</a></li>
-			<li><a href="gallery.php">Artwork</a></li>
-			<li><a href="projects.php" class="selected">Projects</a></li>
-			<li><a href="portfolio.php">Portfolio</a></li>
+			<li><a href="gallery.html">Artwork</a></li>
+			<li><a href="projects.html" class="selected">Projects</a></li>
+			<li><a href="portfolio.html">Portfolio</a></li>
 		</ul>
 	</div>
 </body>

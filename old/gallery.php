@@ -77,9 +77,9 @@
 				<a href="/"><img src="profile.jpg" alt="" class=""/></a>
 			</li>-->
 			<li><a href="">Home</a></li>
-			<li><a href="gallery.php" class="selected">Artwork</a></li>
-			<li><a href="projects.php">Projects</a></li>
-			<li><a href="portfolio.php">Portfolio</a></li>
+			<li><a href="gallery.html" class="selected">Artwork</a></li>
+			<li><a href="projects.html">Projects</a></li>
+			<li><a href="portfolio.html">Portfolio</a></li>
 		</ul>
 	</div>
 </body>
