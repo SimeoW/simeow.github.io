@@ -342,7 +342,7 @@ li {
 	-moz-transition: all .5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 	transition: all .5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
-/* pop-up text arrow */
+/* Pop-up text arrow */
 
 .social a span:before {
 	text-align: center;
@@ -356,15 +356,15 @@ li {
 	bottom: -5px;
 	left: 40px;
 }
-/* text pops up when icon is in hover state */
+/* Text pops up when icon is in hover state */
 
 .social a:hover span {
 	bottom: 50px;
 	visibility: visible;
 	opacity: 1;
 }
-/* font awesome icons */
 
+/* Font awesome icons */
 .social a:nth-of-type(1):before {
 	content: '\f092';
 }
