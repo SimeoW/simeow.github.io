@@ -1,0 +1,220 @@
+<html>
+<head>
+<meta charset="utf-8">
+<title>2048 Sampler</title>
+<style>
+	body{background-color:#000;}
+	#wrapper{width:70%;margin:50px auto;background-color:#555;color:000;text-align:center;font-size:20px;font-family:Arial;border:3px solid #FFF;border-radius:20px;line-height:60px;overflow-x:auto;}
+	table{table-layout:fixed;width:100%;background-color:#444;color:#FFF;text-align:center;border-spacing:0;}
+	td{word-wrap:break-word}
+	.alternate tr:nth-child(even){background-color: #555;}
+	.alternate tr:nth-child(odd){background-color: #777;}
+	label{width:50px;margin:0 10px;color:#FFF;}
+	input{width:50px;text-align:center;font-weight:900;}
+	#game{display:block;margin:0 auto;background-color:#FFF;border-radius:20px;}
+	.b{display:table;float:left;width:60px;height:60px;margin:0;font-size:80%;border:none;overflow:hidden;}
+</style>
+</head>
+<body onload='sizeChanged()'>
+<div id='wrapper'>
+	<table><tr>
+		<td><label for='width'>Width</label><input type='number' id='width' min='2' value='4' onchange='sizeChanged()'/></td>
+		<td><button style='width:100%' onclick='if(!game.stats&&!game.stats2) init()' title='Shortcut: N'>New Game</button></td>
+		<td><label for='height'>Height</label><input type='number' id='height' min='2' value='4' onchange='sizeChanged()'/></td>
+	</tr></table>
+	<table id='arrowKeys' hidden style='width:40%;height:50px;margin:10px auto;background-color:#555'><tr>
+		<td><button style='width:100%;height:100%' onclick='if(!game.stats) left()'>Left</button></td>
+		<td><button style='width:100%;height:100%' onclick='if(!game.stats) up()'>Up</button></td>
+		<td><button style='width:100%;height:100%' onclick='if(!game.stats) down()'>Down</button></td>
+		<td><button style='width:100%;height:100%' onclick='if(!game.stats) right()'>Right</button></td>
+	</tr></table>
+	<button id='toggleArrowKeys' style='float:left;margin:10px 0 0 10px' onclick='arrowKeys()'>On-screen<br>Arrow Keys</button>
+	<button id='toggleArrowKeys' style='float:right;margin:10px 10px 0 0' onclick='randomKey()' title='Shortcut: CTRL'>Random<br>Swipe</button>
+	<div id='game'></div>
+	<table style='margin-top:10px'><tr><td><b>Pattern Sampling</b><button id='toggleStats' style='float:right;margin-right:10px' onclick='toggleStats()'>Show</button></td></tr></table>
+	<table id='statSettings' hidden class='alternate'><tr>
+		<td colspan='3' style='padding:0 100px 20px 100px;background-color:#444;font-size:13px'>Here you are able to test which swipe patterns have a greater success rate on the 2048 game. You can customize each sample by modifying the pattern, and the number of games that will be tested. The pattern will be read from left to right, but you can use numbers and symbols to increase the pattern's complexity. Click the Pattern label to learn more. Be careful not to set the number of games too high, otherwise it may crash the browser</td>
+		</tr><tr>
+		<td><label for='pattern' onclick='alert("U \t\t=\t Swipe Up\nD \t\t=\t Swipe Down\nL \t\t=\t Swipe Left\nR \t\t=\t Swipe Right\n? \t\t=\t Swipe in random direction\n5D \t\t=\t Same as DDDDD\n| \t\t=\t Create a checkpoint (used to separate code blocks)\n* \t\t=\t Repeat the last code block until not possible, then continue\n3: \t\t=\t Loops around to before the 3nd character but after the 2nd until not possible, then continues\n: \t\t=\t (Same as 0:)  Loops back to the 1st character\n\nExamples:\n\nU3LR:\t=\tULLLR ULLLR ULLLR...\nR|UDL*\t=\tRUDL UDL UDL UDL...\nU*LR:\t=\tUUU...LR UUU...LR...")'>Pattern (Click here for Details)</label></td>
+		<td><input type='text' id='pattern' value='U*LR|U*2:D:' style='width:100%;text-transform:uppercase;border:none;border-radius:50px' onchange='fixStats()'/></td>
+		<td><label for='games'>Games</label><input type='number' id='games' min='1' value='1000' style='width:80px' onchange='fixStats()'/></td>
+	</tr><tr>
+		<td colspan='3'><button style='width:55%;margin:25px 0' id='createSample' onclick='createSample()' title='Shortcut: CTRL+ENTER'>Create Sample</button><button style='width:25%;margin:25px 0' onclick='removeAllSamples(DOM.stats)'>Clear Samples</button></td>
+	</tr>
+	</table>
+	<table id='stats' hidden class='alternate'>
+		<tr style='height:15px;background-color:#222;font-weight:100'><td>Pattern</td><td>First Hundred Swipes</td><td>Average Swipes</td><td>Average Score</td><td>Tiles</td><td>Games Finished</td><td>Min Score</td><td>Max Score</td></tr>
+	</table>
+	<hr>
+	<table><tr><td><b>Brute Force Sampling</b><button id='toggleBruteForce' style='float:right;margin-right:10px' onclick='toggleBruteForce()'>Show</button></td></tr></table>
+	<table id='bruteForceSettings' hidden class='alternate'><tr>
+		<td colspan='8' style='padding:0 100px 20px 100px;background-color:#444;font-size:13px'>Brute Force Sampling will attempt to find successful patterns by going through every possible pattern combination. If it comes across a pattern that meets the minimum criteria, then that pattern will be listed in the table below.</td>
+		</tr><tr>
+		<td title='Do you want ? (random swipe character) to be used in the patterns?'><label for='questionMark' style='margin:0'>?</label><input type='checkbox' id='questionMark' checked style='width:30px;margin:0'/></td>
+		<td title='Do you want * (repeat character) to be used in the patterns?'><label for='asteriskMark' style='margin:0'>*</label><input type='checkbox' id='asteriskMark' checked style='width:30px;margin:0'/></td>
+		<td title='Do you want | (block separator character) to be used in the patterns?'><label for='separateMark' style='margin:0'>|</label><input type='checkbox' id='separateMark' style='width:30px;margin:0'/></td>
+		<td colspan='3' title="The pattern's average score must be greater than or equal to this value in order to be listed in the table below."><label for='games'>Minimum Score</label><input type='number' id='minScore' min='100' value='3000' style='width:80px' onchange='fixStats()'/></td>
+		<td colspan='2' title="The pattern's length will start at this value, and work up from there."><label for='games'>Starting Length</label><input type='number' id='startLen' min='1' value='1' style='width:45px' onchange='fixStats()'/></td>
+	</tr><tr>
+		<td colspan='8'><button style='width:80%;margin:25px' id='bruteForce' onclick='bruteForce()'>Begin Brute Force</button></td>
+	</tr>
+	</table>
+	<table id='stats2' hidden class='alternate'>
+		<tr style='height:15px;background-color:#222;font-weight:100'><td>Pattern</td><td>First Hundred Swipes</td><td>Average Swipes</td><td>Average Score</td><td>Tiles</td><td>Games Finished</td><td>Min Score</td><td>Max Score</td></tr>
+	</table>
+</div>
+<script>
+var validator=/[\*\|]{2,}|^[\*\|]|\|$/,DOM={bruteForce:$('bruteForce'),arrowKeys:$('arrowKeys'),createSample:$('createSample'),minScore:$('minScore'),startLen:$('startLen'),pattern:$('pattern'),games:$('games'),stats:$('stats'),stats2:$('stats2'),statSettings:$('statSettings'),bruteForceSettings:$('bruteForceSettings'),wrapper:$('wrapper'),game:$('game'),width:$('width'),height:$('height'),toggleStats:$('toggleStats'),toggleBruteForce:$('toggleBruteForce')},game={width:4,height:4,data:[],full:false,score:0,stats:false,stats2:false,draw:true,bruteForcing:false,tiles:[]};
+function up(){for(var x=0,changed=false;x<game.width;x++){for(var y=1,pos=0;y<game.height;y++){if(game.data[y][x]==0) continue;if(game.data[pos][x]==0){game.data[pos][x]+=game.data[y][x];game.data[y][x]=0;changed=true}else if(game.data[y][x]!=game.data[pos][x]){pos++;if(y!=pos){game.data[pos][x]+=game.data[y][x];game.data[y][x]=0;changed=true}}else{game.data[pos][x]+=game.data[y][x];game.data[y][x]=0;game.score+=game.data[pos][x];pos++;changed=true}}}if(changed) spawn();if(game.draw) draw();return changed}
+function down(){for(var x=0,changed=false;x<game.width;x++){for(var y=game.height-2,pos=game.height-1;y>=0;y--){if(game.data[y][x]==0) continue;if(game.data[pos][x]==0){game.data[pos][x]+=game.data[y][x];game.data[y][x]=0;changed=true}else if(game.data[y][x]!=game.data[pos][x]){pos--;if(y!=pos){game.data[pos][x]+=game.data[y][x];game.data[y][x]=0;changed=true}}else{game.data[pos][x]+=game.data[y][x];game.data[y][x]=0;game.score+=game.data[pos][x];pos--;changed=true}}}if(changed) spawn();if(game.draw) draw();return changed}
+function left(){for(var y=0,changed=false;y<game.height;y++){for(var x=1,pos=0;x<game.width;x++){if(game.data[y][x]==0) continue;if(game.data[y][pos]==0){game.data[y][pos]+=game.data[y][x];game.data[y][x]=0;changed=true}else if(game.data[y][x]!=game.data[y][pos]){pos++;if(x!=pos){game.data[y][pos]+=game.data[y][x];game.data[y][x]=0;changed=true}}else{game.data[y][pos]+=game.data[y][x];game.data[y][x]=0;game.score+=game.data[y][pos];pos++;changed=true}}}if(changed) spawn();if(game.draw) draw();return changed}
+function right(){for(var y=0,changed=false;y<game.height;y++){for(var x=game.width-2,pos=game.width-1;x>=0;x--){if(game.data[y][x]==0) continue;if(game.data[y][pos]==0){game.data[y][pos]+=game.data[y][x];game.data[y][x]=0;changed=true}else if(game.data[y][x]!=game.data[y][pos]){pos--;if(x!=pos){game.data[y][pos]+=game.data[y][x];game.data[y][x]=0;changed=true}}else{game.data[y][pos]+=game.data[y][x];game.data[y][x]=0;game.score+=game.data[y][pos];pos--;changed=true}}}if(changed) spawn();if(game.draw) draw();return changed}
+function spawn(){var x,y;do{x=rnd(0,game.width-1);y=rnd(0,game.height-1)}while(game.data[y][x]!=0);game.data[y][x]=rnd(1,10)==1?4:2}
+function draw(){for(var s='',y=0;y<game.height;y++){for(var x=0;x<game.width;x++) s+='<b class="b">'+(game.data[y][x]==0?'&nbsp;':game.data[y][x])+'</b>';s+='<br>'}s='Score:'+game.score+'<hr>'+s;DOM.game.innerHTML=s}
+function init(){DOM.game.style.width=game.width*60+'px';DOM.createSample.disabled=false;newGame();draw()}
+function newGame(){game.score=0;game.data=[];game.full=false;for(var y=0;y<game.height;y++){game.data[y]=[];for(var x=0;x<game.width;x++) game.data[y][x]=0}spawn();spawn()}
+function rnd(a,b,c){return !c?Math.floor(Math.random()*(b-a+1))+a:Math.random()*(b-a+1)+a}
+function sizeChanged(){if(DOM.width.value<2) DOM.width.value=2; if(DOM.height.value<2) DOM.height.value=2; DOM.width.value=game.width=Math.round(DOM.width.value);DOM.height.value=game.height=Math.round(DOM.height.value);init()}
+function arrowKeys(){if(DOM.arrowKeys.hidden){DOM.arrowKeys.hidden=false}else{DOM.arrowKeys.hidden=true}}
+function randomKey(){switch(rnd(1,4)){case 1:return up();break;case 2:return down();break;case 3:return left();break;case 4:return right();break;}}
+function toggleStats(){if(game.stats){game.stats=false;if(!game.stats2){game.draw=true;DOM.game.style.backgroundColor='#FFF'};DOM.stats.hidden=DOM.statSettings.hidden=true;DOM.toggleStats.innerHTML='Show'}else{game.stats=true;game.draw=false;DOM.game.style.backgroundColor='#CCC';DOM.stats.hidden=DOM.statSettings.hidden=false;DOM.toggleStats.innerHTML='Hide'}}
+function toggleBruteForce(){if(game.stats2){game.stats2=false;if(!game.stats){game.draw=true;DOM.game.style.backgroundColor='#FFF'};DOM.stats2.hidden=DOM.bruteForceSettings.hidden=true;DOM.toggleBruteForce.innerHTML='Show'}else{game.stats2=true;game.draw=false;DOM.game.style.backgroundColor='#CCC';DOM.stats2.hidden=DOM.bruteForceSettings.hidden=false;DOM.toggleBruteForce.innerHTML='Hide'}}
+function fixStats(){DOM.minScore.value=DOM.minScore.value<100?100:Math.round(DOM.minScore.value);DOM.startLen.value=DOM.startLen.value<1?1:Math.round(DOM.startLen.value);DOM.games.value=DOM.games.value<1?1:Math.round(DOM.games.value);DOM.pattern.value=DOM.pattern.value.toUpperCase().replace(/(?![*:|1234567890UDLR?]).{1}/g,'').replace(/\|+/g,' ').trim().replace(/ /g,'|')}
+function getStats(p,games){
+	var pattern='|'+p,stats={pattern:p,count:0,countFull:0,avgSwipes:0,avgScore:0,minScore:Infinity,maxScore:0,scan:'',tiles:[]},len=pattern.length-1,log2=Math.log(2);
+	game.tiles=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+	for(var i=0;i<games;i++){
+		newGame();
+		var scan='',changed=globalChanged=false,anchor=0,temp='',cur=0,loop=true;
+		while(loop){
+			var l=pattern[cur];l=l=='?'?['U','D','L','R'][rnd(0,4)]:l;
+			switch(l){
+				case '|':changed=false;anchor=cur;break;
+				case '*':if(changed){cur=anchor;changed=false}else{anchor=cur}break;
+				case 'U':var c=up();changed=c||changed;if(temp) if(c&&temp!='1'){cur--;temp=(parseInt(temp)-1||'').toString()}else{temp=''};scan+=l;break;
+				case 'D':var c=down();changed=c||changed;if(temp) if(c&&temp!='1'){cur--;temp=(parseInt(temp)-1||'').toString()}else{temp=''};scan+=l;break;
+				case 'L':var c=left();changed=c||changed;if(temp) if(c&&temp!='1'){cur--;temp=(parseInt(temp)-1||'').toString()}else{temp=''};scan+=l;break;
+				case 'R':var c=right();changed=c||changed;if(temp) if(c&&temp!='1'){cur--;temp=(parseInt(temp)-1||'').toString()}else{temp=''};scan+=l;break;
+				case ':':if(globalChanged){changed=globalChanged=false;cur=parseInt(temp)||0;temp=''};break;
+				default:temp+=l;break;
+			}
+			if(changed) globalChanged=true;
+			cur<len?cur++:loop=false;
+		}
+		game.full=true;
+		for(var y=0;y<game.height;y++){
+			for(var x=0;x<game.width;x++){
+				var d=game.data[y][x];
+				if(d==0) game.full=false;
+				game.tiles[Math.log(d)/log2-1]++;
+			}
+		}
+		stats.count++;
+		if(game.full) stats.countFull++;
+		stats.avgSwipes+=scan.length;
+		stats.avgScore+=game.score ;
+		if(game.score<stats.minScore) stats.minScore=game.score;
+		if(game.score>stats.maxScore) stats.maxScore=game.score;
+	}
+	for(var i=0;i<16;i++) game.tiles[i]=100*Math.min(game.tiles[i]/stats.count,1);
+	stats.avgScore/=stats.count;
+	stats.avgSwipes/=stats.count;
+	stats.scan=scan.substr(0,100);
+	stats.tiles=game.tiles;
+	return stats;
+}
+function removeAllSamples(table){for(var i=0,c=table.id+'Temp',l=document.getElementsByClassName(c).length;i<l;i++)  document.getElementsByClassName(c)[0].remove();}
+function logSample(stats,table){
+	var sample=document.createElement('TR'),t;
+	sample.className=table.id+'Temp';
+	t=document.createElement('TD');t.appendChild(document.createTextNode(stats.pattern));sample.appendChild(t);
+	t=document.createElement('TD');t.style.maxWidth='118px';t.style.fontSize='9px';t.appendChild(document.createTextNode(stats.scan));sample.appendChild(t);
+	t=document.createElement('TD');t.appendChild(document.createTextNode(Math.round(10*stats.avgSwipes)/10));sample.appendChild(t);
+	t=document.createElement('TD');t.style.fontWeight='900';t.style.fontSize='20px';t.appendChild(document.createTextNode(Math.round(10*stats.avgScore)/10));sample.appendChild(t);
+	t=document.createElement('TD');t.style.fontSize='11px';
+	for(var i=stats.tiles.lastIndexOf(100)||0;i<16;i++){
+		if(i<2) continue; //hide 2 and 4
+		t.appendChild(document.createTextNode(Math.pow(2,i+1)+'='+Math.floor(100*game.tiles[i])/100+'%'));
+		t.appendChild(document.createElement('BR'));
+		if(stats.tiles[i]==0) break;
+	}
+	sample.appendChild(t);
+	t=document.createElement('TD');t.appendChild(document.createTextNode(Math.round(1000*stats.countFull/stats.count)/10+'%'));sample.appendChild(t);t.appendChild(document.createElement('BR'));t.appendChild(document.createTextNode(stats.countFull+'/'+stats.count));
+	t=document.createElement('TD');t.appendChild(document.createTextNode(stats.minScore));sample.appendChild(t);
+	t=document.createElement('TD');t.appendChild(document.createTextNode(stats.maxScore));sample.appendChild(t);
+	table.appendChild(sample);
+	return sample;
+}
+function createSample(){
+	if(!game.stats) return;
+	game.draw=false;
+	DOM.createSample.innerHTML='Please Wait...';
+	DOM.createSample.disabled=true;
+	fixStats()
+	var sample=logSample(getStats(DOM.pattern.value,DOM.games.value),DOM.stats);
+	DOM.createSample.innerHTML='Create Sample';
+	DOM.createSample.disabled=false;
+	draw();
+	DOM.toggleBruteForce.scrollIntoView(false);
+}
+function bruteForce(){
+	if(game.bruteForcing){
+		game.bruteForcing=false;
+		DOM.bruteForce.innerHTML='Begin Brute Force';
+		return;
+	}
+	DOM.bruteForce.innerHTML='Stop';
+	game.bruteForcing=true;
+	removeAllSamples(DOM.stats2)
+	fixStats();
+	var chars='*UDLR',len=chars.length,count=0,num=Math.pow(len,DOM.startLen.value-1),min=DOM.minScore.value,logTimeout,c;
+	setTimeout(loop,100);
+	function loop(){
+		count++;
+		if(!game.bruteForcing) return;
+		var a=num++;b='';
+		while(a!=0) var b=chars.charAt(a%len)+b,a=Math.floor(a/len);
+		if(validator.test(b)){
+			try{loop()}catch(e){setTimeout(loop,10)}
+			return;
+		}
+		c=b+':';
+		var stats=getStats(c,100);
+		if(min-300<stats.avgScore){
+			stats=getStats(c,1000);
+			if(min<stats.avgScore){
+				logSample(stats,DOM.stats2);
+				setTimeout(loop,100);
+				return;
+			}
+		}
+		if(count%500==0){setTimeout(loop,20)}else{try{loop()}catch(e){setTimeout(loop,10)}}
+		return;
+	}
+}
+document.onkeydown=function(e){
+	var evtobj=window.event?event:e;
+	var key=evtobj.charCode?evtobj.charCode:evtobj.keyCode;
+	if(game.stats) if(key==13) if(document.activeElement.tagName=='INPUT'||evtobj.ctrlKey){createSample();e.preventDefault()}
+	if(document.activeElement.tagName=='INPUT'||game.stats||game.stats2) return;
+	if(evtobj.ctrlKey){
+		while(!randomKey()&&!game.full){}
+		e.preventDefault();
+		return;
+	}
+	switch(key){
+		case 38:up();e.preventDefault();break;
+		case 40:down();e.preventDefault();break;
+		case 37:left();e.preventDefault();break;
+		case 39:right();e.preventDefault();break;
+		case 78:newGame();e.preventDefault();break;
+	}
+}
+function $(e){return document.getElementById(e)}
+
+//When I wrote this, only God and I understood what I was doing
+//Now, God only knows
+
+</script>
+</body>
+</html>

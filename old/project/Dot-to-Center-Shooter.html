@@ -1,0 +1,165 @@
+<html>
+<head>
+<title>Dot to Center Shooter</title>
+<style>
+	body{
+		margin:0;
+		padding:0;
+	}
+	#draw{
+		background-color:#000;
+	}
+</style>
+</head>
+<body onresize='resize()'>
+<canvas id='draw'>Please switch to a browser that supports the HTML5 Canvas</canvas>
+<script>
+	var width,height,loop,curX,curY,iterations=0;
+	var canvas=document.getElementById('draw');
+	var ctx=canvas.getContext('2d');
+	var x=[],y=[],a=[],toggleLoop=false, startToggle=false;
+	var centerRadius=0;
+	
+	function init(){
+		resize();
+		loop=setInterval(run,1000/60);
+	}
+	
+	function resize(){
+		width=window.innerWidth||document.documentElement.clientWidth||document.body.clientWidth;
+		height=window.innerHeight||document.documentElement.clientHeight||document.body.clientHeight;
+		curX=width/2;curY=height/2;curX2=width/2;curY2=height/2;
+		document.getElementById('draw').width=width;
+		document.getElementById('draw').height=height;
+		run();
+	}
+	
+	canvas.addEventListener("touchstart",mousedown,false);
+	canvas.addEventListener("mousedown",mousedown,false);
+	function mousedown(e){
+		if(e.changedTouches!==undefined) e=e.changedTouches[0];
+		curX=curX2=e.pageX-canvas.offsetLeft;
+		curY=curY2=e.pageY-canvas.offsetTop;
+		toggleLoop=true;
+		if(e.changedTouches!==undefined&&e.changedTouches.length>1) dblclick(); 
+	}
+	
+	canvas.addEventListener("touchend",mouseup,false);
+	canvas.addEventListener("mouseup",mouseup,false);
+	function mouseup(){
+		toggleLoop=false;
+		curX2=curX;
+		curY2=curY;
+	}
+	
+	canvas.addEventListener("touchmove",mousemove,false);
+	canvas.addEventListener("mousemove",mousemove,false);
+	function mousemove(e){
+		if(e.changedTouches!==undefined) e=e.changedTouches[0];
+		curX=e.pageX-canvas.offsetLeft;
+		curY=e.pageY-canvas.offsetTop;
+	}
+	
+	canvas.addEventListener("dblclick",dblclick,false);
+	function dblclick(e){
+		for(var i=0,alpha;i<width;i+=20){
+			alpha=Math.atan((i-width/2)/(1-height/2));
+			a.push(1-height/2<0?alpha:alpha+Math.PI);
+			x.push(i);
+			y.push(1);
+			
+			alpha=Math.atan((i-width/2)/(height-height/2));
+			a.push(height-height/2<0?alpha:alpha+Math.PI);
+			x.push(i);
+			y.push(height);
+		}
+		for(var i=0,alpha;i<height;i+=20){
+			alpha=Math.atan((width-width/2)/(i-height/2));
+			a.push(i-height/2<0?alpha:alpha+Math.PI);
+			x.push(width);
+			y.push(i);
+			
+			alpha=Math.atan((1-width/2)/(i-height/2));
+			a.push(i-height/2<0?alpha:alpha+Math.PI);
+			x.push(1);
+			y.push(i);
+		}
+	}
+	
+	canvas.addEventListener('contextmenu',function(e){
+		e.preventDefault();
+		var random=Math.floor(Math.random()*2);
+		if(random==0){
+			for(var i=0;i<width;i++){
+				a.push(Math.random()*Math.PI*2);
+				x.push(Math.random()*width);
+				y.push(Math.random()*height);
+			}
+		}else if(random==1){
+			for(var i=0;i<width;i++){
+				a.push(Math.PI*2+(Math.random()*2-1));
+				x.push(Math.random()*width);
+				y.push(0);
+			}
+		}
+		return false;
+	},false);
+	
+	function run(){
+		if(!toggleLoop&&x.length==0) return;
+		curX2=((curX2*9)+curX)/10;
+		curY2=((curY2*9)+curY)/10;
+		iterations++;
+		var alpha=Math.atan((curX2-width/2)/(curY2-height/2));
+		if(toggleLoop){
+			a.push(curY2-height/2<0?alpha:alpha+Math.PI);
+			x.push(curX2);
+			y.push(curY2);
+		}
+		
+		ctx.fillStyle="rgba(0,0,0,0.05)";
+		ctx.fillRect(0,0,width,height);
+		var nearestIndex=0,nearestDist=width+height;
+		
+		//center circle
+		ctx.strokeStyle="rgba(255,255,255,0.4)";
+		ctx.beginPath();
+		centerRadius=(centerRadius*9+(x.length))/10;
+		ctx.arc(width/2,height/2,centerRadius,0,2*Math.PI,false);
+		
+		//center lines
+		ctx.moveTo(width/2,height/2);
+		ctx.lineTo(width/2+Math.sin(-iterations/40)*centerRadius,height/2+Math.cos(-iterations/40)*centerRadius);
+		ctx.stroke();
+		
+		ctx.fillStyle="#FFF"
+		for(var i=0;i<x.length;i++){
+			x[i]+=Math.sin(a[i])*4;
+			y[i]+=Math.cos(a[i])*4;
+			if(i){
+				//ctx.beginPath();
+				//ctx.moveTo(x[i-1],y[i-1]);
+				//ctx.lineTo(x[i],y[i]);
+				//ctx.stroke();
+			}
+			ctx.fillRect(x[i]-2,y[i]-2,4,4);
+			
+			
+			if(x[i]>width||y[i]>height||x[i]<0||y[i]<0){
+				ctx.beginPath(); //KABOOM
+				ctx.arc(x[i],y[i],20,0,2*Math.PI,false);
+				ctx.fill();
+				x.splice(i,1);
+				y.splice(i,1);
+				a.splice(i,1);
+			}
+		}
+		if(iterations%30==0){ //every second
+			console.clear();
+			console.log('Circles='+x.length);
+		}
+	}
+	init();
+</script>
+</body>
+</html>

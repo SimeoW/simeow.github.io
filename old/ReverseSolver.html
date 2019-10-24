@@ -1,0 +1,712 @@
+<html>
+<title>Reverse Solver</title>
+<style>
+	body {
+		font-family: "Lucida Console", Monaco, monospace;
+		background-color: #3E606F;
+		padding: 20px;
+	}
+
+	button {
+		width: 100%;
+	}
+
+	textarea {
+		background-color: #3E606F;
+		color: #FFF;
+		font-size: 1.5em;
+		padding: 20px;
+		width: 100%;
+		height: 300px;
+	}
+
+	table {
+		width: 100%;
+		overflow-y: auto;
+		background-color: #3E606F;
+		color: #FFF;
+	}
+
+    .container {
+    	border-radius: 10px;
+        margin: 0 auto;
+        padding: 30px;
+        background-color: #D1DBBD;
+        width: 700px;
+    }
+
+    .scrollContainer {
+    	max-height: 150px;
+    	overflow-y: auto;
+    }
+
+    #operatorsTable {
+    	border: 1px solid #5B8DA3;
+    	border-collapse: collapse;
+    	text-align: center;
+    }
+
+	#outputDiv, #verifyDiv {
+		background-color: #193441;
+		color: #FFF;
+		max-height: 70%;
+		padding: 20px;
+		overflow-y: auto;
+	}
+</style>
+<body>
+    <div class="container">
+    	This app will take a set of elementary operations, parse them, then interpret bottom-to-top in order to find a new solution to the code.
+    	<hr>
+    	<div class="scrollContainer"><table id="operatorsTable" border="1">
+    		<tr><td colspan="2">Supported Elementary Operations</td></tr>
+    		<tr><td>==</td><td>Forward: Verify equality<br>Backward: Set a variable</td></tr>
+    		<tr><td>=</td><td>Set operation</td></tr>
+    		<tr><td>+=</td><td>Add operation</td></tr>
+    		<tr><td>*=</td><td>Multiply operation</td></tr>
+    		<tr><td>&=</td><td>AND operation</td></tr>
+    		<tr><td>|=</td><td>OR operation</td></tr>
+    		<tr><td>^=</td><td>XOR operation</td></tr>
+    		<tr><td>=~</td><td>NOT operation</td></tr>
+    		<tr><td>>>>=</td><td>Zero-fill shift right operation</td></tr>
+    		<tr><td>>>>>=</td><td>Rotate right operation</td></tr>
+    	</table></div>
+    	<textarea id="inputTextarea">// A =  6554;
+// B =  32889;
+
+constant = 12345;
+
+B += A;
+temp = B;
+temp += 1;
+B = temp;
+A &= constant;
+A ^= B;
+B >>>= 2;
+
+A == -11814089;
+B == 11814169;</textarea>
+
+
+    	<!--<textarea id="inputTextarea">// A = 12345;
+// B = 98765; // Non-random prerequisite
+// C = 555;
+
+B |= A;
+C += B;
+B >>>= 10;
+A ^= B;
+
+C == 111656;
+A == 12373;
+B == 108;</textarea>-->
+
+
+		<!-- <textarea id="inputTextarea">// A = 0b0111;
+// B = 0b0011;
+// C = 0b1001;
+
+C >>>= 1; // C = 0100
+B |= C; // B = 1101
+A &= B; // A = 0101
+B |= A; // B = 1101
+C ^= A; // C = 0001
+
+A == 0b0101;
+B == 0b1101;
+C == 0b0001;</textarea> -->
+		<button onclick="go()">Reverse</button>
+		<br>
+		<br>
+		<div id="outputDiv">
+		</div>
+		<br>
+		Result verification:
+		<div id="verifyDiv">
+		</div>
+    </div>
+</body>
+<script>
+	let result = null, parsed = null;
+
+	go();
+
+	function compile(instructions) {
+		let cursor = instructions.length;
+		let instruction, i1, i2, i3, variables = [];
+		let n1, n2, n3, i1isNaN, i2isNaN, i3isNaN;
+		let freeEntropy = []; // track the free entropy bits for every instruction
+		let freeEntropy2 = []; // track the free entropy bits for the second variable of every instruction
+		variables.toString = function(delimiter, radix) {
+			radix = radix || 10;
+			let mask = 0xffffffff; //  >>> (32 - radix);
+			let a = [];
+			for (var v in variables) {
+				if(v == "toString") continue;
+				a.push(v + " = " + variables[v] + " = " + formatBinary((variables[v] & mask).toString(radix), 8));
+			}
+			return delimiter === undefined ? a.join(", ") : a.join(delimiter);
+		}
+
+		// Backtrack will keep track of every ambiguous move
+		let backtrack = [], prereqVar, prereqVal, value;
+
+		while(cursor > 0) {
+			cursor--;
+			prereqVar = null;
+			prereqVal = null;
+			instruction = instructions[cursor];
+			freeEntropy[cursor] = 0; // Default = no free entropy bits
+			freeEntropy2[cursor] = 0; // Default = no free entropy bits for second var
+			i1 = instruction[0];
+			i2 = instruction[1];
+			i3 = instruction[2];
+			n1 = parseInt(i1);
+			n2 = parseInt(i2);
+			n3 = parseInt(i3);
+			i1isNaN = isNaN(n1);
+			i2isNaN = isNaN(n2);
+			i3isNaN = isNaN(n3);
+
+			// If the second variable is undefined, give them full free bits
+			if(i1isNaN && isNaN(variables[i1])) {
+				variables[i1] = Math.floor(Math.random() * 0xffffffff);
+				freeEntropy[cursor] = 0xffffffff;
+			}
+
+			// If the second variable is undefined, give them full free bits
+			if(i3isNaN && isNaN(variables[i3])) {
+				variables[i3] = Math.floor(Math.random() * 0xffffffff);
+				freeEntropy2[cursor] = 0xffffffff;
+			}
+
+			if(i1 == "//" || i1.length == 0) continue; // Skip comments
+			if(variables[i1] === undefined) variables[i1] = 0;
+
+			if(i2 == "==") {
+				if(i3isNaN) value = variables[i3];
+				else value = n3;
+				// When reversing, == will directly set the variable
+				variables[i1] = value;
+
+			} else if(i2 == "=") {
+				// in2 = R
+				// in1 = in1
+				if(i3isNaN) value = variables[i3];
+				else value = n3;
+
+				if(isNaN(value)) {
+					if(isNaN(variables[i1])) {
+						// If both are undefined, any value can be chosen
+						value = Math.floor(Math.random() * 0xffffffff);
+						variables[i3] = value;
+						variables[i1] = value;
+
+						///////////
+						freeEntropy2[i1] = 0xffffffff;
+					} else {
+						value = variables[i1];
+						variables[i3] = value;
+					}
+				} else {
+					if(isNaN(variables[i1])) {
+						variables[i1] = value;
+						////////////
+						freeEntropy[i1] = 0xffffffff;
+					}
+				}
+				/*if(isNaN(value)) { // If the other variable has not been initialized, we get to choose it
+					value = variables[i1];
+				}
+				if(isNaN(value)) { // If the other variable has not been initialized either, guess
+					value = Math.floor(Math.random() * 0xffffffff);
+				}*/
+
+				// The variable can be any value
+				freeEntropy[cursor] = 0xffffffff;
+				if(variables[i1] != value) {
+					prereqVar = i1;
+					prereqVal = value;
+				} else {
+					variables[i1] = Math.floor(Math.random() * 0xffffffff);
+				}
+			} else if(i2 == "+=") {
+				// in2 = R
+				// in1 = out - in2
+				if(i3isNaN) {
+					//value = Math.floor(Math.random() * 0xffffffff);
+					//variables[i3] = value;
+					value = variables[i3];
+				} else value = n3;
+				variables[i1] -= value;
+
+			} else if(i2 == "&=") { // Ambiguous
+				// in2 = R | out (keep out's ones)
+				// in1 = ~in2 | out
+				if(i3isNaN) {
+					//value = Math.floor(Math.random() * 0xffffffff) | variables[i1];
+					//variables[i3] = value;
+					value = variables[i3];
+				} else value = n3;
+/* Proof code
+B == 0b1100; // B should be X10X
+B &= 0b0110;
+B is 0b0100;
+*/
+
+
+
+/* Error showing that AND and OR change the forward value, since anding back becomes limited after choosing the random variable 
+A &= B;
+
+A is 12345679;
+B is 255;
+*/
+				freeEntropy[cursor] = ~(value | variables[i1]);
+				prereqVar = i1;
+				prereqVal = variables[i1] & ~value;
+				// prereqVal are the bits that need to be flipped
+				if(prereqVal != 0) {
+					prereqVal = variables[i1] & ~prereqVal;
+				} else {
+					prereqVar = null;
+					prereqVal = null;
+					variables[i1] = (Math.floor(Math.random() * 0xffffffff) | value | variables[i1]) & (variables[i1] | ~value);
+				}
+
+
+
+
+
+
+				//variables[i1] = (Math.floor(Math.random() * 0xffffffff) | value | variables[i1]) & variables[i1];
+
+				//variables[i1] = ~value | variables[i1];
+
+			} else if(i2 == "|=") {
+				// in2 = R & out (keep out's zeros)
+				// in1 = ~in2 & out
+
+				// 
+				if(i3isNaN) {
+					//value = Math.floor(Math.random() * 0xffffffff) & variables[i1];
+					//variables[i3] = value;
+					value = variables[i3];
+				} else value = n3;
+
+				///in1 = (R & in2 & out) | out
+				// 1100 = 1XX0
+				// 0110
+				// ----
+				// 1110
+
+				// 1110 & 1001 = 1000
+				// 0001 | 0110 = 0111
+				// 1000 <-- how to get this?
+				// 0XX0
+
+/* Proof code
+B == 0b1100; // B should be X10X
+B |= 0b0110;
+B is 0b1110;
+*/
+				//if(~variables[i1])
+				freeEntropy[cursor] = (value & variables[i1]);
+
+
+				prereqVar = i1;
+				prereqVal = value & ~variables[i1];
+				// prereqVal are the bits that need to be flipped
+				if(prereqVal != 0) {
+					prereqVal = variables[i1] | prereqVal;
+				} else {
+					prereqVar = null;
+					prereqVal = null;
+					variables[i1] = (Math.floor(Math.random() * 0xffffffff) & value & variables[i1]) | (variables[i1] & ~value);
+				}
+
+				//variables[i1] = (Math.floor(Math.random() * 0xffffffff) & value & variables[i1]) | variables[i1];
+
+				//variables[i1] = ~value & variables[i1];
+
+			} else if(i2 == "^=") {
+				// in2 = R
+				// in1 = in2 ^ out
+				if(i3isNaN) {
+					/*value = Math.floor(Math.random() * 0xffffffff);
+					backtrack.push({
+						var: i3,
+						val: value,
+						src: "R",
+						cursor: cursor,
+					});
+					variables[i3] = value;*/
+					value = variables[i3];
+				} else value = n3;
+				freeEntropy[cursor] = 0;
+				variables[i1] = value ^ variables[i1];
+
+			} else if(i2 == "=~") {
+				// in1 = ~out
+				freeEntropy[cursor] = 0;
+				variables[i1] = ~variables[i1];
+
+			// The first lossy function
+			} else if(i2 == ">>>=") {
+				// in2 = GIVEN
+				// in1 = out | (R >>> (32 - IN2))
+				// Prerequisite, output must start with n3 zero bits
+				prereqVar = i1;
+				prereqVal = ((variables[i1] << n3) & 0xffffffff) >>> n3;
+				if(variables[i1] == prereqVal) { // starts with n3 zeros
+					prereqVar = null;
+					prereqVal = null;
+					value = Math.floor(Math.random() * 0xffffffff) >>> (32 - n3);
+					/*backtrack.push({
+						var: i3,
+						val: value,
+						src: n3 + " random first bits",
+						cursor: cursor,
+					});*/
+					freeEntropy[cursor] = (0xffffffff) >>> (32 - n3);
+
+					console.log();
+					console.log(formatBinary(((variables[i1] << n3) & 0xffffffff).toString(2),32));
+					console.log(formatBinary(value.toString(2),32));
+					variables[i1] = ((variables[i1] << n3) & 0xffffffff) | value;
+					console.log(formatBinary(variables[i1].toString(2),32)+" = "+i1);
+				} else console.log(i1 + "doesn't start with correct amount of zeros.");
+				/*test code
+A &= B;
+B >>>= 10;
+
+A is 12345;
+B is 0x000FFEFF;
+				*/
+
+			} else if(i2 == ">>>>=") {
+				// in2 = GIVEN
+				// in1 = out <<<< in2
+				freeEntropy[cursor] = 0;
+				variables[i1] = ROTL(variables[i1], n3);
+			}
+
+			// Step forward through each operation
+			//			Has: 	1011001
+			//			Needs: 	0001111
+
+			//	Entropy[i-1]: 	0011100
+			// Needs turns into 0000011 absorbed some bits
+			//	Entropy[i-2]: 	1111111
+			// Needs turns into 0000000
+			//		Needs == 0 is true, continue.
+/* Testing code:
+A >>>= 15;
+
+A = B;
+
+A is 111;
+B is 111;
+*/
+			if(prereqVal != null) {
+				cursor++;
+				console.log("Prerequisite reached: Instruction: (" + instruction + ")\t(" + prereqVar + " = " + variables[prereqVar] + " but needs to be " + prereqVal + ")");
+				let cursorBackup = cursor, variablesBackup = [];
+				for(v in variables) variablesBackup[v] = variables[v];
+				// The bits needed to be flipped
+				let bitsRemaining = variables[prereqVar] ^ prereqVal, newBitsRemaining, changedBits;
+				variables[prereqVar] = prereqVal;
+				let cursorMax = instructions.length - 1, inst;
+				// Backtrack until all of the variable is absorbed in entropy
+				while(cursor < cursorMax) {
+					cursor++;
+
+					inst = instructions[cursor];
+					i1 = inst[0];
+					i2 = inst[1];
+					i3 = inst[2];
+					n1 = parseInt(i1);
+					n2 = parseInt(i2);
+					n3 = parseInt(i3);
+					i1isNaN = isNaN(n1);
+					i2isNaN = isNaN(n2);
+					i3isNaN = isNaN(n3);
+
+					// Variable 2 absorption
+					if(i3 == prereqVar && freeEntropy2[cursor] != 0) {
+						newBitsRemaining = bitsRemaining & ~freeEntropy2[cursor];
+						changedBits = newBitsRemaining ^ bitsRemaining;
+						freeEntropy2[cursor] = ~changedBits & freeEntropy2[cursor];
+						bitsRemaining = newBitsRemaining;
+						if(bitsRemaining == 0) {
+							console.log("Successful from entropy2");
+							break;
+						}
+					}
+
+					// Variable 1 absorption
+					if(i1 == prereqVar && freeEntropy[cursor] != 0) {
+						console.log("Bits remaining: " + bitsRemaining + " at instruction " + instruction + " with free entropy " + freeEntropy[cursor]);
+						newBitsRemaining = bitsRemaining & ~freeEntropy[cursor];
+						changedBits = newBitsRemaining ^ bitsRemaining;
+						freeEntropy[cursor] = ~changedBits & freeEntropy[cursor];
+						bitsRemaining = newBitsRemaining;
+						if(bitsRemaining == 0) {
+							console.log("Successful from entropy1");
+							break;
+						}
+					}
+				}
+				if(cursor == cursorMax) {
+					alert("Unsolvable due to instruction " + (cursorBackup + 1) + " (" + instruction + ").\n\nView the console for more information.");
+					console.log("No solution found for variable " + i1);
+					console.log("Bits Remaining to be flipped: " + bitsRemaining + " = " + bitsRemaining.toString(2));
+					variables = variablesBackup;
+					return variables;
+					//return null;
+				} else {
+					console.log("Successfully absorbed the extra entropy. cursor = " + cursor);
+				}
+				cursor = cursorBackup;
+			} else {
+				console.log("Successfully reversed (" + instruction + ")");
+			}
+		}
+		console.log(" ");
+		result = variables;
+		return variables;
+	}
+
+	// Called when the button is clicked
+	function go() {
+		let rawString = inputTextarea.value.trim() + "\n";
+		let rawData = rawString.replace(/\n+/g, ";\n").replace(/;+/g, ";").replace(/\s+/g," ").split(/\s*;\s*/);
+		let instructions = [];
+		for (var i = 0, len = rawData.length - 1, p; i < len; i++) {
+			p = parseInstruction(rawData[i]);
+			if(p != null) instructions.push(p);
+		}
+		parsed = instructions;
+		outputDiv.innerHTML = ("<hr>Parsed instructions:<br>");
+		outputDiv.innerHTML += "<br>" + instructions.join("<br>");
+		let result = compile(instructions);
+		outputDiv.innerHTML += "<hr>Solution from reversing:<br>";
+		outputDiv.innerHTML += "<br>" + result.toString(",<br>", 2);
+		verify();
+	}
+
+	function verify() {
+		if(result == null || parsed == null) return;
+		let allTestsSucceeded = null;
+		let instruction, i1, i2, i3, variables = [], log = [];
+		let n1, n2, n3, i1isNaN, i2isNaN, i3isNaN;
+		let varInserted = []; // Keeps track of if the new result has been inserted into the code yet
+		// If any results were not inserted, add them to the front
+		for(var v in result) {
+			if(v == "toString") continue;
+			if(result[v] !== undefined) {
+				variables[v] = result[v];
+				varInserted[v] = true;
+				log.push(v + " = " + result[v]);
+			}
+		}
+		for(var i = 0, l = parsed.length; i < l; i++) {
+			instruction = parsed[i];
+			i1 = instruction[0];
+			i2 = instruction[1];
+			i3 = instruction[2];
+			n1 = parseInt(i1);
+			n2 = parseInt(i2);
+			n3 = parseInt(i3);
+			i1isNaN = isNaN(n1);
+			i2isNaN = isNaN(n2);
+			i3isNaN = isNaN(n3);
+			if(i1 == "//" || i1.length == 0) continue; // Skip comments
+			if(variables[i1] === undefined) variables[i1] = 0;
+			if(i3isNaN && variables[i3] === undefined) variables[i3] = 0;
+
+			/*if(i2 == "==") {
+				if(result[i1] !== undefined && varInserted[i1] != true) {
+				//	variables[i1] = result[i1];
+				//	varInserted[i1] = true;
+				//	log.push(i1 + " = " + result[i1]);
+				//}
+			} else */if(i2 == "=") {
+				if(i3isNaN) variables[i1] = variables[i3];
+				else variables[i1] = n3;
+				log.push(instruction);
+			} else if(i2 == "+=") {
+				if(i3isNaN) variables[i1] += variables[i3];
+				else variables[i1] += n3;
+				log.push(instruction + " // " + i1 + " is " + variables[i1]);
+			} else if(i2 == "&=") {
+				if(i3isNaN) variables[i1] &= variables[i3];
+				else variables[i1] &= n3;
+				log.push(instruction + " // " + i1 + " is " + variables[i1]);
+			} else if(i2 == "|=") {
+				if(i3isNaN) variables[i1] |= variables[i3];
+				else variables[i1] |= n3;
+				log.push(instruction + " // " + i1 + " is " + variables[i1]);
+			} else if(i2 == "^=") {
+				if(i3isNaN) variables[i1] ^= variables[i3];
+				else variables[i1] ^= n3;
+				log.push(instruction + " // " + i1 + " is " + variables[i1]);
+			} else if(i2 == "=~") {
+				variables[i1] =~ variables[i1];
+				log.push(instruction + " // " + i1 + " is " + variables[i1]);
+			} else if(i2 == ">>>=") {
+				variables[i1] >>>= n3;
+				log.push(instruction + " // " + i1 + " is " + variables[i1]);
+			} else if(i2 == ">>>>=") {
+				variables[i1] = ROTR(variables[i1], n3);
+				log.push(instruction + " // " + i1 + " is " + variables[i1]);
+			} else if(i2 == "==") {
+				let pass = false, value;
+				if(i3isNaN) value = variables[i3];
+				else value = n3;
+				pass = variables[i1] == value;
+				if(pass) {
+					if(allTestsSucceeded == null) allTestsSucceeded = true;
+					log.push(instruction + " //  PASSED!");
+				} else {
+					allTestsSucceeded = false;
+					log.push(instruction + " //  FAILED! (" + variables[i1] + " != " + value + ")");
+				}
+			}
+		}
+		log.unshift("<hr>");
+		if(allTestsSucceeded == null) log.unshift("THERE WERE NO TESTS IN THE CODE");
+		else if(allTestsSucceeded) log.unshift("ALL TESTS PASSED");
+		else log.unshift("ONE OR MORE TESTS FAILED");
+		verifyDiv.innerHTML = log.join("<br>");
+	}
+
+	// Parses the raw input text into a format that is quickly readable by the computer
+	// Guarantees an array of size three
+	// Comments out any instructions that are improperly formatted
+	// All operations must be within the elementary set:
+	//		=		Set
+	//		+=		Add
+	//		*=		Multiply
+	//		&=		And
+	//		|=		Or
+	//		^=		XOR
+	//		=~		Not
+	//		>>>=	Shift right
+	//		>>>>=	Rotate right
+	// With the addition of:
+	//		==
+	//		is
+	function parseInstruction(s) {
+		let supportedOperations = [
+			"is", "=", "+=", "&=", "|=", "^=",
+			"=~", ">>>=", ">>>>=", "=="
+		];
+		let o = ["", "", ""];
+		o.toString = function() {
+			let o_ = [];
+			for(var i = 0; i < o.length; i++) {
+				o_.push(o[i]);
+				//o_.push(formatBinary(o[i].toString(2), 8));
+			}
+			let s = o_.join(" ").trim();
+			if(s.length != 0) s += ";";
+			return s;
+		}
+		
+
+
+
+		/*if(s.startsWith("// ") && s.includes(" is now ")) {
+			let s_ = s.split(" ");
+			// Activate the "is" operator
+			if(s_.length == 5) {
+				s = s_[1] + " is " + s_[4];
+			}
+		}*/
+		if(s == "") {
+		} else if(s.startsWith("//")) {
+			o[0] = "//";
+			o[1] = s.substring(2).trim();
+			return null; // Comment out to include comments
+		} else {
+			let a = s.split(/\s+/);
+			for(let i = 0; i < a.length; i++) {}
+			if(a.length > 3) {
+				// Merge all the other pieces into the last one
+				// Which adds support for A = ROTR(B, C)
+				for(var i = 3; i < a.length - 1; i++) {
+					a[2] += a[i];
+				}
+				a.length = 3;
+			}
+			if(a.length == 3) {
+				o[0] = a[0];
+				o[1] = a[1];
+				o[2] = a[2];
+				if(o[1] == "=") {
+					if(o[2].startsWith("ROTR(")
+						&& o[2].endsWith(")")) {
+						o[2] = o[2].substring(5, o[2].length - 1).split(/\s*,\s*/g);
+						if(o[2].length == 2 && o[2][0] == o[0]) {
+							o[1] = ">>>>="; // ROTR
+							o[2] = o[2][1];
+						} else {
+							o[0] = "//";
+							o[1] = s;
+							o[2] = "";
+						}
+					}
+				}
+				if(!supportedOperations.includes(o[1])) {
+					o[0] = "//";
+					o[1] = s;
+					o[2] = "";
+				} else {
+					let radix1 = getRadix(o[0]), radix2 = getRadix(o[2]);
+					if(radix1 != 10) o[0] = o[0].substring(2);
+					if(radix2 != 10) o[2] = o[2].substring(2);
+					let n1 = parseInt(o[0], radix1), n2 = parseInt(o[2], radix2);
+					if(!isNaN(n1)) o[0] = n1;
+					if(!isNaN(n2)) o[2] = n2;
+				}
+			} else {
+				o[0] = "//";
+				o[1] = s;
+				o[2] = "";
+			}
+		}
+		return o;
+	}
+
+	// Add any extra zeros to make the string a specific size
+	// Possible issue: Check for minus sign
+	function formatBinary(s, length) {
+		if(isNaN(parseInt(s, 2))) return s;
+		let zeros = new Array(length + 1).join("0");
+		if(s.length >= length) return s;
+		s = (zeros + s).substring(length + s.length - length);
+		return s;
+	}
+
+	// Checks for 0x, 0b, or 0o at the beginning of the string to determine the base
+	function getRadix(s) {
+		if(s[0] == "0") {
+			if(s[1] == "b") return 2;
+			if(s[1] == "x") return 16;
+			if(s[1] == "o") return 8;
+		}
+		return 10;
+	}
+
+	// Bitwise circular left rotate
+	function ROTL(X, n) {
+        return (X << n) | (X >> (32 - n));
+    }
+
+    // Bitwise circular right rotate
+	function ROTR(X, n) {
+        return (X >>> n) | (X << (32 - n));
+    }
+</script>
+</html>
