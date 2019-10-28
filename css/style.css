@@ -30,6 +30,10 @@ h1, h2, h3, h4, h5, h6 {
   padding: 0;
 }
 
+hr {
+  border-top: 1px solid #C1BCD980
+}
+
 /* Back to top button */
 .gotoTop {
   position: fixed;
@@ -111,7 +115,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 #header.header {
-  background: #F7D2FCCC;
+  background: #FFC6A4CC;
   padding: 20px 0;
   height: 72px;
   transition: all 0.5s;
@@ -206,8 +210,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 #top .viewMyWorkBtn:hover {
-  background: #2dc997;
-  border: 2px solid #2dc997;
+  background: #C1BCD9;
+  border: 2px solid #C1BCD9;
 }
 
 /*--------------------------------------------------------------
@@ -432,11 +436,11 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 #mobileNav ul .menuHasChildren i.fa-chevron-up {
-  color: #2dc997;
+  color: #C1BCD9;
 }
 
 #mobileNav ul .menu-item-active {
-  color: #2dc997;
+  color: #C1BCD9;
 }
 
 #mobile-body-overly {
@@ -491,8 +495,9 @@ body.mobileNavActive #mobileNavToggle {
 }
 
 #about .aboutContainer .background {
-  min-height: 300px;
-  background: url(../img/about-img.jpg) center top no-repeat;
+  min-height: 854px;
+  min-width: 512px;
+  background: url(../img/about.png) center top no-repeat;
   margin-bottom: 10px;
 }
 
@@ -528,7 +533,7 @@ body.mobileNavActive #mobileNavToggle {
 
 #about .aboutContainer .iconBox .icon {
   float: left;
-  background: #FFF;
+  background: #1E1624;
   width: 64px;
   height: 64px;
   display: flex;
@@ -537,12 +542,12 @@ body.mobileNavActive #mobileNavToggle {
   flex-direction: column;
   text-align: center;
   border-radius: 50%;
-  border: 2px solid #2dc997;
+  border: 2px solid #C1BCD9;
 }
 
 #about .aboutContainer .iconBox .icon i {
-  color: #2dc997;
-  font-size: 24px;
+  color: #C1BCD9;
+  font-size: 40px;
 }
 
 #about .aboutContainer .iconBox .title {
@@ -702,8 +707,8 @@ body.mobileNavActive #mobileNavToggle {
 }
 
 #callToAction .cta-btn:hover {
-  background: #2dc997;
-  border: 2px solid #2dc997;
+  background: #C1BCD9;
+  border: 2px solid #C1BCD9;
 }
 
 /* Portfolio Section
@@ -740,7 +745,7 @@ body.mobileNavActive #mobileNavToggle {
 }
 
 #portfolio #portfolioFilters li:hover, #portfolio #portfolioFilters li.filter-active {
-  background: #2dc997;
+  background: #C1BCD9;
   color: #FFF;
 }
 
@@ -766,7 +771,7 @@ body.mobileNavActive #mobileNavToggle {
 
 #portfolio .portfolioItem .details {
   height: 50px;
-  background: #2dc997;
+  background: #C1BCD9;
   position: absolute;
   width: 100%;
   height: 50px;
@@ -840,7 +845,7 @@ body.mobileNavActive #mobileNavToggle {
 }
 
 #team .member .social a:hover {
-  color: #2dc997;
+  color: #C1BCD9;
 }
 
 #team .member .social i {
@@ -866,7 +871,7 @@ body.mobileNavActive #mobileNavToggle {
 
 #contact .info i {
   font-size: 32px;
-  color: #2dc997;
+  color: #C1BCD9;
   float: left;
 }
 
@@ -900,13 +905,13 @@ body.mobileNavActive #mobileNavToggle {
 }
 
 #contact .socialLinks a:hover {
-  background: #2dc997;
+  background: #C1BCD9;
   color: #FFF;
 }
 
 #contact .form #sendMessage {
-  color: #2dc997;
-  border: 1px solid #2dc997;
+  color: #C1BCD9;
+  BORDER: 1PX Solid #C1BCD9;
   display: none;
   text-align: center;
   padding: 15px;
@@ -943,7 +948,7 @@ body.mobileNavActive #mobileNavToggle {
 }
 
 #contact .form button[type="submit"] {
-  background: #2dc997;
+  background: #C1BCD9;
   border: 0;
   padding: 10px 24px;
   color: #FFF;

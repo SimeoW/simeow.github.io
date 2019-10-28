@@ -1,5 +1,4 @@
 jQuery(document).ready(function($) {
-
   // Header fixed and Back to top button
   $(window).scroll(function() {
     if ($(this).scrollTop() > 100) {
@@ -123,4 +122,10 @@ jQuery(document).ready(function($) {
     delay: 10,
     time: 1000
   });
+
+  setAge = () => {
+    $('#age').text(Math.round((new Date() - new Date(863251200000)) / 31536000000 * 10000000) / 10000000);
+  }
+  setInterval(setAge, 3154.6);
+  setAge();
 });
