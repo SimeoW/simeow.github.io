@@ -128,4 +128,8 @@ jQuery(document).ready(function($) {
   }
   setInterval(setAge, 3154.6);
   setAge();
+
+  var fs = require('fs');
+  var files = fs.readdirSync('/old/');
+  alert(files)
 });
