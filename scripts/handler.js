@@ -1,7 +1,7 @@
 jQuery(document).ready(function($) {
   // Header fixed and Back to top button
   $(window).scroll(function() {
-    if ($(this).scrollTop() > 100) {
+    if ($(this).scrollTop() > 92) {
       $('.gotoTop').fadeIn('slow');
       $('#header').addClass('header');
       $('#header #logo h1 a, .navBar a').css(
@@ -20,7 +20,7 @@ jQuery(document).ready(function($) {
   $('.gotoTop').click(function() {
     $('html, body').animate({
       scrollTop: 0
-    }, 1500, 'easeInOutExpo');
+    }, 600, 'easeInOutExpo');
     return false;
   });
 
@@ -30,7 +30,7 @@ jQuery(document).ready(function($) {
     animation: {
       opacity: 'show'
     },
-    speed: 400
+    speed: 300
   });
 
   // Mobile Navigation
@@ -89,7 +89,7 @@ jQuery(document).ready(function($) {
         }
         $('html, body').animate({
           scrollTop: targetID.offset().top - top_space
-        }, 1500, 'easeInOutExpo');
+        }, 600, 'easeInOutExpo');
         if ($(this).parents('.navBar').length) {
           $('.navBar .menuActive').removeClass('menuActive');
           $(this).closest('li').addClass('menuActive');
@@ -126,10 +126,15 @@ jQuery(document).ready(function($) {
   setAge = () => {
     $('#age').text(Math.round((new Date() - new Date(863251200000)) / 31536000000 * 10000000) / 10000000);
   }
-  setInterval(setAge, 3154.6);
+  setInterval(setAge, 3154.6); // Every 3.1546 seconds age increments by exactly 0.0000001
   setAge();
 
-  var fs = require('fs');
-  var files = fs.readdirSync('/old/');
-  alert(files)
+  fileInput = document.createElement('input');
+  fileInput.directory = ''
+  fileInput.webkitdirectory = ''
+  let i = document.querySelector('input').addEventListener('change', (e)=>{
+    for(let i = 0; i < e.target.files.length; i++) {
+      console.log(e.target.files[i].name);
+    }
+  })
 });

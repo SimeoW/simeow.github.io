@@ -2,575 +2,592 @@
 <html lang='en'>
 
 <head>
-  <meta charset='utf-8'>
-  <title>SIMEWU</title>
-  <meta content='width=device-width, initial-scale=1.0' name='viewport'>
-  <meta content='' name='keywords'>
-  <meta content='' name='description'>
-  <link href='img/favicon.ico' rel='icon'>
-  <link href='img/apple-touch-icon.png' rel='apple-touch-icon'>
-  <link href='lib/monserrat.css' rel='stylesheet'>
-  <link href='lib/bootstrap/css/bootstrap.min.css' rel='stylesheet'>
-  <link href='lib/font-awesome/css/all.min.css' rel='stylesheet'>
-  <link href='lib/animate/animate.min.css' rel='stylesheet'>
-  <link href='css/style.css' rel='stylesheet'>
+	<meta charset='utf-8'>
+	<title>SIMEWU</title>
+	<meta content='width=device-width, initial-scale=1.0' name='viewport'>
+	<meta content='' name='keywords'>
+	<meta content='' name='description'>
+	<link href='img/favicon.ico' rel='icon'>
+	<link href='img/apple-touch-icon.png' rel='apple-touch-icon'>
+	<link href='lib/monserrat.css' rel='stylesheet'>
+	<link href='lib/bootstrap/css/bootstrap.min.css' rel='stylesheet'>
+	<link href='lib/font-awesome/css/all.min.css' rel='stylesheet'>
+	<link href='lib/animate/animate.min.css' rel='stylesheet'>
+	<link href='css/style.css' rel='stylesheet'>
 </head>
 
 <body>
-  <header id='header'>
-    <div class='container'>
-      <div id='logo' class='pull-left'>
-        <!--<a href='#top'><img src='img/logo.png' alt='' title=''/></img></a>-->
-        <h1><a href='#top'>SIMeWU</a></h1>
-      </div>
-      <nav id='navBarContainer'>
-        <ul class='navBar'>
-          <li class='menuActive'><a href='#top'>Home</a></li>
-          <li><a href='#about'>About</a></li>
-          <li><a href='#gallery'>Gallery</a></li>
-          <li class='menuHasChildren'><a>Projects</a>
-            <ul>
-              <li><a href='#'>Drop Down 1</a></li>
-              <li class='menuHasChildren'><a href='#'>Drop Down 2</a>
-                <ul>
-                  <li><a href='#'>Deep Drop Down 1</a></li>
-                  <li><a href='#'>Deep Drop Down 2</a></li>
-                  <li><a href='#'>Deep Drop Down 3</a></li>
-                  <li><a href='#'>Deep Drop Down 4</a></li>
-                  <li><a href='#'>Deep Drop Down 5</a></li>
-                </ul>
-              </li>
-              <li><a href='#'>Drop Down 3</a></li>
-              <li><a href='#'>Drop Down 4</a></li>
-              <li><a href='#'>Drop Down 5</a></li>
-            </ul>
-          </li>
-          <li><a href='#contact'>Contact</a></li>
-        </ul>
-      </nav>
-    </div>
-  </header>
-
-  <!--==========================
-    top Section
-  ============================-->
-  <section id='top'>
-    <canvas id='background'></canvas>
-    <div class='top-container'>
-      <h1>Hello, I'm Simeon.<br>I'm a computer scientist.</h2>
-      <h3>This site is currently under construction, please check back soon.</h3>
-      <a href='#about' class='viewMyWorkBtn'>View My Work</a>
-    </div>
-  </section><!-- #top -->
-
-  <main id='main'>
-
-    <!--==========================
-      About Us Section
-    ============================-->
-    <section id='about'>
-      <div class='container'>
-        <div class='row aboutContainer'>
-
-          <div class='col-lg-6 content order-lg-1 order-2'>
-            <h2 class='title'>About</h2>
-            <p>
-              <h4><i>You might not think that programmers are artists, but programming is an extremely creative profession. It's logic-based creativity.<br>~ John Romero</i></h4><hr>
-              <br>My name is Simeon, I am <span id='age'></span> years old, a computer scientist and an artist. This site is my portfolio, I use it to test and showcase my projects. I specialize in the following:
-            </p>
-
-            <div class='iconBox wow fadeInUp'>
-              <div class='icon'><i class='fa fa-chess-knight'></i></div>
-              <h4 class='title'><a href=''>CODING</a></h4>
-              <p class='description'>My favorites languages are JavaScript, Python, C++, C, Java, all the .NET languages, BASIC, C#, Ruby, Lua, and Assembly.</p>
-            </div>
-
-            <div class='iconBox wow fadeInUp' data-wow-delay='0.2s'>
-              <div class='icon'><i class='fa fa-palette'></i></div>
-              <h4 class='title'><a href=''>ART</a></h4>
-              <p class='description'>Oil painting, oil pastels, pen and ink, charcoal, and digital painting.</p>
-            </div>
-
-            <div class='iconBox wow fadeInUp' data-wow-delay='0.4s'>
-              <div class='icon'><i class='fa fa-unlock-alt'></i></div>
-              <h4 class='title'><a href=''>CYBERSECURITY</a></h4>
-              <p class='description'>Applied cryptography, cryptanalysis, computer security.</p>
-            </div>
-
-            <div class='iconBox wow fadeInUp' data-wow-delay='0.4s'>
-              <div class='icon'><i class='fas fa-camera-retro'></i></div>
-              <h4 class='title'><a href=''>PHOTOGRAPHY</a></h4>
-              <p class='description'>Exploring the world, and taking pictures as I go.</p>
-            </div>
-
-            <div class='iconBox wow fadeInUp' data-wow-delay='0.4s'>
-              <div class='icon'><i class='fab fa-bitcoin'></i></div>
-              <h4 class='title'><a href=''>CRYPTOCURRENCIES</a></h4>
-              <p class='description'>Distributed ledger technology research and Bitcoin Core development.</p>
-            </div>
-            <br>
-            <p>
-              The old version of this side can be found at <a href='http://www.simewu.com/old'>http://www.simewu.com/old<a> (some features no longer function properly)
-            </p>
-
-          </div>
-
-          <div class='col-lg-5 background order-lg-2 order-1 wow fadeInRight'></div>
-        </div>
-
-      </div>
-    </section><!-- #about -->
-
-    <!--==========================
-      Projects Section
-    ============================-->
-    <section id='projects'>
-      <div class='container wow fadeIn'>
-        <div class='sectionHeader'>
-          <h3 class='sectionTitle'>Projects</h3>
-          <p class='sectionDesc'>Here is a collection of my projects</p>
-        </div>
-        <div class='row'>
-          <div class='col-lg-4 col-md-6 wow fadeInUp' data-wow-delay='0.2s'>
-            <div class='box'>
-              <div class='icon'><a href=''><i class='fa fa-desktop'></i></a></div>
-              <h4 class='title'><a href=''>Lorem Ipsum</a></h4>
-              <p class='description'>Voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident</p>
-            </div>
-          </div>
-          <div class='col-lg-4 col-md-6 wow fadeInUp' data-wow-delay='0.4s'>
-            <div class='box'>
-              <div class='icon'><a href=''><i class='fa fa-bar-chart'></i></a></div>
-              <h4 class='title'><a href=''>Dolor Sitema</a></h4>
-              <p class='description'>Minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat tarad limino ata</p>
-            </div>
-          </div>
-          <div class='col-lg-4 col-md-6 wow fadeInUp' data-wow-delay='0.6s'>
-            <div class='box'>
-              <div class='icon'><a href=''><i class='fa fa-paper-plane'></i></a></div>
-              <h4 class='title'><a href=''>Sed ut perspiciatis</a></h4>
-              <p class='description'>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur</p>
-            </div>
-          </div>
-
-          <div class='col-lg-4 col-md-6 wow fadeInUp' data-wow-delay='0.2s'>
-            <div class='box'>
-              <div class='icon'><a href=''><i class='fa fa-photo'></i></a></div>
-              <h4 class='title'><a href=''>Magni Dolores</a></h4>
-              <p class='description'>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum</p>
-            </div>
-          </div>
-          <div class='col-lg-4 col-md-6 wow fadeInUp' data-wow-delay='0.4s'>
-            <div class='box'>
-              <div class='icon'><a href=''><i class='fa fa-road'></i></a></div>
-              <h4 class='title'><a href=''>Nemo Enim</a></h4>
-              <p class='description'>At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque</p>
-            </div>
-          </div>
-          <div class='col-lg-4 col-md-6 wow fadeInUp' data-wow-delay='0.6s'>
-            <div class='box'>
-              <div class='icon'><a href=''><i class='fa fa-code-fork'></i></a></div>
-              <h4 class='title'><a href=''>Eiusmod Tempor</a></h4>
-              <p class='description'>Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi</p>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </section>
-
-    <!--==========================
-      Gallery Section
-    ============================-->
-    <section id='gallery'>
-      <div class='container wow fadeIn'>
-        <div class='sectionHeader'>
-          <h3 class='sectionTitle'>Gallery</h3>
-          <p class='sectionDesc'>Here I will showcase my artwork.</p>
-        </div>
-        <div class='row counters'>
-
-          <div class='col-lg-3 col-6 text-center'>
-            <span data-toggle='counter-up'>123</span>
-            <p>Clients</p>
-          </div>
-
-          <div class='col-lg-3 col-6 text-center'>
-            <span data-toggle='counter-up'>456</span>
-            <p>Projects</p>
-          </div>
-
-          <div class='col-lg-3 col-6 text-center'>
-            <span data-toggle='counter-up'>789</span>
-            <p>Hours Of Support</p>
-          </div>
-
-          <div class='col-lg-3 col-6 text-center'>
-            <span data-toggle='counter-up'>10</span>
-            <p>Hard Workers</p>
-          </div>
-
-        </div>
-
-      </div>
-    </section>
-
-    <!--==========================
-    Call To Action Section
-    ============================-->
-    <section id='callToAction'>
-      <div class='container wow fadeIn'>
-        <div class='row'>
-          <div class='col-lg-9 text-center text-lg-left'>
-            <h3 class='cta-title'>Call To Action</h3>
-            <p class='cta-text'> Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-          </div>
-          <div class='col-lg-3 cta-btn-container text-center'>
-            <a class='cta-btn align-middle' href='#'>Call To Action</a>
-          </div>
-        </div>
-
-      </div>
-    </section><!-- #callToAction -->
-
-    <!--==========================
-      Portfolio Section
-    ============================-->
-    <section id='portfolio'>
-      <div class='container wow fadeInUp'>
-        <div class='sectionHeader'>
-          <h3 class='sectionTitle'>Portfolio</h3>
-          <p class='sectionDesc'>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque</p>
-        </div>
-        <div class='row'>
-
-          <div class='col-lg-12'>
-            <ul id='portfolioFilters'>
-              <li data-filter='.filter-app, .filter-card, .filter-logo, .filter-web' class='filter-active'>All</li>
-              <li data-filter='.filter-app'>App</li>
-              <li data-filter='.filter-card'>Card</li>
-              <li data-filter='.filter-logo'>Logo</li>
-              <li data-filter='.filter-web'>Web</li>
-            </ul>
-          </div>
-        </div>
-
-        <div class='row' id='portfolio-wrapper'>
-          <div class='col-lg-3 col-md-6 portfolioItem filter-app'>
-            <a href=''>
-              <img src='img/portfolio/app1.jpg' alt=''>
-              <div class='details'>
-                <h4>App 1</h4>
-                <span>Alored dono par</span>
-              </div>
-            </a>
-          </div>
-
-          <div class='col-lg-3 col-md-6 portfolioItem filter-web'>
-            <a href=''>
-              <img src='img/portfolio/web2.jpg' alt=''>
-              <div class='details'>
-                <h4>Web 2</h4>
-                <span>Alored dono par</span>
-              </div>
-            </a>
-          </div>
-
-          <div class='col-lg-3 col-md-6 portfolioItem filter-app'>
-            <a href=''>
-              <img src='img/portfolio/app3.jpg' alt=''>
-              <div class='details'>
-                <h4>App 3</h4>
-                <span>Alored dono par</span>
-              </div>
-            </a>
-          </div>
-
-          <div class='col-lg-3 col-md-6 portfolioItem filter-card'>
-            <a href=''>
-              <img src='img/portfolio/card1.jpg' alt=''>
-              <div class='details'>
-                <h4>Card 1</h4>
-                <span>Alored dono par</span>
-              </div>
-            </a>
-          </div>
-
-          <div class='col-lg-3 col-md-6 portfolioItem filter-card'>
-            <a href=''>
-              <img src='img/portfolio/card2.jpg' alt=''>
-              <div class='details'>
-                <h4>Card 2</h4>
-                <span>Alored dono par</span>
-              </div>
-            </a>
-          </div>
-
-          <div class='col-lg-3 col-md-6 portfolioItem filter-web'>
-            <a href=''>
-              <img src='img/portfolio/web3.jpg' alt=''>
-              <div class='details'>
-                <h4>Web 3</h4>
-                <span>Alored dono par</span>
-              </div>
-            </a>
-          </div>
-
-          <div class='col-lg-3 col-md-6 portfolioItem filter-card'>
-            <a href=''>
-              <img src='img/portfolio/card3.jpg' alt=''>
-              <div class='details'>
-                <h4>Card 3</h4>
-                <span>Alored dono par</span>
-              </div>
-            </a>
-          </div>
-
-          <div class='col-lg-3 col-md-6 portfolioItem filter-app'>
-            <a href=''>
-              <img src='img/portfolio/app2.jpg' alt=''>
-              <div class='details'>
-                <h4>App 2</h4>
-                <span>Alored dono par</span>
-              </div>
-            </a>
-          </div>
-
-          <div class='col-lg-3 col-md-6 portfolioItem filter-logo'>
-            <a href=''>
-              <img src='img/portfolio/logo1.jpg' alt=''>
-              <div class='details'>
-                <h4>Logo 1</h4>
-                <span>Alored dono par</span>
-              </div>
-            </a>
-          </div>
-
-          <div class='col-lg-3 col-md-6 portfolioItem filter-logo'>
-            <a href=''>
-              <img src='img/portfolio/logo3.jpg' alt=''>
-              <div class='details'>
-                <h4>Logo 3</h4>
-                <span>Alored dono par</span>
-              </div>
-            </a>
-          </div>
-
-          <div class='col-lg-3 col-md-6 portfolioItem filter-web'>
-            <a href=''>
-              <img src='img/portfolio/web1.jpg' alt=''>
-              <div class='details'>
-                <h4>Web 1</h4>
-                <span>Alored dono par</span>
-              </div>
-            </a>
-          </div>
-
-          <div class='col-lg-3 col-md-6 portfolioItem filter-logo'>
-            <a href=''>
-              <img src='img/portfolio/logo2.jpg' alt=''>
-              <div class='details'>
-                <h4>Logo 2</h4>
-                <span>Alored dono par</span>
-              </div>
-            </a>
-          </div>
-
-        </div>
-
-      </div>
-    </section><!-- #portfolio -->
-
-    <!--==========================
-      Team Section
-    ============================-->
-    <section id='team'>
-      <div class='container wow fadeInUp'>
-        <div class='sectionHeader'>
-          <h3 class='sectionTitle'>Team</h3>
-          <p class='sectionDesc'>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque</p>
-        </div>
-        
-        <!-- LightWidget WIDGET --><script src="https://cdn.lightwidget.com/widgets/lightwidget.js"></script><iframe src="//lightwidget.com/widgets/cca06fa117d05edb9b8d6384be8175bb.html" scrolling="no" allowtransparency="true" class="lightwidget-widget" style="width:100%;border:0;overflow:hidden;"></iframe>
-
-        <div class='row'>
-
-          <div class='col-lg-3 col-md-6'>
-            <div class='member'>
-              <div class='pic'><img src='img/team-1.jpg' alt=''></div>
-              <h4>Bill Nye</h4>
-              <span>Chief Executive Officer</span>
-              <div class='social'>
-                <a href=''><i class='fa fa-twitter'></i></a>
-                <a href=''><i class='fa fa-facebook'></i></a>
-                <a href=''><i class='fa fa-google-plus'></i></a>
-                <a href=''><i class='fa fa-linkedin'></i></a>
-              </div>
-            </div>
-          </div>
-
-          <div class='col-lg-3 col-md-6'>
-            <div class='member'>
-              <div class='pic'><img src='img/team-2.jpg' alt=''></div>
-              <h4>The Science Guy</h4>
-              <span>Product Manager</span>
-              <div class='social'>
-                <a href=''><i class='fa fa-twitter'></i></a>
-                <a href=''><i class='fa fa-facebook'></i></a>
-                <a href=''><i class='fa fa-google-plus'></i></a>
-                <a href=''><i class='fa fa-linkedin'></i></a>
-              </div>
-            </div>
-          </div>
-
-          <div class='col-lg-3 col-md-6'>
-            <div class='member'>
-              <div class='pic'><img src='img/team-3.jpg' alt=''></div>
-              <h4>Science</h4>
-              <span>CTO</span>
-              <div class='social'>
-                <a href=''><i class='fa fa-twitter'></i></a>
-                <a href=''><i class='fa fa-facebook'></i></a>
-                <a href=''><i class='fa fa-google-plus'></i></a>
-                <a href=''><i class='fa fa-linkedin'></i></a>
-              </div>
-            </div>
-          </div>
-
-          <div class='col-lg-3 col-md-6'>
-            <div class='member'>
-              <div class='pic'><img src='img/team-4.jpg' alt=''></div>
-              <h4>Rules</h4>
-              <span>Accountant</span>
-              <div class='social'>
-                <a href=''><i class='fa fa-twitter'></i></a>
-                <a href=''><i class='fa fa-facebook'></i></a>
-                <a href=''><i class='fa fa-google-plus'></i></a>
-                <a href=''><i class='fa fa-linkedin'></i></a>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </section><!-- #team -->
-
-    <!--==========================
-      Contact Section
-    ============================-->
-    <section id='contact'>
-      <div class='container wow fadeInUp'>
-        <div class='sectionHeader'>
-          <h3 class='sectionTitle'>Contact</h3>
-          <p class='sectionDesc'>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque</p>
-        </div>
-      </div>
-
-      <!-- Uncomment below if you wan to use dynamic maps -->
-      <iframe
-        src='https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3105.305216290949!2d-104.80656728436517!3d38.89413515474092!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x87134fa6aae1ddf1%3A0x5ca0842ce49758c9!2s1420%20Austin%20Bluffs%20Pkwy%2C%20Colorado%20Springs%2C%20CO%2080918!5e0!3m2!1sen!2sus!4v1567911630839!5m2!1sen!2sus'
-        width='100%' height='380' frameborder='0' style='border:0' allowfullscreen></iframe>
-
-      <div class='container wow fadeInUp mt-5'>
-        <div class='row justify-content-center'>
-
-          <div class='col-lg-3 col-md-4'>
-
-            <div class='info'>
-              <div>
-                <i class='fa fa-map-marker'></i>
-                <p>1420 Austin Bluffs Pkwy<br>Colorado Springs, CO 80918</p>
-              </div>
-
-              <div>
-                <i class='fa fa-envelope'></i>
-                <p>swuthier@uccs.edu</p>
-              </div>
-            </div>
-
-            <div class='socialLinks'>
-              <a href='#' class='twitter'><i class='fa fa-twitter'></i></a>
-              <a href='#' class='facebook'><i class='fa fa-facebook'></i></a>
-              <a href='#' class='instagram'><i class='fa fa-instagram'></i></a>
-              <a href='#' class='google-plus'><i class='fa fa-google-plus'></i></a>
-              <a href='#' class='linkedin'><i class='fa fa-linkedin'></i></a>
-            </div>
-
-          </div>
-
-          <div class='col-lg-5 col-md-8'>
-            <div class='form'>
-              <div id='sendMessage'>Your message has been sent. Thank you!</div>
-              <div id='errorMessage'></div>
-              <form action='' method='post' role='form' class='contact'>
-                <div class='form-group'>
-                  <input type='text' name='name' class='form-control' id='name' placeholder='Your Name' data-rule='minlen:4' data-msg='Please enter at least 4 chars' />
-                  <div class='validation'></div>
-                </div>
-                <div class='form-group'>
-                  <input type='email' class='form-control' name='email' id='email' placeholder='Your Email' data-rule='email' data-msg='Please enter a valid email' />
-                  <div class='validation'></div>
-                </div>
-                <div class='form-group'>
-                  <input type='text' class='form-control' name='subject' id='subject' placeholder='Subject' data-rule='minlen:4' data-msg='Please enter at least 8 chars of subject' />
-                  <div class='validation'></div>
-                </div>
-                <div class='form-group'>
-                  <textarea class='form-control' name='message' rows='5' data-rule='required' data-msg='Please write something for us' placeholder='Message'></textarea>
-                  <div class='validation'></div>
-                </div>
-                <div class='text-center'><button type='submit'>Send Message</button></div>
-              </form>
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-    </section><!-- #contact -->
-
-  </main>
-
-  <!--==========================
-    Footer
-  ============================-->
-  <footer id='footer'>
-    <div class='footer-top'>
-      <div class='container'>
-
-      </div>
-    </div>
-
-    <div class='container'>
-      <div class="socialLinks">
-        <a href="https://github.com/SimeoW" class="github"><i class="fab fa-github"></i></a>
-        <a href="https://www.instagram.com/simewu" class="instagram"><i class="fab fa-instagram"></i></a>
-        <a href="https://www.colorslive.com/author?id=95735" class="colors"><i class="fas fa-paint-brush"></i></a>
-        <a href="https://www.linkedin.com/in/simewu" class="linkedin"><i class="fab fa-linkedin"></i></a>
-        <a href="https://twitter.com/simewu" class="twitter"><i class="fab fa-twitter"></i></a>
-        <a href="https://www.researchgate.net/profile/Simeon_Wuthier" class="researchgate"><i class="fab fa-researchgate"></i></a>
-      </div>
-      <div class='copyright'>
-        SIMEON WUTHIER <span class="highlight">&copy; 2019</span>
-      </div>
-    </div>
-  </footer>
-
-  <a href='#' class='gotoTop'><i class='fa fa-chevron-up'></i></a>
-
-  <!-- JavaScript Libraries -->
-  <script src='lib/jquery/jquery.min.js'></script>
-  <script src='lib/jquery/jquery-migrate.min.js'></script>
-  <script src='lib/bootstrap/js/bootstrap.bundle.min.js'></script>
-  <script src='lib/easing/easing.min.js'></script>
-  <script src='lib/wow/wow.min.js'></script>
-  <script src='lib/waypoints/waypoints.min.js'></script>
-  <script src='lib/counterup/counterup.min.js'></script>
-  <script src='lib/superfish/hoverIntent.js'></script>
-  <script src='lib/superfish/superfish.min.js'></script>
-  <script src='contact/contact.js'></script>
-  <script src='scripts/handler.js'></script>
-  <script src='scripts/background.js'></script>
+	<header id='header'>
+		<div class='container'>
+			<div id='logo' class='pull-left'>
+				<!--<a href='#top'><img src='img/logo.png' alt='' title=''/></img></a>-->
+				<h1><a href='#top'>SIMewu</a></h1>
+			</div>
+			<nav id='navBarContainer'>
+				<ul class='navBar'>
+					<li class='menuActive'><a href='#top'>Home</a></li>
+					<li><a href='#about'>About</a></li>
+					<li><a href='#gallery'>Gallery</a></li>
+					<li class='menuHasChildren'><a>Projects</a>
+						<ul>
+							<li><a href='#'>Drop Down 1</a></li>
+							<li class='menuHasChildren'><a href='#'>Drop Down 2</a>
+								<ul>
+									<li><a href='#'>Deep Drop Down 1</a></li>
+									<li><a href='#'>Deep Drop Down 2</a></li>
+									<li><a href='#'>Deep Drop Down 3</a></li>
+									<li><a href='#'>Deep Drop Down 4</a></li>
+									<li><a href='#'>Deep Drop Down 5</a></li>
+								</ul>
+							</li>
+							<li><a href='#'>Drop Down 3</a></li>
+							<li><a href='#'>Drop Down 4</a></li>
+							<li><a href='#'>Drop Down 5</a></li>
+						</ul>
+					</li>
+					<li><a href='#contact'>Contact</a></li>
+				</ul>
+			</nav>
+		</div>
+	</header>
+
+	<!--==========================
+top Section
+============================-->
+	<section id='top'>
+		<canvas id='background'></canvas>
+		<div class='top-container'>
+			<h1>Hello, I'm Simeon.<br>I'm a computer scientist.</h1>
+			<h3>This site is currently under construction, please check back soon.</h3>
+			<a href='#about' class='viewMyWorkBtn'>View My Work</a>
+		</div>
+	</section>
+	<!-- #top -->
+
+	<main id='main'>
+
+		<!--==========================
+About Us Section
+============================-->
+		<section id='about'>
+			<div class='container'>
+				<div class='row aboutContainer'>
+
+					<div class='col-lg-6 content order-lg-1 order-2'>
+						<h2 class='title'>About</h2>
+						<p>
+							<h5><i>"You might not think that programmers are artists, but programming is an extremely creative profession. It's logic-based creativity." - John Romero</i></h5>
+							<hr>
+							<br>My name is Simeon, I am <span id='age'></span> years old, a computer scientist and an artist. This site is my portfolio, I use it to test and showcase my projects. I specialize in the following:
+						</p>
+
+						<div class='iconBox wow fadeInUp'>
+							<div class='icon'><i class='fa fa-chess-knight'></i></div>
+							<h4 class='title'><a href=''>CODING</a></h4>
+							<p class='description'>My favorites languages are JavaScript, Python, C++, C, Java, all the .NET languages, BASIC, C#, Ruby, Lua, and Assembly.</p>
+						</div>
+
+						<div class='iconBox wow fadeInUp' data-wow-delay='0.2s'>
+							<div class='icon'><i class='fa fa-palette'></i></div>
+							<h4 class='title'><a href=''>ART</a></h4>
+							<p class='description'>Oil painting, oil pastels, pen and ink, charcoal, and digital painting.</p>
+						</div>
+
+						<div class='iconBox wow fadeInUp' data-wow-delay='0.4s'>
+							<div class='icon'><i class='fa fa-unlock-alt'></i></div>
+							<h4 class='title'><a href=''>CYBERSECURITY</a></h4>
+							<p class='description'>Applied cryptography, cryptanalysis, computer security.</p>
+						</div>
+
+						<div class='iconBox wow fadeInUp' data-wow-delay='0.4s'>
+							<div class='icon'><i class='fas fa-camera-retro'></i></div>
+							<h4 class='title'><a href=''>PHOTOGRAPHY</a></h4>
+							<p class='description'>Exploring the world, and taking pictures as I go.</p>
+						</div>
+
+						<div class='iconBox wow fadeInUp' data-wow-delay='0.4s'>
+							<div class='icon'><i class='fab fa-bitcoin'></i></div>
+							<h4 class='title'><a href=''>CRYPTOCURRENCIES</a></h4>
+							<p class='description'>Distributed ledger technology research and Bitcoin Core development.</p>
+						</div>
+						<br>
+						<p>
+							The old version of this side can be found at <a href='http://www.simewu.com/old'>http://www.simewu.com/old<a> (some features no longer function properly)
+</p>
+
+</div>
+
+<div class='col-lg-5 background order-lg-2 order-1 wow fadeInRight'></div>
+</div>
+
+</div>
+</section><!-- #about -->
+
+<!--==========================
+Projects Section
+============================-->
+<section id='projects'>
+<div class='container wow fadeIn'>
+<div class='sectionHeader'>
+<h3 class='sectionTitle'>Projects</h3>
+<p class='sectionDesc'>Here is a collection of my projects</p>
+</div>
+<div class='row'>
+<div class='col-lg-4 col-md-6 wow fadeInUp' data-wow-delay='0.2s'>
+<div class='box'>
+<div class='icon'><a href=''><i class='fa fa-desktop'></i></a></div>
+					<h4 class='title'><a href=''>Lorem Ipsum</a></h4>
+					<p class='description'>Voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident</p>
+				</div>
+			</div>
+			<div class='col-lg-4 col-md-6 wow fadeInUp' data-wow-delay='0.4s'>
+				<div class='box'>
+					<div class='icon'><a href=''><i class='fa fa-bar-chart'></i></a></div>
+					<h4 class='title'><a href=''>Dolor Sitema</a></h4>
+					<p class='description'>Minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat tarad limino ata</p>
+				</div>
+			</div>
+			<div class='col-lg-4 col-md-6 wow fadeInUp' data-wow-delay='0.6s'>
+				<div class='box'>
+					<div class='icon'><a href=''><i class='fa fa-paper-plane'></i></a></div>
+					<h4 class='title'><a href=''>Sed ut perspiciatis</a></h4>
+					<p class='description'>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur</p>
+				</div>
+			</div>
+
+			<div class='col-lg-4 col-md-6 wow fadeInUp' data-wow-delay='0.2s'>
+				<div class='box'>
+					<div class='icon'><a href=''><i class='fa fa-photo'></i></a></div>
+					<h4 class='title'><a href=''>Magni Dolores</a></h4>
+					<p class='description'>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum</p>
+				</div>
+			</div>
+			<div class='col-lg-4 col-md-6 wow fadeInUp' data-wow-delay='0.4s'>
+				<div class='box'>
+					<div class='icon'><a href=''><i class='fa fa-road'></i></a></div>
+					<h4 class='title'><a href=''>Nemo Enim</a></h4>
+					<p class='description'>At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque</p>
+				</div>
+			</div>
+			<div class='col-lg-4 col-md-6 wow fadeInUp' data-wow-delay='0.6s'>
+				<div class='box'>
+					<div class='icon'><a href=''><i class='fa fa-code-fork'></i></a></div>
+					<h4 class='title'><a href=''>Eiusmod Tempor</a></h4>
+					<p class='description'>Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi</p>
+				</div>
+			</div>
+			</div>
+
+			</div>
+		</section>
+		
+		<section id='bgWindow'>
+			<div class='container wow fadeIn'>
+				<div class='row'>
+					<div class='col-lg-9 text-center text-lg-left'>
+						<h3 class='cta-title'>Call To Action</h3>
+						<p class='cta-text'> Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+					</div>
+					<div class='col-lg-3 cta-btn-container text-center'>
+						<a class='cta-btn align-middle' href='#'>Call To Action</a>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<section id='gallery'>
+			<div class='container wow fadeIn'>
+				<div class='sectionHeader'>
+					<h3 class='sectionTitle'>Gallery</h3>
+					<p class='sectionDesc'>Here I will showcase my artwork.</p>
+				</div>
+				<div class='row counters'>
+
+					<div class='col-lg-3 col-6 text-center'>
+						<span data-toggle='counter-up'>123</span>
+						<p>Clients</p>
+					</div>
+
+					<div class='col-lg-3 col-6 text-center'>
+						<span data-toggle='counter-up'>456</span>
+						<p>Projects</p>
+					</div>
+
+					<div class='col-lg-3 col-6 text-center'>
+						<span data-toggle='counter-up'>789</span>
+						<p>Hours Of Support</p>
+					</div>
+
+					<div class='col-lg-3 col-6 text-center'>
+						<span data-toggle='counter-up'>10</span>
+						<p>Hard Workers</p>
+					</div>
+
+				</div>
+
+			</div>
+		</section>
+
+		<section id='bgWindow'>
+			<div class='container wow fadeIn'>
+				<div class='row'>
+					<div class='col-lg-9 text-center text-lg-left'>
+						<h3 class='cta-title'>Call To Action</h3>
+						<p class='cta-text'> Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+					</div>
+					<div class='col-lg-3 cta-btn-container text-center'>
+						<a class='cta-btn align-middle' href='#'>Call To Action</a>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<section id='portfolio'>
+			<div class='container wow fadeInUp'>
+				<div class='sectionHeader'>
+					<h3 class='sectionTitle'>Portfolio</h3>
+					<p class='sectionDesc'>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque</p>
+				</div>
+				<div class='row'>
+
+					<div class='col-lg-12'>
+						<ul id='portfolioFilters'>
+							<li data-filter='.filter-app, .filter-card, .filter-logo, .filter-web' class='filter-active'>All</li>
+							<li data-filter='.filter-app'>App</li>
+							<li data-filter='.filter-card'>Card</li>
+							<li data-filter='.filter-logo'>Logo</li>
+							<li data-filter='.filter-web'>Web</li>
+						</ul>
+					</div>
+				</div>
+
+				<div class='row' id='portfolio-wrapper'>
+					<div class='col-lg-3 col-md-6 portfolioItem filter-app'>
+						<a href=''>
+							<img src='img/portfolio/app1.jpg' alt=''>
+							<div class='details'>
+								<h4>App 1</h4>
+								<span>Alored dono par</span>
+							</div>
+						</a>
+					</div>
+
+					<div class='col-lg-3 col-md-6 portfolioItem filter-web'>
+						<a href=''>
+							<img src='img/portfolio/web2.jpg' alt=''>
+							<div class='details'>
+								<h4>Web 2</h4>
+								<span>Alored dono par</span>
+							</div>
+						</a>
+					</div>
+
+					<div class='col-lg-3 col-md-6 portfolioItem filter-app'>
+						<a href=''>
+							<img src='img/portfolio/app3.jpg' alt=''>
+							<div class='details'>
+								<h4>App 3</h4>
+								<span>Alored dono par</span>
+							</div>
+						</a>
+					</div>
+
+					<div class='col-lg-3 col-md-6 portfolioItem filter-card'>
+						<a href=''>
+							<img src='img/portfolio/card1.jpg' alt=''>
+							<div class='details'>
+								<h4>Card 1</h4>
+								<span>Alored dono par</span>
+							</div>
+						</a>
+					</div>
+
+					<div class='col-lg-3 col-md-6 portfolioItem filter-card'>
+						<a href=''>
+							<img src='img/portfolio/card2.jpg' alt=''>
+							<div class='details'>
+								<h4>Card 2</h4>
+								<span>Alored dono par</span>
+							</div>
+						</a>
+					</div>
+
+					<div class='col-lg-3 col-md-6 portfolioItem filter-web'>
+						<a href=''>
+							<img src='img/portfolio/web3.jpg' alt=''>
+							<div class='details'>
+								<h4>Web 3</h4>
+								<span>Alored dono par</span>
+							</div>
+						</a>
+					</div>
+
+					<div class='col-lg-3 col-md-6 portfolioItem filter-card'>
+						<a href=''>
+							<img src='img/portfolio/card3.jpg' alt=''>
+							<div class='details'>
+								<h4>Card 3</h4>
+								<span>Alored dono par</span>
+							</div>
+						</a>
+					</div>
+
+					<div class='col-lg-3 col-md-6 portfolioItem filter-app'>
+						<a href=''>
+							<img src='img/portfolio/app2.jpg' alt=''>
+							<div class='details'>
+								<h4>App 2</h4>
+								<span>Alored dono par</span>
+							</div>
+						</a>
+					</div>
+
+					<div class='col-lg-3 col-md-6 portfolioItem filter-logo'>
+						<a href=''>
+							<img src='img/portfolio/logo1.jpg' alt=''>
+							<div class='details'>
+								<h4>Logo 1</h4>
+								<span>Alored dono par</span>
+							</div>
+						</a>
+					</div>
+
+					<div class='col-lg-3 col-md-6 portfolioItem filter-logo'>
+						<a href=''>
+							<img src='img/portfolio/logo3.jpg' alt=''>
+							<div class='details'>
+								<h4>Logo 3</h4>
+								<span>Alored dono par</span>
+							</div>
+						</a>
+					</div>
+
+					<div class='col-lg-3 col-md-6 portfolioItem filter-web'>
+						<a href=''>
+							<img src='img/portfolio/web1.jpg' alt=''>
+							<div class='details'>
+								<h4>Web 1</h4>
+								<span>Alored dono par</span>
+							</div>
+						</a>
+					</div>
+
+					<div class='col-lg-3 col-md-6 portfolioItem filter-logo'>
+						<a href=''>
+							<img src='img/portfolio/logo2.jpg' alt=''>
+							<div class='details'>
+								<h4>Logo 2</h4>
+								<span>Alored dono par</span>
+							</div>
+						</a>
+					</div>
+
+				</div>
+
+			</div>
+		</section>
+		<!-- #portfolio -->
+
+		<!--==========================
+Team Section
+============================-->
+		<section id='team'>
+			<div class='container wow fadeInUp'>
+				<div class='sectionHeader'>
+					<h3 class='sectionTitle'>Team</h3>
+					<p class='sectionDesc'>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque</p>
+				</div>
+
+				<div class='row'>
+
+					<div class='col-lg-3 col-md-6'>
+						<div class='member'>
+							<div class='pic'><img src='img/team-1.jpg' alt=''></div>
+							<h4>Bill Nye</h4>
+							<span>Chief Executive Officer</span>
+							<div class='social'>
+								<a href=''><i class='fa fa-twitter'></i></a>
+								<a href=''><i class='fa fa-facebook'></i></a>
+								<a href=''><i class='fa fa-google-plus'></i></a>
+								<a href=''><i class='fa fa-linkedin'></i></a>
+							</div>
+						</div>
+					</div>
+
+					<div class='col-lg-3 col-md-6'>
+						<div class='member'>
+							<div class='pic'><img src='img/team-2.jpg' alt=''></div>
+							<h4>The Science Guy</h4>
+							<span>Product Manager</span>
+							<div class='social'>
+								<a href=''><i class='fa fa-twitter'></i></a>
+								<a href=''><i class='fa fa-facebook'></i></a>
+								<a href=''><i class='fa fa-google-plus'></i></a>
+								<a href=''><i class='fa fa-linkedin'></i></a>
+							</div>
+						</div>
+					</div>
+
+					<div class='col-lg-3 col-md-6'>
+						<div class='member'>
+							<div class='pic'><img src='img/team-3.jpg' alt=''></div>
+							<h4>Science</h4>
+							<span>CTO</span>
+							<div class='social'>
+								<a href=''><i class='fa fa-twitter'></i></a>
+								<a href=''><i class='fa fa-facebook'></i></a>
+								<a href=''><i class='fa fa-google-plus'></i></a>
+								<a href=''><i class='fa fa-linkedin'></i></a>
+							</div>
+						</div>
+					</div>
+
+					<div class='col-lg-3 col-md-6'>
+						<div class='member'>
+							<div class='pic'><img src='img/team-4.jpg' alt=''></div>
+							<h4>Rules</h4>
+							<span>Accountant</span>
+							<div class='social'>
+								<a href=''><i class='fa fa-twitter'></i></a>
+								<a href=''><i class='fa fa-facebook'></i></a>
+								<a href=''><i class='fa fa-google-plus'></i></a>
+								<a href=''><i class='fa fa-linkedin'></i></a>
+							</div>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</section>
+		<!-- #team -->
+
+		<!--==========================
+Contact Section
+============================-->
+		<section id='contact'>
+			<div class='container wow fadeInUp'>
+				<div class='sectionHeader'>
+					<h3 class='sectionTitle'>Contact</h3>
+					<p class='sectionDesc'>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque</p>
+				</div>
+			</div>
+
+			<!-- Uncomment below if you wan to use dynamic maps -->
+			<iframe src='https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3105.305216290949!2d-104.80656728436517!3d38.89413515474092!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x87134fa6aae1ddf1%3A0x5ca0842ce49758c9!2s1420%20Austin%20Bluffs%20Pkwy%2C%20Colorado%20Springs%2C%20CO%2080918!5e0!3m2!1sen!2sus!4v1567911630839!5m2!1sen!2sus' width='100%' height='380' frameborder='0' style='border:0' allowfullscreen></iframe>
+
+			<div class='container wow fadeInUp mt-5'>
+				<div class='row justify-content-center'>
+
+					<div class='col-lg-3 col-md-4'>
+
+						<div class='info'>
+							<div>
+								<i class='fa fa-map-marker'></i>
+								<p>1420 Austin Bluffs Pkwy<br>Colorado Springs, CO 80918</p>
+							</div>
+
+							<div>
+								<i class='fa fa-envelope'></i>
+								<p>swuthier@uccs.edu</p>
+							</div>
+						</div>
+
+						<div class='socialLinks'>
+							<a href='#' class='twitter'><i class='fa fa-twitter'></i></a>
+							<a href='#' class='facebook'><i class='fa fa-facebook'></i></a>
+							<a href='#' class='instagram'><i class='fa fa-instagram'></i></a>
+							<a href='#' class='google-plus'><i class='fa fa-google-plus'></i></a>
+							<a href='#' class='linkedin'><i class='fa fa-linkedin'></i></a>
+						</div>
+
+					</div>
+
+					<div class='col-lg-5 col-md-8'>
+						<div class='form'>
+							<div id='sendMessage'>Your message has been sent. Thank you!</div>
+							<div id='errorMessage'></div>
+							<form action='' method='post' role='form' class='contact'>
+								<div class='form-group'>
+									<input type='text' name='name' class='form-control' id='name' placeholder='Your Name' data-rule='minlen:4' data-msg='Please enter at least 4 chars' />
+									<div class='validation'></div>
+								</div>
+								<div class='form-group'>
+									<input type='email' class='form-control' name='email' id='email' placeholder='Your Email' data-rule='email' data-msg='Please enter a valid email' />
+									<div class='validation'></div>
+								</div>
+								<div class='form-group'>
+									<input type='text' class='form-control' name='subject' id='subject' placeholder='Subject' data-rule='minlen:4' data-msg='Please enter at least 8 chars of subject' />
+									<div class='validation'></div>
+								</div>
+								<div class='form-group'>
+									<textarea class='form-control' name='message' rows='5' data-rule='required' data-msg='Please write something for us' placeholder='Message'></textarea>
+									<div class='validation'></div>
+								</div>
+								<div class='text-center'><button type='submit'>Send Message</button></div>
+							</form>
+						</div>
+					</div>
+
+				</div>
+
+			</div>
+		</section>
+		<!-- #contact -->
+
+	</main>
+
+	<!--==========================
+Footer
+============================-->
+	<footer id='footer'>
+		<div class='footer-top'>
+			<div class='container'>
+
+			</div>
+		</div>
+
+		<div class='container'>
+
+			<div class="socialLinks">
+				<p>You can show your support by clicking the link down below</p>
+				<div class="social">
+					<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+						<input type="hidden" name="cmd" value="_s-xclick">
+						<input type="hidden" name="encrypted" value="-----BEGIN PKCS7-----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-----END PKCS7-----
+">
+						<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+						<img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
+					</form>
+				</div>
+				<hr>
+				<a href="https://github.com/SimeoW" class="github"><i class="fab fa-github"></i></a>
+				<a href="https://www.instagram.com/simewu" class="instagram"><i class="fab fa-instagram"></i></a>
+				<a href="https://www.colorslive.com/author?id=95735" class="colors"><i class="fas fa-paint-brush"></i></a>
+				<a href="https://www.linkedin.com/in/simewu" class="linkedin"><i class="fab fa-linkedin"></i></a>
+				<a href="https://twitter.com/simewu" class="twitter"><i class="fab fa-twitter"></i></a>
+				<a href="https://www.researchgate.net/profile/Simeon_Wuthier" class="researchgate"><i class="fab fa-researchgate"></i></a>
+			</div>
+			<div class='copyright'>
+				SIMEON WUTHIER <span class="highlight">&copy; 2019</span>
+			</div>
+		</div>
+	</footer>
+
+	<a href='#' class='gotoTop'><i class='fa fa-chevron-up'></i></a>
+
+	<!-- JavaScript Libraries -->
+	<script src='lib/jquery/jquery.min.js'></script>
+	<script src='lib/jquery/jquery-migrate.min.js'></script>
+	<script src='lib/bootstrap/js/bootstrap.bundle.min.js'></script>
+	<script src='lib/easing/easing.min.js'></script>
+	<script src='lib/wow/wow.min.js'></script>
+	<script src='lib/waypoints/waypoints.min.js'></script>
+	<script src='lib/counterup/counterup.min.js'></script>
+	<script src='lib/superfish/hoverIntent.js'></script>
+	<script src='lib/superfish/superfish.min.js'></script>
+	<script src='contact/contact.js'></script>
+	<script src='scripts/handler.js'></script>
+	<script src='scripts/background.js'></script>
 </body>
 
 </html>
